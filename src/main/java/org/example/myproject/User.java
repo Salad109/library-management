@@ -1,6 +1,7 @@
 package org.example.myproject;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "users")
@@ -9,8 +10,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name cannot be empty")
     private String name;
+
+    @Min(value = 0, message = "Age must be positive")
+    @Max(value = 999, message = "Age must be realistic")
     private int age;
+
+    @NotBlank(message = "City cannot be empty")
     private String city;
 
     @Embedded
