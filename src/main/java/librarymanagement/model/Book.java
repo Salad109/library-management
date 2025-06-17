@@ -2,6 +2,7 @@ package librarymanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "books")
@@ -10,26 +11,34 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Title cannot be blank")
     private String title;
-    @NotBlank
+
     private String author;
 
     private Integer publicationYear;
 
-    public Book() {
-    }
+    @Column(unique = true)
+    @Pattern(
+            regexp = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$",
+            message = "ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979"
+    )
+    private String isbn;
 
-    public Book(String title, String author, int publicationYear) {
+    public Book(String title, String author, Integer publicationYear) {
         this.title = title;
         this.author = author;
         this.publicationYear = publicationYear;
     }
 
-    public Book(String title, String author) {
+    public Book(String title, String author, Integer publicationYear, String isbn) {
         this.title = title;
         this.author = author;
-        this.publicationYear = null; // Year is optional
+        this.publicationYear = publicationYear;
+        this.isbn = isbn;
+    }
+
+    public Book() {
     }
 
     public Long getId() {
@@ -63,4 +72,13 @@ public class Book {
     public void setPublicationYear(Integer publicationYear) {
         this.publicationYear = publicationYear;
     }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
 }
