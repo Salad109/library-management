@@ -25,19 +25,6 @@ public class Book {
     )
     private String isbn;
 
-    public Book(String title, String author, Integer publicationYear) {
-        this.title = title;
-        this.author = author;
-        this.publicationYear = publicationYear;
-    }
-
-    public Book(String title, String author, Integer publicationYear, String isbn) {
-        this.title = title;
-        this.author = author;
-        this.publicationYear = publicationYear;
-        this.isbn = isbn;
-    }
-
     public Book() {
     }
 
