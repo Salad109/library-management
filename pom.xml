@@ -11,8 +11,8 @@
     <groupId>org.example</groupId>
     <artifactId>myproject</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>myproject</name>
-    <description>myproject</description>
+    <name>library-management</name>
+    <description>Library Management System</description>
     <url/>
     <licenses>
         <license/>

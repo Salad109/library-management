@@ -1,6 +1,8 @@
-package org.example.myproject;
+package librarymanagement.controller;
 
 import jakarta.validation.Valid;
+import librarymanagement.model.Book;
+import librarymanagement.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
