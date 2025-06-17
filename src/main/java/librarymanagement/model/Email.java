@@ -1,4 +1,4 @@
-package org.example.myproject;
+package librarymanagement.model;
 
 import jakarta.persistence.*;
 

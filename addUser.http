@@ -1,9 +1,0 @@
-POST http://localhost:8080/api/user
-Content-Type: application/json
-
-{
-  "name": "Test User",
-  "age": 30,
-  "city": "Test City",
-  "email": "test@test.com"
-}
