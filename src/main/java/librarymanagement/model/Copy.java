@@ -2,12 +2,12 @@ package librarymanagement.model;
 
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;
-import librarymanagement.model.CopyStatus;
 
 @Entity
 @Table(name = "copies")
 public class Copy {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -18,6 +18,11 @@ public class Copy {
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
 
     public Copy() {
+    }
+
+    public Copy(Book book, CopyStatus status) {
+        this.book = book;
+        this.status = status;
     }
 
     public Long getId() {

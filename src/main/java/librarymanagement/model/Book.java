@@ -28,6 +28,13 @@ public class Book {
     public Book() {
     }
 
+    public Book(String title, String author, Integer publicationYear, String isbn) {
+        this.title = title;
+        this.author = author;
+        this.publicationYear = publicationYear;
+        this.isbn = isbn;
+    }
+
     public Long getId() {
         return id;
     }
