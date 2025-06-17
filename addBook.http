@@ -4,5 +4,6 @@ Content-Type: application/json
 {
   "title": "Test book",
   "author": "Joe",
-  "year": 2077
+  "year": 2077,
+  "isbn": "1234567890"
 }
