@@ -1,6 +1,7 @@
 package librarymanagement.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import org.wildfly.common.annotation.NotNull;
 
 @Entity
@@ -15,18 +16,20 @@ public class Customer {
     @NotNull
     private String lastName;
 
-    @Embedded
-    private Email email;
+    @Pattern(
+            regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+            message = "Email must be a valid email address"
+    )
+    private String email;
 
     // todo borrowed books, reserved books, ...
 
     public Customer() {
     }
 
-    public Customer(String firstName, String lastName, Email email) {
+    public Customer(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
     }
 
     public Long getId() {
@@ -53,11 +56,4 @@ public class Customer {
         this.lastName = lastName;
     }
 
-    public Email getEmail() {
-        return email;
-    }
-
-    public void setEmail(Email email) {
-        this.email = email;
-    }
 }

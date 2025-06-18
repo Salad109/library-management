@@ -26,7 +26,7 @@ public class BookTest {
         String title = "Test Book 2";
         String author = "Jane Mama";
         Integer publicationYear = 2077;
-        String isbn = "9781234567890";
+        String isbn = "123456789X";
 
         book.setTitle(title);
         book.setAuthor(author);
