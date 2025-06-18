@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,24 +19,53 @@ public class BookControllerTest {
 
     @Test
     void testGetAllBooks() {
-        assertThat(mockMvcTester.get().uri("/api/books")).hasStatusOk();
+        assertThat(mockMvcTester.get().uri("/api/books")).hasStatus(HttpStatus.OK);
     }
 
     @Test
     void testAddBook() {
-        String bookJson = """
+        String requestBody = """
                 {
-                    "title": "Test Book 3",
+                    "title": "Test Book 4",
                     "author": "Test Author",
-                    "publicationYear": 2023,
+                    "publicationYear": 2025,
                     "isbn": "9781234567890"
                 }
                 """;
 
-        assertThat(mockMvcTester.post().uri("/api/books")
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(bookJson))
+                .content(requestBody)
+                .exchange();
+
+        assertThat(testResult)
                 .hasStatus(HttpStatus.CREATED)
-                .bodyJson().isLenientlyEqualTo(bookJson);
+                .bodyJson().isLenientlyEqualTo(requestBody);
+    }
+
+    @Test
+    void testAddInvalidBook() {
+        String untitledBook = """
+                {
+                    "isbn": "no"
+                }
+                """;
+
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(untitledBook)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST);
+
+        assertThat(testResult).bodyJson()
+                .extractingPath("isbn")
+                .isEqualTo("ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979");
+
+        assertThat(testResult).bodyJson()
+                .extractingPath("title")
+                .isEqualTo("Title cannot be blank");
     }
 }

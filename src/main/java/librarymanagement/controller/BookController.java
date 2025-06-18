@@ -2,6 +2,7 @@ package librarymanagement.controller;
 
 import jakarta.validation.Valid;
 import librarymanagement.model.Book;
+import librarymanagement.model.DuplicateIsbnException;
 import librarymanagement.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,9 @@ public class BookController {
     @PostMapping("/api/books")
     @ResponseStatus(HttpStatus.CREATED)
     public Book addBook(@Valid @RequestBody Book book) {
+        if (bookRepository.existsByIsbn(book.getIsbn())) {
+            throw new DuplicateIsbnException(book.getIsbn());
+        }
         return bookRepository.save(book);
     }
 }
