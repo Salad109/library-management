@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import librarymanagement.model.Book;
 import librarymanagement.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class BookController {
     }
 
     @PostMapping("/api/books")
+    @ResponseStatus(HttpStatus.CREATED)
     public Book addBook(@Valid @RequestBody Book book) {
         return bookRepository.save(book);
     }
