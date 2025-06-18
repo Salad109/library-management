@@ -26,8 +26,8 @@ public class BookControllerTest {
     void testAddBook() {
         String requestBody = """
                 {
-                    "title": "Test Book 4",
-                    "author": "Test Author",
+                    "title": "Valid Book",
+                    "author": "Joe Mama",
                     "publicationYear": 2025,
                     "isbn": "9781234567890"
                 }
@@ -67,5 +67,34 @@ public class BookControllerTest {
         assertThat(testResult).bodyJson()
                 .extractingPath("title")
                 .isEqualTo("Title cannot be blank");
+    }
+
+    @Test
+    void testAddDuplicateIsbnBook() {
+        String duplicateIsbnBook = """
+                {
+                    "title": "Duplicate ISBN Book",
+                    "author": "Jane Mama",
+                    "publicationYear": 2025,
+                    "isbn": "9781234567891"
+                }
+                """;
+
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(duplicateIsbnBook)
+                .exchange();
+
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(duplicateIsbnBook)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.CONFLICT);
+        assertThat(testResult).bodyJson()
+                .extractingPath("isbn")
+                .isEqualTo("A book with this ISBN already exists: 9781234567891");
     }
 }
