@@ -25,7 +25,7 @@ public class Customer {
     )
     private String email;
 
-    // todo borrowed books, reserved books, ...
+    // todo borrowed copies, reserved copies, ...
 
     public Customer() {
     }
