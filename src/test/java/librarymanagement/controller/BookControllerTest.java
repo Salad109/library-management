@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,36 +25,14 @@ public class BookControllerTest {
 
     @Test
     void testAddBook() {
-        String requestBody = """
-                {
-                         "title": "Test Book",
-                         "publicationYear": 2025,
-                         "isbn": "9781234567890",
-                         "authors": [
-                             {
-                                 "name": "Joe Mama"
-                             },
-                             {
-                                 "name": "Jane Mama"
-                             }
-                         ]
-                     }
-                """;
+        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
 
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(requestBody).exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.CREATED).bodyJson().isLenientlyEqualTo(requestBody);
+        assertThat(testResult).hasStatus(HttpStatus.CREATED).bodyJson().isLenientlyEqualTo(BookTestData.ValidBook1.JSON);
     }
 
     @Test
     void testAddInvalidBook() {
-        String untitledBook = """
-                {
-                    "isbn": "no"
-                }
-                """;
-
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(untitledBook).exchange();
+        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.InvalidBookNoTitleInvalidIsbn.JSON).exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST);
 
@@ -64,27 +43,23 @@ public class BookControllerTest {
 
     @Test
     void testAddDuplicateIsbnBook() {
-        String duplicateIsbnBook = """
-                {
-                    "title": "Duplicate ISBN Book",
-                    "authors": [
-                        {
-                            "name": "Joe Mama"
-                        },
-                        {
-                            "name": "Jane Mama"
-                        }
-                    ],
-                    "publicationYear": 2025,
-                    "isbn": "9781234567891"
-                }
-                """;
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
 
-        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(duplicateIsbnBook).exchange();
-
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(duplicateIsbnBook).exchange();
+        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.CONFLICT);
-        assertThat(testResult).bodyJson().extractingPath("isbn").isEqualTo("A book with this ISBN already exists: 9781234567891");
+        assertThat(testResult).bodyJson().extractingPath("isbn").isEqualTo("A book with this ISBN already exists: " + BookTestData.ValidBook1.ISBN);
+    }
+
+    @Test
+    void testSearchBooks() {
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook2.JSON).exchange();
+
+        MvcTestResult isbnSearchResult = mockMvcTester.get().uri("/api/books/search").param("isbn", BookTestData.ValidBook1.ISBN).exchange();
+        assertThat(isbnSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook1.JSON + "]");
+
+        MvcTestResult titleSearchResult = mockMvcTester.get().uri("/api/books/search").param("title", BookTestData.ValidBook1.TITLE).exchange();
+        assertThat(titleSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook1.JSON + ", " + BookTestData.ValidBook2.JSON + "]");
     }
 }
