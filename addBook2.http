@@ -2,7 +2,7 @@ POST http://localhost:8080/api/books
 Content-Type: application/json
 
 {
-  "title": "Test book",
+  "title": "Test book 2",
   "authors": [
     {
       "name": "Joe Mama"
@@ -12,5 +12,5 @@ Content-Type: application/json
     }
   ],
   "year": 2077,
-  "isbn": "1234567890"
+  "isbn": "123456789X"
 }

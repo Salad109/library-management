@@ -2,7 +2,5 @@ POST http://localhost:8080/api/books
 Content-Type: application/json
 
 {
-  "author": "Yes",
-  "year": 3000,
-  "isbn": "yes"
+  "isbn": "no"
 }
