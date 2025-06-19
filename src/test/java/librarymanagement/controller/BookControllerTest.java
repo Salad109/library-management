@@ -31,10 +31,10 @@ public class BookControllerTest {
                          "isbn": "9781234567890",
                          "authors": [
                              {
-                                 "name": "Joe Mama 2"
+                                 "name": "Joe Mama"
                              },
                              {
-                                 "name": "Jane Mama 2"
+                                 "name": "Jane Mama"
                              }
                          ]
                      }
@@ -69,10 +69,10 @@ public class BookControllerTest {
                     "title": "Duplicate ISBN Book",
                     "authors": [
                         {
-                            "name": "Joe Mama 3"
+                            "name": "Joe Mama"
                         },
                         {
-                            "name": "Jane Mama 3"
+                            "name": "Jane Mama"
                         }
                     ],
                     "publicationYear": 2025,
