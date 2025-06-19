@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -30,7 +30,7 @@ public class Book {
     private String isbn;
 
     public Book() {
-        authors = new HashSet<>();
+        authors = new LinkedHashSet<>();
     }
 
     public Long getId() {
@@ -54,7 +54,7 @@ public class Book {
     }
 
     public void setAuthors(Set<Author> authors) {
-        this.authors = (authors != null) ? authors : new HashSet<>();
+        this.authors = (authors != null) ? authors : new LinkedHashSet<>();
     }
 
     public Integer getPublicationYear() {

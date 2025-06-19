@@ -11,6 +11,6 @@ Content-Type: application/json
       "name": "Jane Mama"
     }
   ],
-  "year": 2077,
+  "publicationYear": 2077,
   "isbn": "1234567890"
 }

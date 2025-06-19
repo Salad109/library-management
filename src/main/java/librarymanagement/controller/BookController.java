@@ -37,6 +37,19 @@ public class BookController {
         }
     }
 
+    @GetMapping("/api/books/search")
+    public List<Book> searchBooks(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String authorName,
+            @RequestParam(required = false) Integer publicationYear
+    ) {
+        if (title == null && authorName == null && publicationYear == null) {
+            return bookRepository.findAll();
+        } else {
+            return bookRepository.searchBooks(title, authorName, publicationYear);
+        }
+    }
+
     @PostMapping("/api/books")
     @ResponseStatus(HttpStatus.CREATED)
     public Book addBook(@Valid @RequestBody Book book) {
@@ -45,7 +58,7 @@ public class BookController {
         }
 
         Set<Author> finalAuthors = new HashSet<>();
-        for (Author incomingAuthor : book.getAuthors()){
+        for (Author incomingAuthor : book.getAuthors()) {
             Author existingAuthor = authorRepository.findByName(incomingAuthor.getName());
             if (existingAuthor != null) {
                 finalAuthors.add(existingAuthor); // if found, use existing author
