@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "books")
 public class Book {
@@ -14,7 +17,8 @@ public class Book {
     @NotBlank(message = "Title cannot be blank")
     private String title;
 
-    private String author;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private Set<Author> authors;
 
     private Integer publicationYear;
 
@@ -26,13 +30,7 @@ public class Book {
     private String isbn;
 
     public Book() {
-    }
-
-    public Book(String title, String author, Integer publicationYear, String isbn) {
-        this.title = title;
-        this.author = author;
-        this.publicationYear = publicationYear;
-        this.isbn = isbn;
+        authors = new HashSet<>();
     }
 
     public Long getId() {
@@ -51,12 +49,12 @@ public class Book {
         this.title = title;
     }
 
-    public String getAuthor() {
-        return author;
+    public Set<Author> getAuthors() {
+        return authors;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthors(Set<Author> authors) {
+        this.authors = (authors != null) ? authors : new HashSet<>();
     }
 
     public Integer getPublicationYear() {

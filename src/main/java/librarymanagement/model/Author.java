@@ -3,6 +3,9 @@ package librarymanagement.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "authors")
 public class Author {
@@ -13,11 +16,16 @@ public class Author {
     @NotBlank(message = "Name cannot be blank")
     private String name;
 
+    @ManyToMany(mappedBy = "authors")
+    private Set<Book> books;
+
     public Author() {
+        books = new HashSet<>();
     }
 
     public Author(String name) {
         this.name = name;
+        this.books = new HashSet<>();
     }
 
     public Long getId() {
@@ -36,5 +44,13 @@ public class Author {
         this.name = name;
     }
 
-    // todo many-to-many relationship with books
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(Set<Book> books) {
+        this.books = (books != null) ? books : new HashSet<>();
+    }
+
+
 }
