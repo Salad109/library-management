@@ -41,12 +41,13 @@ public class BookController {
     public List<Book> searchBooks(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String authorName,
-            @RequestParam(required = false) Integer publicationYear
+            @RequestParam(required = false) Integer publicationYear,
+            @RequestParam(required = false) String isbn
     ) {
-        if (title == null && authorName == null && publicationYear == null) {
+        if (title == null && authorName == null && publicationYear == null && isbn == null) {
             return bookRepository.findAll();
         } else {
-            return bookRepository.searchBooks(title, authorName, publicationYear);
+            return bookRepository.searchBooks(title, authorName, publicationYear, isbn);
         }
     }
 
