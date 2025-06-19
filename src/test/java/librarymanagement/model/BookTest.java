@@ -2,40 +2,29 @@ package librarymanagement.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BookTest {
 
     @Test
-    void testBookConstructor() {
+    void testBookCreation() {
         String title = "Test Book";
-        String author = "Joe Mama";
+        Set<Author> authors = new HashSet<>();
+        authors.add(new Author("Joe Mama"));
         Integer publicationYear = 2025;
         String isbn = "1234567890";
 
-        Book book = new Book(title, author, publicationYear, isbn);
-
-        assertThat(book.getTitle()).isEqualTo(title);
-        assertThat(book.getAuthor()).isEqualTo(author);
-        assertThat(book.getPublicationYear()).isEqualTo(publicationYear);
-        assertThat(book.getIsbn()).isEqualTo(isbn);
-    }
-
-    @Test
-    void testBookSetters() {
         Book book = new Book();
-        String title = "Test Book 2";
-        String author = "Jane Mama";
-        Integer publicationYear = 2077;
-        String isbn = "123456789X";
-
         book.setTitle(title);
-        book.setAuthor(author);
+        book.setAuthors(authors);
         book.setPublicationYear(publicationYear);
         book.setIsbn(isbn);
 
         assertThat(book.getTitle()).isEqualTo(title);
-        assertThat(book.getAuthor()).isEqualTo(author);
+        assertThat(book.getAuthors()).isEqualTo(authors);
         assertThat(book.getPublicationYear()).isEqualTo(publicationYear);
         assertThat(book.getIsbn()).isEqualTo(isbn);
     }
