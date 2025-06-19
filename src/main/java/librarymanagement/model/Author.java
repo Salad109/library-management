@@ -1,9 +1,10 @@
 package librarymanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -18,15 +19,16 @@ public class Author {
     private String name;
 
     @ManyToMany(mappedBy = "authors")
+    @JsonIgnore
     private Set<Book> books;
 
     public Author() {
-        books = new HashSet<>();
+        books = new LinkedHashSet<>();
     }
 
     public Author(String name) {
         this.name = name;
-        this.books = new HashSet<>();
+        this.books = new LinkedHashSet<>();
     }
 
     public Long getId() {
@@ -50,8 +52,6 @@ public class Author {
     }
 
     public void setBooks(Set<Book> books) {
-        this.books = (books != null) ? books : new HashSet<>();
+        this.books = (books != null) ? books : new LinkedHashSet<>();
     }
-
-
 }
