@@ -3,7 +3,6 @@ package librarymanagement.controller;
 import jakarta.validation.Valid;
 import librarymanagement.model.Author;
 import librarymanagement.model.Book;
-import librarymanagement.model.DuplicateIsbnException;
 import librarymanagement.repository.AuthorRepository;
 import librarymanagement.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +23,8 @@ public class BookController {
     private AuthorRepository authorRepository;
 
     @GetMapping("/api/books")
-    public List<Book> getAllBooks(@RequestParam(required = false) Long id) {
-        if (id == null) {
+    public List<Book> getAllBooks() {
             return bookRepository.findAll();
-        } else {
-            Book book = bookRepository.findById(id).orElse(null);
-            if (book != null) {
-                return List.of(book);
-            } else {
-                return List.of();
-            }
-        }
     }
 
     @GetMapping("/api/books/search")
@@ -70,5 +60,14 @@ public class BookController {
         book.setAuthors(finalAuthors);
 
         return bookRepository.save(book);
+    }
+
+    @DeleteMapping("/api/books/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBook(@PathVariable Long id) {
+    if (!bookRepository.existsById(id)) {
+            throw new ResourceNotFoundException(id);
+    }
+    bookRepository.deleteById(id);
     }
 }
