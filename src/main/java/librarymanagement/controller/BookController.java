@@ -1,6 +1,8 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
+import librarymanagement.exception.DuplicateResourceException;
+import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Author;
 import librarymanagement.model.Book;
 import librarymanagement.repository.AuthorRepository;
@@ -45,7 +47,7 @@ public class BookController {
     @ResponseStatus(HttpStatus.CREATED)
     public Book addBook(@Valid @RequestBody Book book) {
         if (bookRepository.existsByIsbn(book.getIsbn())) {
-            throw new DuplicateIsbnException(book.getIsbn());
+            throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
         }
 
         Set<Author> finalAuthors = new HashSet<>();
@@ -66,7 +68,7 @@ public class BookController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(@PathVariable Long id) {
     if (!bookRepository.existsById(id)) {
-            throw new ResourceNotFoundException(id);
+            throw new ResourceNotFoundException("Book not found with id: " + id);
     }
     bookRepository.deleteById(id);
     }
