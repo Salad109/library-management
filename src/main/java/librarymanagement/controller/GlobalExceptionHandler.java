@@ -1,5 +1,7 @@
 package librarymanagement.controller;
 
+import librarymanagement.exception.DuplicateResourceException;
+import librarymanagement.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -24,10 +26,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DuplicateIsbnException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateIsbn(DuplicateIsbnException ex) {
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateResource(DuplicateResourceException ex) {
         Map<String, String> error = new HashMap<>();
-        error.put("isbn", ex.getMessage());
+        error.put("error", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 

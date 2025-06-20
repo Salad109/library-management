@@ -48,7 +48,7 @@ public class BookControllerTest {
         MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.CONFLICT);
-        assertThat(testResult).bodyJson().extractingPath("isbn").isEqualTo("A book with this ISBN already exists: " + BookTestData.ValidBook1.ISBN);
+        assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("A book with this ISBN already exists: " + BookTestData.ValidBook1.ISBN);
     }
 
     @Test
