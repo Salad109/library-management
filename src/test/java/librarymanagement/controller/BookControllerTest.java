@@ -43,23 +43,42 @@ public class BookControllerTest {
 
     @Test
     void testAddDuplicateIsbnBook() {
-        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook2.JSON).exchange();
 
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
+        MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook2.JSON).exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.CONFLICT);
-        assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("A book with this ISBN already exists: " + BookTestData.ValidBook1.ISBN);
+        assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("A book with this ISBN already exists: " + BookTestData.ValidBook2.ISBN);
     }
 
     @Test
     void testSearchBooks() {
-        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook1.JSON).exchange();
-        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook2.JSON).exchange();
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook3.JSON).exchange();
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook4.JSON).exchange();
 
-        MvcTestResult isbnSearchResult = mockMvcTester.get().uri("/api/books/search").param("isbn", BookTestData.ValidBook1.ISBN).exchange();
-        assertThat(isbnSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook1.JSON + "]");
+        MvcTestResult isbnSearchResult = mockMvcTester.get().uri("/api/books/search").param("isbn", BookTestData.ValidBook3.ISBN).exchange();
+        assertThat(isbnSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook3.JSON + "]");
 
-        MvcTestResult titleSearchResult = mockMvcTester.get().uri("/api/books/search").param("title", BookTestData.ValidBook1.TITLE).exchange();
-        assertThat(titleSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook1.JSON + ", " + BookTestData.ValidBook2.JSON + "]");
+        MvcTestResult titleSearchResult = mockMvcTester.get().uri("/api/books/search").param("publicationYear", BookTestData.ValidBook3.PUBLICATION_YEAR.toString()).exchange();
+        assertThat(titleSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook3.JSON + ", " + BookTestData.ValidBook4.JSON + "]");
+    }
+
+    @Test
+    void testUpdateBook() {
+        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook5.JSON).exchange();
+
+        MvcTestResult updateResult = mockMvcTester.put().uri("/api/books/3").contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.ValidBook6.JSON).exchange();
+        assertThat(updateResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo(BookTestData.ValidBook6.JSON);
+    }
+
+    @Test
+    void testUpdateNonExistentBook() {
+        // todo
+    }
+
+    @Test
+    void testDeleteBook() {
+        // todo
     }
 }

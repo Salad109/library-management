@@ -3,6 +3,8 @@ Content-Type: application/json
 
 {
   "title": "Test book",
+  "publicationYear": 2025,
+  "isbn": "9781234567890",
   "authors": [
     {
       "name": "Joe Mama"
@@ -10,7 +12,5 @@ Content-Type: application/json
     {
       "name": "Jane Mama"
     }
-  ],
-  "publicationYear": 2077,
-  "isbn": "1234567890"
+  ]
 }
