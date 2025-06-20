@@ -31,6 +31,17 @@ public class Author {
         this.books = new LinkedHashSet<>();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Author) || getName() == null || ((Author) o).getName() == null) return false;
+        return (getName().equals(((Author) o).getName()));
+    }
+
+    @Override
+    public int hashCode() {
+        return getName() != null ? getName().hashCode() : 0;
+    }
+
     public Long getId() {
         return id;
     }
