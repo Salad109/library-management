@@ -26,7 +26,7 @@ public class BookController {
 
     @GetMapping("/api/books")
     public List<Book> getAllBooks() {
-            return bookRepository.findAll();
+        return bookRepository.findAll();
     }
 
     @GetMapping("/api/books/search")
@@ -50,26 +50,46 @@ public class BookController {
             throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
         }
 
+        book.setAuthors(deduplicateAuthors(book.getAuthors()));
+        return bookRepository.save(book);
+    }
+
+    @PutMapping("/api/books/{id}")
+    public Book updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
+        Book existingBook = bookRepository.findById(id).orElse(null);
+        if (existingBook == null) {
+            throw new ResourceNotFoundException("Book not found with ID: " + id);
+        }
+        if (bookRepository.existsByIsbn(book.getIsbn()) && !existingBook.getIsbn().equals(book.getIsbn())) {
+            throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
+        }
+        existingBook.setAuthors(deduplicateAuthors(book.getAuthors()));
+        existingBook.setTitle(book.getTitle());
+        existingBook.setPublicationYear(book.getPublicationYear());
+        existingBook.setIsbn(book.getIsbn());
+        return bookRepository.save(existingBook);
+    }
+
+    @DeleteMapping("/api/books/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBook(@PathVariable Long id) {
+        if (!bookRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Book not found with id: " + id);
+        }
+        bookRepository.deleteById(id);
+    }
+
+    // Helper
+    private Set<Author> deduplicateAuthors(Set<Author> incomingAuthors) {
         Set<Author> finalAuthors = new HashSet<>();
-        for (Author incomingAuthor : book.getAuthors()) {
-            Author existingAuthor = authorRepository.findByName(incomingAuthor.getName());
+        for (Author incomingAuthor : incomingAuthors) {
+            Author existingAuthor = authorRepository.findByName(incomingAuthor.getName()); // Check if the author already exists in the database
             if (existingAuthor != null) {
                 finalAuthors.add(existingAuthor); // if found, use existing author
             } else {
                 finalAuthors.add(incomingAuthor); // else, add the new author
             }
         }
-        book.setAuthors(finalAuthors);
-
-        return bookRepository.save(book);
-    }
-
-    @DeleteMapping("/api/books/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBook(@PathVariable Long id) {
-    if (!bookRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Book not found with id: " + id);
-    }
-    bookRepository.deleteById(id);
+        return finalAuthors;
     }
 }
