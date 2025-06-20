@@ -1,4 +1,4 @@
-package librarymanagement.model;
+package librarymanagement.controller;
 
 public class DuplicateIsbnException extends RuntimeException {
     public DuplicateIsbnException(String message) {
