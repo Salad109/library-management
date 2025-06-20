@@ -65,7 +65,17 @@ public class Book {
     }
 
     public void setAuthors(Set<Author> authors) {
-        this.authors = (authors != null) ? authors : new LinkedHashSet<>();
+        for (Author author : this.authors) {
+            author.getBooks().remove(this);
+        }
+        this.authors.clear();
+
+        if (authors != null) {
+            for (Author author : authors) {
+                author.getBooks().add(this);
+                this.authors.add(author);
+            }
+        }
     }
 
     public Integer getPublicationYear() {

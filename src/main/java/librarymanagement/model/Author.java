@@ -63,6 +63,16 @@ public class Author {
     }
 
     public void setBooks(Set<Book> books) {
-        this.books = (books != null) ? books : new LinkedHashSet<>();
+        for (Book book : this.books) {
+            book.getAuthors().remove(this);
+        }
+        this.books.clear();
+
+        if (books != null) {
+            for (Book book : books) {
+                book.getAuthors().add(this);
+                this.books.add(book);
+            }
+        }
     }
 }
