@@ -1,0 +1,16 @@
+PUT http://localhost:8080/api/books/1
+Content-Type: application/json
+
+{
+  "title": "Test book updated",
+  "authors": [
+    {
+      "name": "Joe Mama"
+    },
+    {
+      "name": "Jane Mama"
+    }
+  ],
+  "publicationYear": 2077,
+  "isbn": "123456789X"
+}
