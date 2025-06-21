@@ -10,20 +10,20 @@ public class BookTestData {
         public static final String AUTHOR_2 = "Jane Mama";
 
         public static final String JSON = """
-            {
-                "title": "%s",
-                "publicationYear": %d,
-                "isbn": "%s",
-                "authors": [
-                    {
-                        "name": "%s"
-                    },
-                    {
-                        "name": "%s"
-                    }
-                ]
-            }
-            """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1, AUTHOR_2);
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        },
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1, AUTHOR_2);
     }
 
     public static class ValidBook2 {
@@ -33,17 +33,17 @@ public class BookTestData {
         public static final String AUTHOR_1 = "Joe Mama";
 
         public static final String JSON = """
-            {
-                "title": "%s",
-                "publicationYear": %d,
-                "isbn": "%s",
-                "authors": [
-                    {
-                        "name": "%s"
-                    }
-                ]
-            }
-            """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
     }
 
     public static class ValidBook3 {
@@ -132,15 +132,15 @@ public class BookTestData {
         public static final String AUTHOR_1 = "Jane Mama";
 
         public static final String JSON = """
-            {
-                "publicationYear": %d,
-                "authors": [
-                    {
-                        "name": "%s"
-                    }
-                ],
-                "isbn": "%s"
-            }
-            """.formatted(PUBLICATION_YEAR, AUTHOR_1, ISBN);
+                {
+                    "publicationYear": %d,
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ],
+                    "isbn": "%s"
+                }
+                """.formatted(PUBLICATION_YEAR, AUTHOR_1, ISBN);
     }
 }

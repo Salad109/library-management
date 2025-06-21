@@ -60,8 +60,10 @@ public class BookControllerTest {
 
     @Test
     void testAddDuplicateIsbnBook() {
+        // Add once
         mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook2.JSON).exchange();
 
+        // Add the same book again
         MvcTestResult testResult = mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook2.JSON).exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.CONFLICT);
@@ -73,26 +75,31 @@ public class BookControllerTest {
         mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook3.JSON).exchange();
         mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook4.JSON).exchange();
 
+        // Search by unique ISBN, expect one result
         MvcTestResult isbnSearchResult = mockMvcTester.get().uri("/api/books/search").param("isbn", BookTestData.ValidBook3.ISBN).exchange();
         assertThat(isbnSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook3.JSON + "]");
 
+        // Search by shared year, expect multiple results
         MvcTestResult titleSearchResult = mockMvcTester.get().uri("/api/books/search").param("publicationYear", BookTestData.ValidBook3.PUBLICATION_YEAR.toString()).exchange();
         assertThat(titleSearchResult).hasStatus(HttpStatus.OK).bodyJson().isLenientlyEqualTo("[" + BookTestData.ValidBook3.JSON + ", " + BookTestData.ValidBook4.JSON + "]");
     }
 
     @Test
     void testUpdateBook() throws Exception {
+        // Create a book to update
         MvcResult createResult = mockMvc.perform(post("/api/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(BookTestData.ValidBook5.JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
 
+        // Extract book ID from response
         String responseContent = createResult.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseContent);
         long bookId = jsonNode.get("id").asLong();
 
+        // Update the book
         assertThat(mockMvcTester.put().uri("/api/books/" + bookId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(BookTestData.ValidBook6.JSON))
