@@ -1,5 +1,6 @@
 package librarymanagement.model;
 
+import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -11,11 +12,12 @@ public class BookTest {
 
     @Test
     void testBookCreation() {
-        String title = "Test Book";
+        String title = BookTestData.ValidBook1.TITLE;
         Set<Author> authors = new HashSet<>();
-        authors.add(new Author("Joe Mama"));
-        Integer publicationYear = 2025;
-        String isbn = "1234567890";
+        authors.add(new Author(BookTestData.ValidBook1.AUTHOR_1));
+        authors.add(new Author(BookTestData.ValidBook1.AUTHOR_2));
+        Integer publicationYear = BookTestData.ValidBook1.PUBLICATION_YEAR;
+        String isbn = BookTestData.ValidBook1.ISBN;
 
         Book book = new Book();
         book.setTitle(title);
