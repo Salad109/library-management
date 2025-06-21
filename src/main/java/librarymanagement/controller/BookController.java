@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -32,8 +33,12 @@ public class BookController {
 
     @GetMapping("/api/books/{id}")
     public Book getBookById(@PathVariable Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID: " + id));
+        Optional<Book> bookOptional = bookRepository.findById(id);
+        if (bookOptional.isPresent()) {
+            return bookOptional.get();
+        } else {
+            throw new ResourceNotFoundException("Book not found with ID: " + id);
+        }
     }
 
     @GetMapping("/api/books/search")
