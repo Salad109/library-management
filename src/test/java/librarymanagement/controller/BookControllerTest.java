@@ -110,11 +110,39 @@ public class BookControllerTest {
 
     @Test
     void testUpdateNonExistentBook() {
-        // todo
+        MvcTestResult testResult = mockMvcTester.put().uri("/api/books/9999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.ValidBook6.JSON)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ID: 9999");
     }
 
     @Test
-    void testDeleteBook() {
-        // todo
+    void testDeleteBook() throws Exception {
+        // Create a book to delete
+        MvcResult createResult = mockMvc.perform(post("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(BookTestData.ValidBook5.JSON))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // Extract book ID from response
+        String responseContent = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseContent);
+        long bookId = jsonNode.get("id").asLong();
+
+        // Delete the book
+        assertThat(mockMvcTester.delete().uri("/api/books/" + bookId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.ValidBook6.JSON))
+                .hasStatus(HttpStatus.NO_CONTENT);
+
+        // Verify the book is deleted
+        MvcTestResult getResult = mockMvcTester.get().uri("/api/books/" + bookId).exchange();
+        assertThat(getResult).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(getResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ID: " + bookId);
     }
 }
