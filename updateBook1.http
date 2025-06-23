@@ -1,4 +1,4 @@
-PUT http://localhost:8080/api/books/1
+PUT http://localhost:8080/api/books/9781234567890
 Content-Type: application/json
 
 {

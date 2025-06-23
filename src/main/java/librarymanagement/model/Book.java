@@ -11,8 +11,12 @@ import java.util.Set;
 @Table(name = "books")
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(unique = true)
+    @Pattern(
+            regexp = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$",
+            message = "ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979"
+    )
+    private String isbn;
 
     @NotBlank(message = "Title cannot be blank")
     private String title;
@@ -22,12 +26,6 @@ public class Book {
 
     private Integer publicationYear;
 
-    @Column(unique = true)
-    @Pattern(
-            regexp = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$",
-            message = "ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979"
-    )
-    private String isbn;
 
     public Book() {
         authors = new LinkedHashSet<>();
@@ -42,14 +40,6 @@ public class Book {
     @Override
     public int hashCode() {
         return getIsbn() != null ? getIsbn().hashCode() : 0;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {

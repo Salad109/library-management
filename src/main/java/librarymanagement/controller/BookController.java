@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.undertow.util.BadRequestException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import librarymanagement.exception.DuplicateResourceException;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -31,13 +31,13 @@ public class BookController {
         return bookRepository.findAll();
     }
 
-    @GetMapping("/api/books/{id}")
-    public Book getBookById(@PathVariable Long id) {
-        Optional<Book> bookOptional = bookRepository.findById(id);
-        if (bookOptional.isPresent()) {
-            return bookOptional.get();
+    @GetMapping("/api/books/{isbn}")
+    public Book getBookByIsbn(@PathVariable String isbn) {
+        Book book = bookRepository.findByIsbn(isbn);
+        if (book != null) {
+            return book;
         } else {
-            throw new ResourceNotFoundException("Book not found with ID: " + id);
+            throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
         }
     }
 
@@ -60,7 +60,7 @@ public class BookController {
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public Book addBook(@Valid @RequestBody Book book) {
-        if (bookRepository.existsByIsbn(book.getIsbn())) {
+        if (bookRepository.findByIsbn(book.getIsbn()) != null) {
             throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
         }
 
@@ -68,32 +68,30 @@ public class BookController {
         return bookRepository.save(book);
     }
 
-    @PutMapping("/api/books/{id}")
+    @PutMapping("/api/books/{isbn}")
     @Transactional
-    public Book updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
-        Book existingBook = bookRepository.findById(id).orElse(null);
-        if (existingBook == null) {
-            throw new ResourceNotFoundException("Book not found with ID: " + id);
+    public Book updateBook(@PathVariable String isbn, @Valid @RequestBody Book book) throws BadRequestException {
+        Book existingBook = bookRepository.findById(isbn)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ISBN: " + isbn));
+
+        if (!existingBook.getIsbn().equals(book.getIsbn())) {
+            throw new BadRequestException("Cannot change ISBN of an existing book");
         }
-        // Check if the new ISBN is already taken by another book
-        if (bookRepository.existsByIsbn(book.getIsbn()) && !existingBook.getIsbn().equals(book.getIsbn())) {
-            throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
-        }
-        existingBook.setAuthors(deduplicateAuthors(book.getAuthors()));
+
+        existingBook.setAuthors(book.getAuthors());
         existingBook.setTitle(book.getTitle());
         existingBook.setPublicationYear(book.getPublicationYear());
-        existingBook.setIsbn(book.getIsbn());
         return bookRepository.save(existingBook);
     }
 
-    @DeleteMapping("/api/books/{id}")
+    @DeleteMapping("/api/books/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void deleteBook(@PathVariable Long id) {
-        if (!bookRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Book not found with id: " + id);
+    public void deleteBook(@PathVariable String isbn) {
+        if (!bookRepository.existsById(isbn)) {
+            throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
         }
-        bookRepository.deleteById(id);
+        bookRepository.deleteById(isbn);
     }
 
     // Helper
