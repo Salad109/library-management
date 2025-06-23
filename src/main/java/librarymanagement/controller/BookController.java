@@ -5,9 +5,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
-import librarymanagement.model.Author;
 import librarymanagement.model.Book;
-import librarymanagement.repository.AuthorRepository;
 import librarymanagement.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,17 +13,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
 
 @RestController
 public class BookController {
 
     @Autowired
     private BookRepository bookRepository;
-
-    @Autowired
-    private AuthorRepository authorRepository;
 
     @GetMapping("/api/books")
     public Page<Book> getAllBooks(Pageable pageable) {
@@ -42,13 +36,7 @@ public class BookController {
     }
 
     @GetMapping("/api/books/search")
-    public Page<Book> searchBooks(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String authorName,
-            @RequestParam(required = false) Integer publicationYear,
-            @RequestParam(required = false) String isbn,
-            Pageable pageable
-    ) {
+    public Page<Book> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String authorName, @RequestParam(required = false) Integer publicationYear, @RequestParam(required = false) String isbn, Pageable pageable) {
         // If no parameters provided, return all books
         if (title == null && authorName == null && publicationYear == null && isbn == null) {
             return bookRepository.findAll(pageable);
@@ -65,15 +53,18 @@ public class BookController {
             throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
         }
 
-        book.setAuthors(deduplicateAuthors(book.getAuthors()));
         return bookRepository.save(book);
     }
 
     @PutMapping("/api/books/{isbn}")
     @Transactional
     public Book updateBook(@PathVariable String isbn, @Valid @RequestBody Book book) throws BadRequestException {
-        Book existingBook = bookRepository.findById(isbn)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ISBN: " + isbn));
+        Optional<Book> optionalBook = bookRepository.findById(isbn);
+        if (optionalBook.isEmpty()) {
+            throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
+        }
+
+        Book existingBook = optionalBook.get();
 
         if (!existingBook.getIsbn().equals(book.getIsbn())) {
             throw new BadRequestException("Cannot change ISBN of an existing book");
@@ -93,19 +84,5 @@ public class BookController {
             throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
         }
         bookRepository.deleteById(isbn);
-    }
-
-    // Helper
-    private Set<Author> deduplicateAuthors(Set<Author> incomingAuthors) {
-        Set<Author> finalAuthors = new HashSet<>();
-        for (Author incomingAuthor : incomingAuthors) {
-            Author existingAuthor = authorRepository.findByName(incomingAuthor.getName()); // Check if the author already exists in the database
-            if (existingAuthor != null) {
-                finalAuthors.add(existingAuthor); // if found, use existing author
-            } else {
-                finalAuthors.add(incomingAuthor); // else, add the new author
-            }
-        }
-        return finalAuthors;
     }
 }
