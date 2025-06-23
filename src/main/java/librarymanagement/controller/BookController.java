@@ -34,11 +34,10 @@ public class BookController {
     @GetMapping("/api/books/{isbn}")
     public Book getBookByIsbn(@PathVariable String isbn) {
         Book book = bookRepository.findByIsbn(isbn);
-        if (book != null) {
-            return book;
-        } else {
+        if (book == null) {
             throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
         }
+        return book;
     }
 
     @GetMapping("/api/books/search")
