@@ -10,11 +10,12 @@ import librarymanagement.model.Book;
 import librarymanagement.repository.AuthorRepository;
 import librarymanagement.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -27,8 +28,8 @@ public class BookController {
     private AuthorRepository authorRepository;
 
     @GetMapping("/api/books")
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public Page<Book> getAllBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable);
     }
 
     @GetMapping("/api/books/{isbn}")
@@ -41,17 +42,18 @@ public class BookController {
     }
 
     @GetMapping("/api/books/search")
-    public List<Book> searchBooks(
+    public Page<Book> searchBooks(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String authorName,
             @RequestParam(required = false) Integer publicationYear,
-            @RequestParam(required = false) String isbn
+            @RequestParam(required = false) String isbn,
+            Pageable pageable
     ) {
         // If no parameters provided, return all books
         if (title == null && authorName == null && publicationYear == null && isbn == null) {
-            return bookRepository.findAll();
+            return bookRepository.findAll(pageable);
         } else {
-            return bookRepository.searchBooks(title, authorName, publicationYear, isbn);
+            return bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
         }
     }
 
