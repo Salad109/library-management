@@ -106,11 +106,111 @@ public class BookTestData {
                 """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
     }
 
+    public static class ValidBook5Updated {
+        public static final String TITLE = "Test Book 5 Updated";
+        public static final String ISBN = ValidBook5.ISBN;
+        public static final Integer PUBLICATION_YEAR = 2026;
+        public static final String AUTHOR_1 = "Charlie Charles Updated";
+
+        public static final String JSON = """
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+    }
+
     public static class ValidBook6 {
         public static final String TITLE = "Test Book 6";
         public static final String ISBN = "9791234567893";
         public static final Integer PUBLICATION_YEAR = 2027;
         public static final String AUTHOR_1 = "Charlie Charles Jr.";
+
+        public static final String JSON = """
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+    }
+
+    public static class ValidBook7 {
+        public static final String TITLE = "Test Book 7";
+        public static final String ISBN = "9781234567894";
+        public static final Integer PUBLICATION_YEAR = 2028;
+        public static final String AUTHOR_1 = "Alice Allison";
+
+        public static final String JSON = """
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+    }
+
+    public static class ValidBook8 {
+        public static final String TITLE = "Test Book 8";
+        public static final String ISBN = "9791234567894";
+        public static final Integer PUBLICATION_YEAR = 2029;
+        public static final String AUTHOR_1 = "Bob Builder";
+
+        public static final String JSON = """
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+    }
+
+    public static class ValidBook9 {
+        public static final String TITLE = "Test Book 9";
+        public static final String ISBN = "9781234567895";
+        public static final Integer PUBLICATION_YEAR = 2030;
+        public static final String AUTHOR_1 = "Carol Carter";
+
+        public static final String JSON = """
+                {
+                    "title": "%s",
+                    "publicationYear": %d,
+                    "isbn": "%s",
+                    "authors": [
+                        {
+                            "name": "%s"
+                        }
+                    ]
+                }
+                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+    }
+
+    public static class ValidBook10 {
+        public static final String TITLE = "Test Book 10";
+        public static final String ISBN = "9791234567895";
+        public static final Integer PUBLICATION_YEAR = 2031;
+        public static final String AUTHOR_1 = "David Davis";
 
         public static final String JSON = """
                 {
