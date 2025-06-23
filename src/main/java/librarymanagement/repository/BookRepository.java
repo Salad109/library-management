@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long> {
+public interface BookRepository extends JpaRepository<Book, String> {
     @Query("SELECT DISTINCT b FROM Book b " +
             "LEFT JOIN b.authors a " +
             "WHERE (:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
@@ -21,5 +21,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                            @Param("year") Integer year,
                            @Param("isbn") String isbn);
 
-    boolean existsByIsbn(String isbn);
+    Book findByIsbn(String isbn);
 }

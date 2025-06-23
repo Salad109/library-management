@@ -1,7 +1,10 @@
 package librarymanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.LinkedHashSet;
@@ -11,10 +14,6 @@ import java.util.Set;
 @Table(name = "authors")
 public class Author {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true)
     @NotBlank(message = "Name cannot be blank")
     private String name;
 
@@ -40,14 +39,6 @@ public class Author {
     @Override
     public int hashCode() {
         return getName() != null ? getName().hashCode() : 0;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
