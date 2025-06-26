@@ -131,9 +131,9 @@ class BookControllerTest {
 
     @Test
     void testUpdateNonExistentBook() {
-        MvcTestResult testResult = mockMvcTester.put().uri("/api/books/9999").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook8.JSON).exchange();
+        MvcTestResult testResult = mockMvcTester.put().uri("/api/books/" + BookTestData.ValidBook8.ISBN).contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook8.JSON).exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: 9999");
+        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: " + BookTestData.ValidBook8.ISBN);
     }
 
     @Test
