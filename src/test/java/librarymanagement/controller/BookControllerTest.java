@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class BookControllerTest {
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-    MockMvcTester mockMvcTester;
+    private MockMvcTester mockMvcTester;
 
     @PostConstruct
     void setUp() {
