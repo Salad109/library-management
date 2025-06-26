@@ -1,7 +1,7 @@
 package librarymanagement.model;
 
 import jakarta.persistence.*;
-import org.wildfly.common.annotation.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "copies")
@@ -13,7 +13,7 @@ public class Copy {
     @ManyToOne
     private Book book;
 
-    @NotNull
+    @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
 
