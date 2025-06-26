@@ -1,0 +1,36 @@
+# Update copy status (replace 1 with actual copy ID)
+PUT http://localhost:8080/api/copies/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "book": {
+    "isbn": "9781234567890"
+  },
+  "status": "BORROWED"
+}
+
+###
+
+# Borrow copy
+PUT http://localhost:8080/api/copies/1/borrow
+
+###
+
+# Return copy
+PUT http://localhost:8080/api/copies/1/return
+
+###
+
+# Mark copy as lost
+PUT http://localhost:8080/api/copies/1/lost
+
+###
+
+# Try to borrow non-existent copy
+PUT http://localhost:8080/api/copies/999/borrow
+
+###
+
+# Try to return copy that isn't borrowed
+PUT http://localhost:8080/api/copies/2/return
