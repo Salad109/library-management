@@ -20,13 +20,6 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public Book addBook(Book book) {
-        if (bookRepository.findByIsbn(book.getIsbn()) != null) {
-            throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
-        }
-        return bookRepository.save(book);
-    }
-
     public Page<Book> getAllBooks(Pageable pageable) {
         return bookRepository.findAll(pageable);
     }
@@ -46,6 +39,13 @@ public class BookService {
         } else {
             return bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
         }
+    }
+
+    public Book addBook(Book book) {
+        if (bookRepository.findByIsbn(book.getIsbn()) != null) {
+            throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
+        }
+        return bookRepository.save(book);
     }
 
     @Transactional
