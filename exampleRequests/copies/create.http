@@ -1,0 +1,59 @@
+# Valid copy
+POST http://localhost:8080/api/copies
+Content-Type: application/json
+
+{
+  "book": {
+    "isbn": "9781234567890"
+  },
+  "status": "AVAILABLE"
+}
+
+###
+
+# Another valid copy
+POST http://localhost:8080/api/copies
+Content-Type: application/json
+
+{
+  "book": {
+    "isbn": "123456789X"
+  },
+  "status": "RESERVED"
+}
+
+###
+
+# Invalid - bad status
+POST http://localhost:8080/api/copies
+Content-Type: application/json
+
+{
+  "book": {
+    "isbn": "9781234567890"
+  },
+  "status": "INVALID_STATUS"
+}
+
+###
+
+# Invalid - no book reference
+POST http://localhost:8080/api/copies
+Content-Type: application/json
+
+{
+  "status": "AVAILABLE"
+}
+
+###
+
+# Invalid - non-existent book
+POST http://localhost:8080/api/copies
+Content-Type: application/json
+
+{
+  "book": {
+    "isbn": "9999999999999"
+  },
+  "status": "AVAILABLE"
+}
