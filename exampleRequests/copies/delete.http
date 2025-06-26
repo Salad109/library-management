@@ -1,12 +1,12 @@
-# Delete copy (replace 1 with actual copy ID)
+# Delete copy
 DELETE http://localhost:8080/api/copies/1
-
-###
-
-# Try to delete non-existent copy
-DELETE http://localhost:8080/api/copies/999
 
 ###
 
 # Delete another copy
 DELETE http://localhost:8080/api/copies/2
+
+###
+
+# Try to delete non-existent copy
+DELETE http://localhost:8080/api/copies/999

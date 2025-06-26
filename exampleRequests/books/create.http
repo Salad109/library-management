@@ -59,3 +59,20 @@ Content-Type: application/json
     }
   ]
 }
+
+###
+
+# Invalid - total junk
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title": "Junk Book",
+  "eeeeee": 21,
+  "year": "123",
+  "authors": [
+    {
+      "Goober": "Joe Mama"
+    }
+  ]
+}
