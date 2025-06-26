@@ -56,14 +56,6 @@ public class CopyController {
         return copyService.addCopy(copy);
     }
 
-    @PutMapping("/api/copies/{id}")
-    public Copy updateCopy(@PathVariable Long id, @Valid @RequestBody Copy copy) {
-        if (!id.equals(copy.getId())) {
-            throw new IllegalArgumentException("Cannot change ID of an existing copy");
-        }
-        return copyService.updateCopy(id, copy);
-    }
-
     @PutMapping("/api/copies/{id}/borrow")
     public Copy borrowCopy(@PathVariable Long id) {
         return copyService.borrowCopy(id);

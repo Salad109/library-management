@@ -1,17 +1,3 @@
-# Update copy status (replace 1 with actual copy ID)
-PUT http://localhost:8080/api/copies/1
-Content-Type: application/json
-
-{
-  "id": 1,
-  "book": {
-    "isbn": "9781234567890"
-  },
-  "status": "BORROWED"
-}
-
-###
-
 # Borrow copy
 PUT http://localhost:8080/api/copies/1/borrow
 

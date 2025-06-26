@@ -41,15 +41,6 @@ public class CopyService {
     }
 
     @Transactional
-    public Copy updateCopy(Long id, Copy copy) {
-        if (!copyRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Copy not found with ID: " + id);
-        }
-        copy.setId(id);
-        return copyRepository.save(copy);
-    }
-
-    @Transactional
     public Copy borrowCopy(Long id) {
         Optional<Copy> optionalCopy = copyRepository.findById(id);
         if (optionalCopy.isEmpty()) {
