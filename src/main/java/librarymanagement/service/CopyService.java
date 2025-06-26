@@ -37,9 +37,6 @@ public class CopyService {
 
     @Transactional
     public Copy addCopy(Copy copy) {
-        if (copy.getBook() == null) {
-            throw new IllegalArgumentException("Copy must be associated with an existing book");
-        }
         return copyRepository.save(copy);
     }
 

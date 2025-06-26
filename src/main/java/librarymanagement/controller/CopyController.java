@@ -1,8 +1,10 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
+import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
+import librarymanagement.service.BookService;
 import librarymanagement.service.CopyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +15,11 @@ import java.util.List;
 public class CopyController {
 
     private final CopyService copyService;
+    private final BookService bookService;
 
-    public CopyController(CopyService copyService) {
+    public CopyController(CopyService copyService, BookService bookService) {
         this.copyService = copyService;
+        this.bookService = bookService;
     }
 
     @GetMapping("/api/copies")
@@ -41,6 +45,14 @@ public class CopyController {
     @PostMapping("/api/copies")
     @ResponseStatus(HttpStatus.CREATED)
     public Copy addCopy(@Valid @RequestBody Copy copy) {
+        if (copy.getBook() == null || copy.getBook().getIsbn() == null) {
+            throw new IllegalArgumentException("Copy must be associated with an existing book");
+        }
+
+        // Make the copy associated with an existing book
+        Book existingBook = bookService.getBookByIsbn(copy.getBook().getIsbn());
+        copy.setBook(existingBook);
+
         return copyService.addCopy(copy);
     }
 
