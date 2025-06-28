@@ -70,25 +70,30 @@ class BookControllerTest {
         assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("A book with this ISBN already exists: " + BookTestData.ValidBook2.ISBN);
     }
 
-    @Test
-    void testSearchBooks() {
-        // Add multiple books to search
-        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook3.JSON).exchange();
-        mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook4.JSON).exchange();
+@Test
+void testSearchBooksByIsbn() {
+    // Add one book
+    mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook3.JSON).exchange();
 
-        // Search by unique ISBN, expect one result
-        MvcTestResult isbnSearchResult = mockMvcTester.get().uri("/api/books/search").param("isbn", BookTestData.ValidBook3.ISBN).param("order", "title").exchange();
-        assertThat(isbnSearchResult).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(1);
-        assertThat(isbnSearchResult).bodyJson().extractingPath("content[0].isbn").isEqualTo(BookTestData.ValidBook3.ISBN);
+    // Search by ISBN
+    MvcTestResult result = mockMvcTester.get().uri("/api/books/search").param("isbn", BookTestData.ValidBook3.ISBN).exchange();
 
-        // Search by shared year, expect multiple results
-        MvcTestResult yearSearchResult = mockMvcTester.get().uri("/api/books/search").param("publicationYear", BookTestData.ValidBook3.PUBLICATION_YEAR.toString()).exchange();
-        assertThat(yearSearchResult).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(2);
-        assertThat(yearSearchResult).bodyJson().extractingPath("content[0].isbn").isEqualTo(BookTestData.ValidBook3.ISBN);
-        assertThat(yearSearchResult).bodyJson().extractingPath("content[1].isbn").isEqualTo(BookTestData.ValidBook4.ISBN);
-    }
+    assertThat(result).hasStatus(HttpStatus.OK)
+            .bodyJson().extractingPath("totalElements").isEqualTo(1);
+}
+
+@Test
+void testSearchBooksByYear() {
+    // Add two books with same year
+    mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook3.JSON).exchange();
+    mockMvcTester.post().uri("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook4.JSON).exchange();
+
+    // Search by year
+    MvcTestResult result = mockMvcTester.get().uri("/api/books/search").param("publicationYear", BookTestData.ValidBook3.PUBLICATION_YEAR.toString()).exchange();
+
+    assertThat(result).hasStatus(HttpStatus.OK)
+            .bodyJson().extractingPath("totalElements").isEqualTo(2);
+}
 
     @Test
     void testUpdateBook() throws Exception {

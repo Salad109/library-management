@@ -64,5 +64,18 @@ class CopyControllerTest {
 
         assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: " + CopyTestData.InvalidCopyInvalidBook.ISBN);
     }
+    @Test
+    void testSearchCopies() {
+        // Add a book
+        mockMvcTester.post().uri("/api/books").contentType("application/json").content(BookTestData.ValidBook1.JSON).exchange();
+
+        // Add a copy of that book
+        mockMvcTester.post().uri("/api/copies").contentType("application/json").content(CopyTestData.ValidCopy1.JSON).exchange();
+
+        // Search for copies by ISBN
+        MvcTestResult testResult = mockMvcTester.get().uri("/api/copies/search?isbn=" + BookTestData.ValidBook1.ISBN).exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.OK).bodyJson().extractingPath("totalElements").isEqualTo(1);
+    }
     // todo test searching, status transitions and deleting
 }

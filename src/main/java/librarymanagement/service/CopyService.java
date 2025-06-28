@@ -5,9 +5,10 @@ import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.repository.CopyRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,16 +20,25 @@ public class CopyService {
         this.copyRepository = copyRepository;
     }
 
-    public List<Copy> getAllCopies() {
-        return copyRepository.findAll();
+    public Page<Copy> getAllCopies(Pageable pageable) {
+        return copyRepository.findAll(pageable);
     }
 
-    public List<Copy> getCopiesByBookIsbn(String isbn) {
-        return copyRepository.findByBookIsbn(isbn);
+    public Page<Copy> getCopiesByBookIsbn(String isbn, Pageable pageable) {
+        return copyRepository.findByBookIsbn(isbn, pageable);
     }
 
-    public List<Copy> getCopiesByBookIsbnAndStatus(String isbn, CopyStatus status) {
-        return copyRepository.findByBookIsbnAndStatus(isbn, status);
+    public Page<Copy> getCopiesByBookIsbnAndStatus(String isbn, CopyStatus status, Pageable pageable) {
+        return copyRepository.findByBookIsbnAndStatus(isbn, status, pageable);
+    }
+
+    public Page<Copy> searchCopies(String isbn, CopyStatus status, Pageable pageable) {
+        // If no parameters provided, return all copies
+        if (isbn == null && status == null) {
+            return copyRepository.findAll(pageable);
+        } else {
+            return copyRepository.searchCopies(isbn, status, pageable);
+        }
     }
 
     public long countCopiesByBookIsbnAndStatus(String isbn, CopyStatus status) {
