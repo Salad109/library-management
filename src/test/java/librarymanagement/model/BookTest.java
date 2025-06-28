@@ -12,12 +12,12 @@ class BookTest {
 
     @Test
     void testBookCreation() {
-        String title = BookTestData.ValidBook1.TITLE;
+        String title = BookTestData.getNextBook().TITLE;
         Set<Author> authors = new HashSet<>();
-        authors.add(new Author(BookTestData.ValidBook1.AUTHOR_1));
-        authors.add(new Author(BookTestData.ValidBook1.AUTHOR_2));
-        Integer publicationYear = BookTestData.ValidBook1.PUBLICATION_YEAR;
-        String isbn = BookTestData.ValidBook1.ISBN;
+        authors.add(new Author(BookTestData.getCurrentBook().AUTHOR1));
+        authors.add(new Author(BookTestData.getCurrentBook().AUTHOR2));
+        Integer publicationYear = BookTestData.getCurrentBook().PUBLICATION_YEAR;
+        String isbn = BookTestData.getCurrentBook().ISBN;
 
         Book book = new Book();
         book.setTitle(title);
