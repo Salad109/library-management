@@ -6,10 +6,10 @@ import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.service.BookService;
 import librarymanagement.service.CopyService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 public class CopyController {
@@ -23,23 +23,31 @@ public class CopyController {
     }
 
     @GetMapping("/api/copies")
-    public List<Copy> getAllCopies() {
-        return copyService.getAllCopies();
+    public Page<Copy> getAllCopies(Pageable pageable) {
+        return copyService.getAllCopies(pageable);
     }
 
     @GetMapping("/api/copies/book/{isbn}")
-    public List<Copy> getCopiesByBookIsbn(@PathVariable String isbn) {
-        return copyService.getCopiesByBookIsbn(isbn);
+    public Page<Copy> getCopiesByBookIsbn(@PathVariable String isbn, Pageable pageable) {
+        return copyService.getCopiesByBookIsbn(isbn, pageable);
     }
 
     @GetMapping("/api/copies/book/{isbn}/available")
-    public List<Copy> getAvailableCopies(@PathVariable String isbn) {
-        return copyService.getCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
+    public Page<Copy> getAvailableCopies(@PathVariable String isbn, Pageable pageable) {
+        return copyService.getCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, pageable);
     }
 
     @GetMapping("/api/copies/book/{isbn}/count")
     public long countAvailableCopies(@PathVariable String isbn) {
         return copyService.countCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
+    }
+
+    @GetMapping("/api/copies/search")
+    public Page<Copy> searchCopies(@RequestParam(required = false) String bookIsbn, @RequestParam(required = false) CopyStatus status, Pageable pageable) {
+        bookIsbn = (bookIsbn == null || bookIsbn.isBlank()) ? null : bookIsbn;
+        status = status == null ? null : CopyStatus.valueOf(status.name());
+
+        return copyService.searchCopies(bookIsbn, status, pageable);
     }
 
     @PostMapping("/api/copies")
