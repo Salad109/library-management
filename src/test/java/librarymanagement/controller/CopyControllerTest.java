@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import librarymanagement.testdata.BookTestData;
-import librarymanagement.testdata.CopyTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,14 +24,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class CopyControllerTest {
+    private static final String INVALID_STATUS_COPY_JSON = """
+            {
+                "book": {"isbn": "9781234567890"},
+                "status": "INVALID_STATUS"
+            }
+            """;
+    private static final String INVALID_BOOK_COPY_JSON = """
+            {
+                "book": {"isbn": "9999999999999"},
+                "status": "AVAILABLE"
+            }
+            """;
     @Autowired
     private MockMvc mockMvc;
-
     private MockMvcTester mockMvcTester;
 
     @PostConstruct
     void setUp() {
         mockMvcTester = MockMvcTester.create(mockMvc);
+    }
+
+    private String createCopyJson(String isbn, String status) {
+        return """
+                {
+                    "book": {"isbn": "%s"},
+                    "status": "%s"
+                }
+                """.formatted(isbn, status);
     }
 
     @Test
@@ -42,60 +61,108 @@ class CopyControllerTest {
 
     @Test
     void testAddCopy() {
-        // Add a book
-        mockMvcTester.post().uri("/api/books").contentType("application/json").content(BookTestData.ValidBook1.JSON).exchange();
+        BookTestData.BookData book = BookTestData.getNextBook();
 
-        // Add a copy of that book
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/copies").contentType("application/json").content(CopyTestData.ValidCopy1.JSON).exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.CREATED).bodyJson().isLenientlyEqualTo(CopyTestData.ValidCopy1.JSON);
-    }
-
-    @Test
-    void testAddInvalidCopyInvalidStatus() {
-        // Add a book
-        mockMvcTester.post().uri("/api/books").contentType("application/json").content(BookTestData.ValidBook1.JSON).exchange();
-
-        // Attempt to add a copy with an invalid status
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/copies").contentType("application/json").content(CopyTestData.InvalidCopyInvalidStatus.JSON).exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST).bodyJson().extractingPath("error").isEqualTo("Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
-    }
-
-    @Test
-    void testAddInvalidCopyInvalidBook() {
-        MvcTestResult testResult = mockMvcTester.post().uri("/api/copies").contentType("application/json").content(CopyTestData.InvalidCopyInvalidBook.JSON).exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND);
-
-        assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: " + CopyTestData.InvalidCopyInvalidBook.ISBN);
-    }
-
-    @Test
-    void testSearchCopies() {
-        // Add a book
-        mockMvcTester.post().uri("/api/books").contentType("application/json").content(BookTestData.ValidBook1.JSON).exchange();
-
-        // Add a copy of that book
-        mockMvcTester.post().uri("/api/copies").contentType("application/json").content(CopyTestData.ValidCopy1.JSON).exchange();
-
-        // Search for copies by ISBN
-        MvcTestResult testResult = mockMvcTester.get().uri("/api/copies/search?isbn=" + BookTestData.ValidBook1.ISBN).exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.OK).bodyJson().extractingPath("totalElements").isEqualTo(1);
-    }
-
-    @Test
-    void testDeleteCopy() throws Exception {
         // Add a book
         mockMvcTester.post()
                 .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(BookTestData.ValidBook1.JSON)
+                .content(book.JSON)
                 .exchange();
 
         // Add a copy of that book
-        MvcResult createResult = mockMvc.perform(post("/api/copies").contentType(MediaType.APPLICATION_JSON).content(CopyTestData.ValidCopy1.JSON)).andExpect(status().isCreated()).andReturn();
+        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.CREATED);
+    }
+
+    @Test
+    void testAddInvalidCopyInvalidStatus() {
+        BookTestData.BookData book = BookTestData.getNextBook();
+
+        // Add a book
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(book.JSON)
+                .exchange();
+
+        // Attempt to add a copy with an invalid status
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(INVALID_STATUS_COPY_JSON)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
+    }
+
+    @Test
+    void testAddInvalidCopyInvalidBook() {
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(INVALID_BOOK_COPY_JSON)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(testResult).bodyJson().extractingPath("error")
+                .isEqualTo("Book not found with ISBN: 9999999999999");
+    }
+
+    @Test
+    void testSearchCopies() {
+        BookTestData.BookData book = BookTestData.getNextBook();
+
+        // Add a book
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(book.JSON)
+                .exchange();
+
+        // Add a copy of that book
+        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        // Search for copies by ISBN
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/copies/search?isbn=" + book.ISBN)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.OK)
+                .bodyJson().extractingPath("totalElements").isEqualTo(1);
+    }
+
+    @Test
+    void testDeleteCopy() throws Exception {
+        BookTestData.BookData book = BookTestData.getNextBook();
+
+        // Add a book
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(book.JSON)
+                .exchange();
+
+        // Add a copy of that book
+        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        MvcResult createResult = mockMvc.perform(post("/api/copies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(copyJson))
+                .andExpect(status().isCreated())
+                .andReturn();
 
         // Extract the copy ID from the response
         String responseBody = createResult.getResponse().getContentAsString();
