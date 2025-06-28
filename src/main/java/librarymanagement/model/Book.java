@@ -31,6 +31,13 @@ public class Book {
         authors = new LinkedHashSet<>();
     }
 
+    public Book(String isbn, String title, Set<Author> authors, Integer publicationYear) {
+        this.isbn = isbn;
+        this.title = title;
+        this.authors = (authors != null) ? new LinkedHashSet<>(authors) : new LinkedHashSet<>();
+        this.publicationYear = publicationYear;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Book) || getIsbn() == null || ((Book) o).getIsbn() == null) return false;
