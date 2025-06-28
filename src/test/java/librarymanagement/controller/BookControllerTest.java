@@ -142,22 +142,21 @@ class BookControllerTest {
     }
 
     @Test
-    void testDeleteBook() throws Exception {
+    void testDeleteBook() {
         // Create a book to delete
-        MvcResult createResult = mockMvc.perform(post("/api/books").contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook9.JSON)).andExpect(status().isCreated()).andReturn();
-
-        // Extract book ID from response
-        String responseContent = createResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseContent);
-        String bookIsbn = jsonNode.get("isbn").asText();
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.ValidBook9.JSON)
+                .exchange();
 
         // Delete the book
-        assertThat(mockMvcTester.delete().uri("/api/books/" + bookIsbn).contentType(MediaType.APPLICATION_JSON).content(BookTestData.ValidBook10.JSON)).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(mockMvcTester.delete().uri("/api/books/" + BookTestData.ValidBook9.ISBN))
+                .hasStatus(HttpStatus.NO_CONTENT);
 
         // Verify the book is deleted
-        MvcTestResult getResult = mockMvcTester.get().uri("/api/books/" + bookIsbn).exchange();
+        MvcTestResult getResult = mockMvcTester.get().uri("/api/books/" + BookTestData.ValidBook9.ISBN).exchange();
         assertThat(getResult).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(getResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: " + bookIsbn);
+        assertThat(getResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: " + BookTestData.ValidBook9.ISBN);
     }
 }
