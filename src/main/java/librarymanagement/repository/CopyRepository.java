@@ -12,10 +12,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CopyRepository extends JpaRepository<Copy, Long> {
     @Query("SELECT DISTINCT c FROM Copy c " +
-           "LEFT JOIN c.book b " +
-           "WHERE (:isbn IS NULL OR b.isbn = :isbn) " +
-           "AND (:status IS NULL OR LOWER(c.status) = :status)")
-    Page<Copy> searchCopies(@Param ("isbn") String isbn,
+            "LEFT JOIN c.book b " +
+            "WHERE (:isbn IS NULL OR b.isbn = :isbn) " +
+            "AND (:status IS NULL OR LOWER(c.status) = :status)")
+    Page<Copy> searchCopies(@Param("isbn") String isbn,
                             @Param("status") CopyStatus status,
                             Pageable pageable);
 

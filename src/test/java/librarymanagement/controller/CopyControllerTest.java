@@ -64,6 +64,7 @@ class CopyControllerTest {
 
         assertThat(testResult).bodyJson().extractingPath("error").isEqualTo("Book not found with ISBN: " + CopyTestData.InvalidCopyInvalidBook.ISBN);
     }
+
     @Test
     void testSearchCopies() {
         // Add a book
