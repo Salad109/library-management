@@ -2,6 +2,13 @@ package librarymanagement.testdata;
 
 public class BookTestData {
 
+    private static final BookData[] BOOKS = {
+            new BookData("The Goober Lore", "9781234567890", 2025, "The Goober", "Joe Mama"),
+            new BookData("The Mama Family", "123456789X", 2026, "Joe Mama", "Jane Mama"),
+            new BookData("Junior's Junipers", "9791234567890", 1984, "Joe Mama Jr.", "The Goober"),
+            new BookData("Charlie's Cherries", "9781234567891", 1999, "Charlie Charles", "Charlie Charles Jr."),
+            new BookData("Builder's Buildings", "9791234567891", 2027, "Bob Builder", "Alice Allison")
+    };
     private static int bookIndex = 0;
 
     public static BookData getNextBook() {
@@ -11,14 +18,6 @@ public class BookTestData {
     public static BookData getCurrentBook() {
         return BOOKS[bookIndex % BOOKS.length];
     }
-
-    private static final BookData[] BOOKS = {
-        new BookData("The Goober Lore", "9781234567890", 2025, "The Goober", "Joe Mama"),
-        new BookData("The Mama Family", "123456789X", 2026, "Joe Mama", "Jane Mama"),
-        new BookData("Junior's Junipers", "9791234567890", 1984, "Joe Mama Jr.", "The Goober"),
-        new BookData("Charlie's Cherries", "9781234567891", 1999, "Charlie Charles", "Charlie Charles Jr."),
-        new BookData("Builder's Buildings", "9791234567891", 2027, "Bob Builder", "Alice Allison")
-    };
 
     public static class BookData {
         public final String TITLE;
