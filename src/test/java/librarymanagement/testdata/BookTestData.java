@@ -2,228 +2,54 @@ package librarymanagement.testdata;
 
 public class BookTestData {
 
-    public static class ValidBook1 {
-        public static final String TITLE = "Test Book";
-        public static final String ISBN = "9781234567890";
-        public static final Integer PUBLICATION_YEAR = 2025;
-        public static final String AUTHOR_1 = "Joe Mama";
-        public static final String AUTHOR_2 = "Jane Mama";
+    private static int bookIndex = 0;
 
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        },
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1, AUTHOR_2);
+    public static BookData getNextBook() {
+        return BOOKS[++bookIndex % BOOKS.length];
     }
 
-    public static class ValidBook2 {
-        public static final String TITLE = "Test Book 2";
-        public static final String ISBN = "9791234567890";
-        public static final Integer PUBLICATION_YEAR = 2026;
-        public static final String AUTHOR_1 = "Joe Mama";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+    public static BookData getCurrentBook() {
+        return BOOKS[bookIndex % BOOKS.length];
     }
 
-    public static class ValidBook3 {
-        public static final String TITLE = "Test Book 3";
-        public static final String ISBN = "9781234567891";
-        public static final Integer PUBLICATION_YEAR = 1984;
-        public static final String AUTHOR_1 = "Joe Mama Jr.";
+    private static final BookData[] BOOKS = {
+        new BookData("The Goober Lore", "9781234567890", 2025, "The Goober", "Joe Mama"),
+        new BookData("The Mama Family", "123456789X", 2026, "Joe Mama", "Jane Mama"),
+        new BookData("Junior's Junipers", "9791234567890", 1984, "Joe Mama Jr.", "The Goober"),
+        new BookData("Charlie's Cherries", "9781234567891", 1999, "Charlie Charles", "Charlie Charles Jr."),
+        new BookData("Builder's Buildings", "9791234567891", 2027, "Bob Builder", "Alice Allison")
+    };
 
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
+    public static class BookData {
+        public final String TITLE;
+        public final String ISBN;
+        public final Integer PUBLICATION_YEAR;
+        public final String AUTHOR1;
+        public final String AUTHOR2;
+        public final String JSON;
 
-    public static class ValidBook4 {
-        public static final String TITLE = "Test Book 4";
-        public static final String ISBN = "9791234567892";
-        public static final Integer PUBLICATION_YEAR = 1984;
-        public static final String AUTHOR_1 = "The Goober";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook5 {
-        public static final String TITLE = "Test Book 5";
-        public static final String ISBN = "9781234567893";
-        public static final Integer PUBLICATION_YEAR = 2025;
-        public static final String AUTHOR_1 = "Charlie Charles";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook5Updated {
-        public static final String TITLE = "Test Book 5 Updated";
-        public static final String ISBN = ValidBook5.ISBN;
-        public static final Integer PUBLICATION_YEAR = 2026;
-        public static final String AUTHOR_1 = "Charlie Charles Updated";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook6 {
-        public static final String TITLE = "Test Book 6";
-        public static final String ISBN = "9791234567893";
-        public static final Integer PUBLICATION_YEAR = 2027;
-        public static final String AUTHOR_1 = "Charlie Charles Jr.";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook7 {
-        public static final String TITLE = "Test Book 7";
-        public static final String ISBN = "9781234567894";
-        public static final Integer PUBLICATION_YEAR = 2028;
-        public static final String AUTHOR_1 = "Alice Allison";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook8 {
-        public static final String TITLE = "Test Book 8";
-        public static final String ISBN = "9791234567894";
-        public static final Integer PUBLICATION_YEAR = 2029;
-        public static final String AUTHOR_1 = "Bob Builder";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook9 {
-        public static final String TITLE = "Test Book 9";
-        public static final String ISBN = "9781234567895";
-        public static final Integer PUBLICATION_YEAR = 2030;
-        public static final String AUTHOR_1 = "Carol Carter";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
-    }
-
-    public static class ValidBook10 {
-        public static final String TITLE = "Test Book 10";
-        public static final String ISBN = "9791234567895";
-        public static final Integer PUBLICATION_YEAR = 2031;
-        public static final String AUTHOR_1 = "David Davis";
-
-        public static final String JSON = """
-                {
-                    "title": "%s",
-                    "publicationYear": %d,
-                    "isbn": "%s",
-                    "authors": [
-                        {
-                            "name": "%s"
-                        }
-                    ]
-                }
-                """.formatted(TITLE, PUBLICATION_YEAR, ISBN, AUTHOR_1);
+        public BookData(String title, String isbn, Integer publicationYear, String author1, String author2) {
+            this.TITLE = title;
+            this.ISBN = isbn;
+            this.PUBLICATION_YEAR = publicationYear;
+            this.AUTHOR1 = author1;
+            this.AUTHOR2 = author2;
+            this.JSON = """
+                    {
+                        "title": "%s",
+                        "publicationYear": %d,
+                        "isbn": "%s",
+                        "authors": [
+                            {
+                                "name": "%s"
+                            },
+                            {
+                                "name": "%s"
+                            }
+                        ]
+                    }
+                    """.formatted(title, publicationYear, isbn, author1, author2);
+        }
     }
 
     public static class InvalidBookNoTitleInvalidIsbn {
