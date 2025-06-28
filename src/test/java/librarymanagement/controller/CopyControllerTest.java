@@ -1,5 +1,7 @@
 package librarymanagement.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import librarymanagement.testdata.BookTestData;
@@ -9,11 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -78,5 +84,29 @@ class CopyControllerTest {
 
         assertThat(testResult).hasStatus(HttpStatus.OK).bodyJson().extractingPath("totalElements").isEqualTo(1);
     }
-    // todo test searching, status transitions and deleting
+
+    @Test
+    void testDeleteCopy() throws Exception {
+        // Add a book
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.ValidBook1.JSON)
+                .exchange();
+
+        // Add a copy of that book
+        MvcResult createResult = mockMvc.perform(post("/api/copies").contentType(MediaType.APPLICATION_JSON).content(CopyTestData.ValidCopy1.JSON)).andExpect(status().isCreated()).andReturn();
+
+        // Extract the copy ID from the response
+        String responseBody = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String copyId = jsonNode.get("id").asText();
+
+        // Delete the copy
+        MvcTestResult deleteResult = mockMvcTester.delete().uri("/api/copies/" + copyId).exchange();
+
+        assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
+    }
+    // todo test status transitions
 }
