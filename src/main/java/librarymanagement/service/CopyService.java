@@ -90,6 +90,34 @@ public class CopyService {
     }
 
     @Transactional
+    public Copy reserveCopy(Long id) {
+        Optional<Copy> optionalCopy = copyRepository.findById(id);
+        if (optionalCopy.isEmpty()) {
+            throw new ResourceNotFoundException("Copy not found with ID: " + id);
+        }
+        if (optionalCopy.get().getStatus() != CopyStatus.AVAILABLE) {
+            throw new IllegalStateException("Copy is not available for reservation");
+        }
+
+        optionalCopy.get().setStatus(CopyStatus.RESERVED);
+        return copyRepository.save(optionalCopy.get());
+    }
+
+    @Transactional
+    public Copy cancelCopyReservation(Long id) {
+        Optional<Copy> optionalCopy = copyRepository.findById(id);
+        if (optionalCopy.isEmpty()) {
+            throw new ResourceNotFoundException("Copy not found with ID: " + id);
+        }
+        if (optionalCopy.get().getStatus() != CopyStatus.RESERVED) {
+            throw new IllegalStateException("Copy is not currently reserved");
+        }
+
+        optionalCopy.get().setStatus(CopyStatus.AVAILABLE);
+        return copyRepository.save(optionalCopy.get());
+    }
+
+    @Transactional
     public void deleteCopy(Long id) {
         if (!copyRepository.existsById(id)) {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
