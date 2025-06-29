@@ -43,11 +43,13 @@ public class CopyController {
     }
 
     @GetMapping("/api/copies/search")
-    public Page<Copy> searchCopies(@RequestParam(required = false) String bookIsbn, @RequestParam(required = false) CopyStatus status, Pageable pageable) {
+    public Page<Copy> searchCopies(@RequestParam(required = false) String bookIsbn, @RequestParam(required = false) String status, Pageable pageable) {
         bookIsbn = (bookIsbn == null || bookIsbn.isBlank()) ? null : bookIsbn;
-        status = status == null ? null : CopyStatus.valueOf(status.name());
-
-        return copyService.searchCopies(bookIsbn, status, pageable);
+        CopyStatus statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            statusEnum = CopyStatus.valueOf(status.toUpperCase());
+        }
+        return copyService.searchCopies(bookIsbn, statusEnum, pageable);
     }
 
     @PostMapping("/api/copies")
