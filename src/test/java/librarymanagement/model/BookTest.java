@@ -31,6 +31,7 @@ class BookTest {
         assertThat(book.getIsbn()).isEqualTo(isbn);
     }
 
+    @Test
     void testBookEquality() {
         Book book1 = new Book();
         BookTestData.BookData bookData = BookTestData.getNextBook();
