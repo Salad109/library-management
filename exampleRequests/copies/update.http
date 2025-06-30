@@ -8,6 +8,16 @@ PUT http://localhost:8080/api/copies/1/return
 
 ###
 
+# Reserve copy
+PUT http://localhost:8080/api/copies/1/reserve
+
+###
+
+# Unreserve copy
+PUT http://localhost:8080/api/copies/1/unreserve
+
+###
+
 # Mark copy as lost
 PUT http://localhost:8080/api/copies/1/lost
 

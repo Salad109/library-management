@@ -87,6 +87,16 @@ public class CopyController {
         return copyService.markCopyAsLost(id);
     }
 
+    @PutMapping("/api/copies/{id}/reserve")
+    public Copy reserveCopy(@PathVariable Long id) {
+        return copyService.reserveCopy(id);
+    }
+
+    @PutMapping("/api/copies/{id}/undo-reserve")
+    public Copy unreserveCopy(@PathVariable Long id) {
+        return copyService.cancelCopyReservation(id);
+    }
+
     @DeleteMapping("/api/copies/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCopy(@PathVariable Long id) {
