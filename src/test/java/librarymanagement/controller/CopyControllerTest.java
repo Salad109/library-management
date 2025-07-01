@@ -171,14 +171,16 @@ class CopyControllerTest {
         assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
     }
 
+    // STATUS TRANSITION TESTS
+
     @Test
-    void testBorrowCopy() throws Exception {
+    void testBorrowAvailableCopy() throws Exception {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
 
         // Add a book
         addBook(bookData);
 
-        // Add a copy of that book
+        // Add an available copy of that book
         String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
         MvcResult createResult = mockMvc.perform(post("/api/copies")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -186,16 +188,47 @@ class CopyControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        // Extract the copy ID from the response
+        // Extract the available copy ID from the response
         String responseBody = createResult.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         String copyId = jsonNode.get("id").asText();
 
-        // Borrow the copy
+        // Borrow the available copy
         MvcTestResult borrowResult = mockMvcTester.put().uri("/api/copies/" + copyId + "/borrow").exchange();
 
         assertThat(borrowResult).hasStatus(HttpStatus.OK);
+        assertThat(borrowResult).bodyJson().extractingPath("status").isEqualTo("BORROWED");
     }
+
+    @Test
+    void borrowUnavailableCopy() throws Exception {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+
+        // Add a book
+        addBook(bookData);
+
+        // Add a reserved copy of that book
+        String copyJson = createCopyJson(bookData.ISBN, "LOST");
+        MvcResult createResult = mockMvc.perform(post("/api/copies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(copyJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // Extract the reserved copy ID from the response
+        String responseBody = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String copyId = jsonNode.get("id").asText();
+
+        // Attempt to borrow the reserved copy
+        MvcTestResult borrowResult = mockMvcTester.put().uri("/api/copies/" + copyId + "/borrow").exchange();
+
+        assertThat(borrowResult).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(borrowResult).bodyJson().extractingPath("error")
+                .isEqualTo("Copy is not available for borrowing. Current status: LOST");
+    }
+
     // todo test status transitions: return, lost, reserve, undo-reserve
 }

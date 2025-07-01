@@ -57,7 +57,7 @@ public class CopyService {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
         }
         if (optionalCopy.get().getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException("Copy is not available for borrowing");
+            throw new IllegalStateException("Copy is not available for borrowing. Current status: " + optionalCopy.get().getStatus());
         }
 
         optionalCopy.get().setStatus(CopyStatus.BORROWED);
@@ -71,7 +71,7 @@ public class CopyService {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
         }
         if (optionalCopy.get().getStatus() != CopyStatus.BORROWED) {
-            throw new IllegalStateException("Copy is not currently borrowed");
+            throw new IllegalStateException("Copy is not currently borrowed. Current status: " + optionalCopy.get().getStatus());
         }
 
         optionalCopy.get().setStatus(CopyStatus.AVAILABLE);
@@ -96,7 +96,7 @@ public class CopyService {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
         }
         if (optionalCopy.get().getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException("Copy is not available for reservation");
+            throw new IllegalStateException("Copy is not available for reservation. Current status: " + optionalCopy.get().getStatus());
         }
 
         optionalCopy.get().setStatus(CopyStatus.RESERVED);
@@ -110,7 +110,7 @@ public class CopyService {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
         }
         if (optionalCopy.get().getStatus() != CopyStatus.RESERVED) {
-            throw new IllegalStateException("Copy is not currently reserved");
+            throw new IllegalStateException("Copy is not currently reserved. Current status: " + optionalCopy.get().getStatus());
         }
 
         optionalCopy.get().setStatus(CopyStatus.AVAILABLE);
