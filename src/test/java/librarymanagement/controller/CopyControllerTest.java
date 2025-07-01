@@ -175,5 +175,35 @@ class CopyControllerTest {
 
         assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
     }
-    // todo test status transitions
+    @Test
+    void testBorrowCopy() throws Exception {
+        BookTestData.BookData book = BookTestData.getNextBook();
+
+        // Add a book
+        mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(book.JSON)
+                .exchange();
+
+        // Add a copy of that book
+        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        MvcResult createResult = mockMvc.perform(post("/api/copies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(copyJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // Extract the copy ID from the response
+        String responseBody = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String copyId = jsonNode.get("id").asText();
+
+        // Borrow the copy
+        MvcTestResult borrowResult = mockMvcTester.put().uri("/api/copies/" + copyId + "/borrow").exchange();
+
+        assertThat(borrowResult).hasStatus(HttpStatus.OK);
+    }
+    // todo test status transitions: return, lost, reserve, undo-reserve
 }
