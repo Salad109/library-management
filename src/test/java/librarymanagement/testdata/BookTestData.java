@@ -11,11 +11,11 @@ public class BookTestData {
     };
     private static int bookIndex = 0;
 
-    public static BookData getNextBook() {
+    public static BookData getNextBookData() {
         return BOOKS[++bookIndex % BOOKS.length];
     }
 
-    public static BookData getCurrentBook() {
+    public static BookData getCurrentBookData() {
         return BOOKS[bookIndex % BOOKS.length];
     }
 

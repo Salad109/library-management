@@ -12,12 +12,12 @@ class BookTest {
 
     @Test
     void testBookCreation() {
-        String title = BookTestData.getNextBook().TITLE;
+        String title = BookTestData.getNextBookData().TITLE;
         Set<Author> authors = new HashSet<>();
-        authors.add(new Author(BookTestData.getCurrentBook().AUTHOR1));
-        authors.add(new Author(BookTestData.getCurrentBook().AUTHOR2));
-        Integer publicationYear = BookTestData.getCurrentBook().PUBLICATION_YEAR;
-        String isbn = BookTestData.getCurrentBook().ISBN;
+        authors.add(new Author(BookTestData.getCurrentBookData().AUTHOR1));
+        authors.add(new Author(BookTestData.getCurrentBookData().AUTHOR2));
+        Integer publicationYear = BookTestData.getCurrentBookData().PUBLICATION_YEAR;
+        String isbn = BookTestData.getCurrentBookData().ISBN;
 
         Book book = new Book();
         book.setTitle(title);
@@ -34,7 +34,7 @@ class BookTest {
     @Test
     void testBookEquality() {
         Book book1 = new Book();
-        BookTestData.BookData bookData = BookTestData.getNextBook();
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
         book1.setIsbn(bookData.ISBN);
         book1.setTitle(bookData.TITLE);
         book1.setPublicationYear(bookData.PUBLICATION_YEAR);

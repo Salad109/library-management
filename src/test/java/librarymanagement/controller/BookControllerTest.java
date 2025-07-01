@@ -36,7 +36,7 @@ class BookControllerTest {
 
     @Test
     void testAddBook() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
 
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/books")
@@ -65,7 +65,7 @@ class BookControllerTest {
 
     @Test
     void testAddDuplicateIsbnBook() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
 
         // Add once
         mockMvcTester.post()
@@ -88,7 +88,7 @@ class BookControllerTest {
 
     @Test
     void testSearchBooksByIsbn() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
 
         // Add one book
         mockMvcTester.post()
@@ -109,8 +109,8 @@ class BookControllerTest {
 
     @Test
     void testSearchBooksByYear() {
-        BookTestData.BookData book1 = BookTestData.getNextBook();
-        BookTestData.BookData book2 = BookTestData.getNextBook();
+        BookTestData.BookData book1 = BookTestData.getNextBookData();
+        BookTestData.BookData book2 = BookTestData.getNextBookData();
 
         // Create second book with same year as first
         String book2SameYearJson = """
@@ -153,7 +153,7 @@ class BookControllerTest {
 
     @Test
     void testUpdateBook() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
 
         // Create a book to update
         mockMvcTester.post()
@@ -191,8 +191,8 @@ class BookControllerTest {
 
     @Test
     void testUpdateBookChangeIsbn() {
-        BookTestData.BookData book = BookTestData.getNextBook();
-        BookTestData.BookData differentBook = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
+        BookTestData.BookData differentBook = BookTestData.getNextBookData();
 
         // Create a book to update
         mockMvcTester.post()
@@ -227,7 +227,7 @@ class BookControllerTest {
 
     @Test
     void testUpdateNonExistentBook() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
 
         MvcTestResult testResult = mockMvcTester.put()
                 .uri("/api/books/" + book.ISBN)
@@ -242,7 +242,7 @@ class BookControllerTest {
 
     @Test
     void testDeleteBook() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData book = BookTestData.getNextBookData();
 
         // Create a book to delete
         mockMvcTester.post()

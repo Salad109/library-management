@@ -54,6 +54,20 @@ class CopyControllerTest {
                 """.formatted(isbn, status);
     }
 
+    private MvcResult addBook(BookTestData.BookData bookData) {
+        MvcResult addResult = null;
+        try {
+            addResult = mockMvc.perform(post("/api/books")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(bookData.JSON))
+                    .andExpect(status().isCreated())
+                    .andReturn();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add book: " + bookData.ISBN, e);
+        }
+        return addResult;
+    }
+
     @Test
     void testGetAllCopies() {
         assertThat(mockMvcTester.get().uri("/api/copies")).hasStatus(HttpStatus.OK);
@@ -61,17 +75,13 @@ class CopyControllerTest {
 
     @Test
     void testAddCopy() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
 
         // Add a book
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(book.JSON)
-                .exchange();
+        addBook(bookData);
 
         // Add a copy of that book
-        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/copies")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,14 +93,10 @@ class CopyControllerTest {
 
     @Test
     void testAddInvalidCopyInvalidStatus() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
 
         // Add a book
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(book.JSON)
-                .exchange();
+        addBook(bookData);
 
         // Attempt to add a copy with an invalid status
         MvcTestResult testResult = mockMvcTester.post()
@@ -119,17 +125,13 @@ class CopyControllerTest {
 
     @Test
     void testSearchCopies() {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
 
         // Add a book
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(book.JSON)
-                .exchange();
+        addBook(bookData);
 
         // Add a copy of that book
-        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
         mockMvcTester.post()
                 .uri("/api/copies")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +140,7 @@ class CopyControllerTest {
 
         // Search for copies by ISBN
         MvcTestResult testResult = mockMvcTester.get()
-                .uri("/api/copies/search?isbn=" + book.ISBN)
+                .uri("/api/copies/search?isbn=" + bookData.ISBN)
                 .exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.OK)
@@ -147,17 +149,13 @@ class CopyControllerTest {
 
     @Test
     void testDeleteCopy() throws Exception {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
 
         // Add a book
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(book.JSON)
-                .exchange();
+        addBook(bookData);
 
         // Add a copy of that book
-        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
         MvcResult createResult = mockMvc.perform(post("/api/copies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(copyJson))
@@ -175,19 +173,16 @@ class CopyControllerTest {
 
         assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
     }
+
     @Test
     void testBorrowCopy() throws Exception {
-        BookTestData.BookData book = BookTestData.getNextBook();
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
 
         // Add a book
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(book.JSON)
-                .exchange();
+        addBook(bookData);
 
         // Add a copy of that book
-        String copyJson = createCopyJson(book.ISBN, "AVAILABLE");
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
         MvcResult createResult = mockMvc.perform(post("/api/copies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(copyJson))
