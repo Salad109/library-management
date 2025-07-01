@@ -54,18 +54,15 @@ class CopyControllerTest {
                 """.formatted(isbn, status);
     }
 
-    private MvcResult addBook(BookTestData.BookData bookData) {
-        MvcResult addResult = null;
+    private void addBook(BookTestData.BookData bookData) {
         try {
-            addResult = mockMvc.perform(post("/api/books")
+            mockMvc.perform(post("/api/books")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(bookData.JSON))
-                    .andExpect(status().isCreated())
-                    .andReturn();
+                    .andExpect(status().isCreated());
         } catch (Exception e) {
             throw new RuntimeException("Failed to add book: " + bookData.ISBN, e);
         }
-        return addResult;
     }
 
     @Test
