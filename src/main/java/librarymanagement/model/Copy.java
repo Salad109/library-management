@@ -20,11 +20,6 @@ public class Copy {
     public Copy() {
     }
 
-    public Copy(Book book, CopyStatus status) {
-        this.book = book;
-        this.status = status;
-    }
-
     public Long getId() {
         return id;
     }

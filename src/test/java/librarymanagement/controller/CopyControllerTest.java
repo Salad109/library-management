@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import librarymanagement.model.CopyStatus;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -135,13 +138,34 @@ class CopyControllerTest {
                 .content(copyJson)
                 .exchange();
 
-        // Search for copies by ISBN
-        MvcTestResult testResult = mockMvcTester.get()
+        // Search for copies by ISBN, status and both
+        MvcTestResult testResultSearchIsbn = mockMvcTester.get()
                 .uri("/api/copies/search?isbn=" + bookData.ISBN)
                 .exchange();
+        MvcTestResult testResultSearchStatus = mockMvcTester.get()
+                .uri("/api/copies/search?status=AVAILABLE").exchange();
+        MvcTestResult testResultSearchBoth = mockMvcTester.get()
+                .uri("/api/copies/search?isbn=" + bookData.ISBN + "&status=AVAILABLE")
+                .exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.OK)
+        assertThat(testResultSearchIsbn).hasStatus(HttpStatus.OK)
                 .bodyJson().extractingPath("totalElements").isEqualTo(1);
+        assertThat(testResultSearchStatus).hasStatus(HttpStatus.OK)
+                .bodyJson().extractingPath("totalElements").isEqualTo(1);
+        assertThat(testResultSearchBoth).hasStatus(HttpStatus.OK)
+                .bodyJson().extractingPath("totalElements").isEqualTo(1);
+    }
+
+    @Test
+    void testInvalidSearchCopies() {
+        // Search for copies with an invalid status
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/copies/search?status=EATEN")
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Invalid copy status: EATEN. Valid values are: " + Arrays.toString(CopyStatus.values()));
     }
 
     @Test
@@ -228,6 +252,62 @@ class CopyControllerTest {
         assertThat(borrowResult).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(borrowResult).bodyJson().extractingPath("error")
                 .isEqualTo("Copy is not available for borrowing. Current status: LOST");
+    }
+
+    @Test
+    void testReturnBorrowedCopy() throws Exception {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+
+        // Add a book
+        addBook(bookData);
+
+        // Add a borrowed copy of that book
+        String copyJson = createCopyJson(bookData.ISBN, "BORROWED");
+        MvcResult createResult = mockMvc.perform(post("/api/copies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(copyJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // Extract the borrowed copy ID from the response
+        String responseBody = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String copyId = jsonNode.get("id").asText();
+
+        // Return the borrowed copy
+        MvcTestResult returnResult = mockMvcTester.put().uri("/api/copies/" + copyId + "/return").exchange();
+        assertThat(returnResult).hasStatus(HttpStatus.OK);
+        assertThat(returnResult).bodyJson().extractingPath("status").isEqualTo("AVAILABLE");
+    }
+
+    @Test
+    void testReturnNotBorrowedCopy() throws Exception {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+
+        // Add a book
+        addBook(bookData);
+
+        // Add an available copy of that book
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
+        MvcResult createResult = mockMvc.perform(post("/api/copies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(copyJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // Extract the available copy ID from the response
+        String responseBody = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String copyId = jsonNode.get("id").asText();
+
+        // Attempt to return the available copy
+        MvcTestResult returnResult = mockMvcTester.put().uri("/api/copies/" + copyId + "/return").exchange();
+
+        assertThat(returnResult).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(returnResult).bodyJson().extractingPath("error")
+                .isEqualTo("Copy is not currently borrowed. Current status: AVAILABLE");
     }
 
     @Test
