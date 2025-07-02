@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -449,5 +451,23 @@ class CopyControllerTest {
         assertThat(undoReserveResult).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(undoReserveResult).bodyJson().extractingPath("error")
                 .isEqualTo("Copy is not currently reserved. Current status: AVAILABLE");
+    }
+
+    @Test
+    void testStateTransitionNonexistingCopy() {
+        List<String> transitions = new ArrayList<>(5);
+        transitions.add("borrow");
+        transitions.add("return");
+        transitions.add("lost");
+        transitions.add("reserve");
+        transitions.add("undo-reserve");
+
+        for (String transition : transitions) {
+            assertThat(mockMvcTester.put().uri("/api/copies/999/" + transition).exchange())
+                    .hasStatus(HttpStatus.NOT_FOUND)
+                    .bodyJson()
+                    .extractingPath("error")
+                    .isEqualTo("Copy not found with ID: 999");
+        }
     }
 }
