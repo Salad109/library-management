@@ -25,11 +25,11 @@ public class BookService {
     }
 
     public Book getBookByIsbn(String isbn) {
-        Book book = bookRepository.findByIsbn(isbn);
-        if (book == null) {
+        Optional<Book> book = bookRepository.findByIsbn(isbn);
+        if (book.isEmpty()) {
             throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
         }
-        return book;
+        return book.get();
     }
 
     public Page<Book> searchBooks(String title, String authorName, Integer publicationYear, String isbn, Pageable pageable) {
@@ -42,7 +42,7 @@ public class BookService {
     }
 
     public Book addBook(Book book) {
-        if (bookRepository.findByIsbn(book.getIsbn()) != null) {
+        if (bookRepository.findByIsbn(book.getIsbn()).isPresent()) {
             throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
         }
         return bookRepository.save(book);

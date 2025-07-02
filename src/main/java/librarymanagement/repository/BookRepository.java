@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
     @Query("SELECT DISTINCT b FROM Book b " +
@@ -22,5 +24,5 @@ public interface BookRepository extends JpaRepository<Book, String> {
                            @Param("isbn") String isbn,
                            Pageable pageable);
 
-    Book findByIsbn(String isbn);
+    Optional<Book> findByIsbn(String isbn);
 }
