@@ -3,7 +3,7 @@ package librarymanagement.model;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +13,7 @@ class BookTest {
     @Test
     void testBookCreation() {
         String title = BookTestData.getNextBookData().TITLE;
-        Set<Author> authors = new HashSet<>();
+        Set<Author> authors = new LinkedHashSet<>();
         authors.add(new Author(BookTestData.getCurrentBookData().AUTHOR1));
         authors.add(new Author(BookTestData.getCurrentBookData().AUTHOR2));
         Integer publicationYear = BookTestData.getCurrentBookData().PUBLICATION_YEAR;
