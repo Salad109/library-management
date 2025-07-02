@@ -24,6 +24,14 @@ public class CopyService {
         return copyRepository.findAll(pageable);
     }
 
+    public Copy getCopyById(Long id) {
+        Optional<Copy> copy = copyRepository.findById(id);
+        if (copy.isEmpty()) {
+            throw new ResourceNotFoundException("Copy not found with ID: " + id);
+        }
+        return copy.get();
+    }
+
     public Page<Copy> getCopiesByBookIsbn(String isbn, Pageable pageable) {
         return copyRepository.findByBookIsbn(isbn, pageable);
     }

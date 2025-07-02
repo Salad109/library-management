@@ -29,6 +29,11 @@ public class CopyController {
         return copyService.getAllCopies(pageable);
     }
 
+    @GetMapping("/api/copies/{id}")
+    public Copy getCopyById(@PathVariable Long id) {
+        return copyService.getCopyById(id);
+    }
+
     @GetMapping("/api/copies/book/{isbn}")
     public Page<Copy> getCopiesByBookIsbn(@PathVariable String isbn, Pageable pageable) {
         return copyService.getCopiesByBookIsbn(isbn, pageable);
