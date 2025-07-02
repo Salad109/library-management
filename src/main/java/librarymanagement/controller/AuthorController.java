@@ -3,6 +3,8 @@ package librarymanagement.controller;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Author;
 import librarymanagement.repository.AuthorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,11 +36,11 @@ public class AuthorController {
     }
 
     @GetMapping("/api/authors/search")
-    public List<Author> searchAuthors(@RequestParam(required = false) String name) {
+    public Page<Author> searchAuthors(@RequestParam(required = false) String name, Pageable pageable) {
         if (name == null || name.isBlank()) {
-            return authorRepository.findAll();
+            return authorRepository.findAll(pageable);
         } else {
-            return authorRepository.findByNameContainingIgnoreCase(name);
+            return authorRepository.findByNameContainingIgnoreCase(name, pageable);
         }
     }
 }
