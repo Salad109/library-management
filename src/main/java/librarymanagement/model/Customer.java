@@ -1,11 +1,11 @@
 package librarymanagement.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 public class Customer {
@@ -25,14 +25,17 @@ public class Customer {
     )
     private String email;
 
-    // todo borrowed copies, reserved copies, ...
+    @OneToMany(mappedBy = "customer")
+    private Set<Copy> copies;
 
     public Customer() {
+        copies = new LinkedHashSet<>();
     }
 
-    public Customer(String firstName, String lastName) {
+    public Customer(String firstName, String lastName, Set<Copy> copies) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.copies = copies != null ? new LinkedHashSet<>(copies) : new LinkedHashSet<>();
     }
 
     public Long getId() {
@@ -57,6 +60,26 @@ public class Customer {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Set<Copy> getCopies() {
+        return copies;
+    }
+
+    public void setCopies(Set<Copy> copies) {
+        for (Copy copy : this.copies) {
+            copy.setCustomer(null);
+        }
+        this.copies.clear();
+
+        if (copies != null) {
+            for (Copy copy : copies) {
+                copy.setCustomer(this);
+            }
+            this.copies = new LinkedHashSet<>(copies);
+        } else {
+            this.copies = new LinkedHashSet<>();
+        }
     }
 
 }

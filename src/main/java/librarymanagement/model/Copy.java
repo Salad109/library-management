@@ -13,6 +13,9 @@ public class Copy {
     @ManyToOne
     private Book book;
 
+    @ManyToOne
+    private Customer customer;
+
     @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
@@ -42,5 +45,13 @@ public class Copy {
 
     public void setStatus(CopyStatus status) {
         this.status = status;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }
