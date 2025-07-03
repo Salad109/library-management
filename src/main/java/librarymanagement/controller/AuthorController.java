@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 public class AuthorController {
 
@@ -22,8 +20,8 @@ public class AuthorController {
     }
 
     @GetMapping("/api/authors")
-    public List<Author> getAuthors() {
-        return authorRepository.findAll();
+    public Page<Author> getAuthors(Pageable pageable) {
+        return authorRepository.findAll(pageable);
     }
 
     @GetMapping("api/authors/{name}")
