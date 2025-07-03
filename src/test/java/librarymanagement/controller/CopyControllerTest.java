@@ -78,6 +78,77 @@ class CopyControllerTest {
     }
 
     @Test
+    void testGetCopyById() throws Exception {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+
+        // Add a book
+        addBook(bookData);
+
+        // Add a copy of that book
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        // Extract the copy ID from the response
+        String responseBody = createResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String copyId = jsonNode.get("id").asText();
+
+        // Get the copy by ID
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/copies/" + copyId)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.OK);
+    }
+
+    @Test
+    void testGetNonexistingCopyById() {
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/copies/999")
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Copy not found with ID: 999");
+    }
+
+    @Test
+    void testGetCopyCountByBookIsbnAndStatus() {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+
+        // Add a book
+        addBook(bookData);
+
+        // Add a copy of that book
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
+        for (int i = 0; i < 5; i++) {
+            // Create multiple copies for the same book
+            MvcTestResult createResult = mockMvcTester.post()
+                    .uri("/api/copies")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(copyJson)
+                    .exchange();
+
+            assertThat(createResult).hasStatus(HttpStatus.CREATED);
+        }
+
+        // Get the count of available copies for the book
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/copies/book/" + bookData.ISBN + "/count")
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("5");
+    }
+
+    @Test
     void testAddCopy() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
 
@@ -93,6 +164,23 @@ class CopyControllerTest {
                 .exchange();
 
         assertThat(testResult).hasStatus(HttpStatus.CREATED);
+    }
+
+    @Test
+    void testAddCopyNonexistingBook() {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
+
+        // Attempt to add a copy with a non-existing book
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
     }
 
     @Test
@@ -112,19 +200,6 @@ class CopyControllerTest {
         assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson().extractingPath("error")
                 .isEqualTo("Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
-    }
-
-    @Test
-    void testAddInvalidCopyInvalidBook() {
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(INVALID_BOOK_COPY_JSON)
-                .exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(testResult).bodyJson().extractingPath("error")
-                .isEqualTo("Book not found with ISBN: 9999999999999");
     }
 
     @Test
@@ -197,6 +272,15 @@ class CopyControllerTest {
         MvcTestResult deleteResult = mockMvcTester.delete().uri("/api/copies/" + copyId).exchange();
 
         assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void testDeleteNonexistingCopy() {
+        MvcTestResult deleteResult = mockMvcTester.delete().uri("/api/copies/999").exchange();
+
+        assertThat(deleteResult).hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Copy not found with ID: 999");
     }
 
     // STATUS TRANSITION TESTS

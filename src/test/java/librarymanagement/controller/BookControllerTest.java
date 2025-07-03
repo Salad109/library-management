@@ -261,4 +261,17 @@ class BookControllerTest {
         assertThat(getResult).bodyJson().extractingPath("error")
                 .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
     }
+
+    @Test
+    void testDeleteNonexistentBook() {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+
+        MvcTestResult testResult = mockMvcTester.delete()
+                .uri("/api/books/" + bookData.ISBN)
+                .exchange();
+
+        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
+    }
 }
