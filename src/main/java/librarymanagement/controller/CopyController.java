@@ -61,29 +61,29 @@ public class CopyController {
         return copyService.addCopy(copy);
     }
 
-    @PutMapping("/api/copies/{id}/borrow")
-    public Copy borrowCopy(@PathVariable Long id) {
-        return copyService.borrowCopy(id);
+    @PutMapping("/api/copies/{copyId}/borrow/{customerId}")
+    public Copy borrowCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
+        return copyService.borrowCopy(copyId, customerId);
     }
 
-    @PutMapping("/api/copies/{id}/return")
-    public Copy returnCopy(@PathVariable Long id) {
-        return copyService.returnCopy(id);
+    @PutMapping("/api/copies/{copyId}/return/{customerId}")
+    public Copy returnCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
+        return copyService.returnCopy(copyId, customerId);
     }
 
-    @PutMapping("/api/copies/{id}/lost")
-    public Copy markCopyAsLost(@PathVariable Long id) {
-        return copyService.markCopyAsLost(id);
+    @PutMapping("/api/copies/{copyId}/lost/{customerId}")
+    public Copy markCopyAsLost(@PathVariable Long copyId, @PathVariable Long customerId) {
+        return copyService.markCopyAsLost(copyId, customerId);
     }
 
-    @PutMapping("/api/copies/{id}/reserve")
-    public Copy reserveCopy(@PathVariable Long id) {
-        return copyService.reserveCopy(id);
+    @PutMapping("/api/copies/{copyId}/reserve/{customerId}")
+    public Copy reserveCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
+        return copyService.reserveCopy(copyId, customerId);
     }
 
-    @PutMapping("/api/copies/{id}/undo-reserve")
-    public Copy unreserveCopy(@PathVariable Long id) {
-        return copyService.cancelCopyReservation(id);
+    @PutMapping("/api/copies/{copyId}/undo-reserve/{customerId}")
+    public Copy unreserveCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
+        return copyService.cancelCopyReservation(copyId, customerId);
     }
 
     @DeleteMapping("/api/copies/{id}")

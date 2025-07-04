@@ -56,11 +56,11 @@ username: `sa`, no password)
 - `GET /api/copies/book/{isbn}/available` - Get available copies (paginated)
 - `GET /api/copies/book/{isbn}/count` - Count available copies
 - `POST /api/copies` - Create copy
-- `PUT /api/copies/{id}/borrow` - Borrow copy
-- `PUT /api/copies/{id}/return` - Return copy
-- `PUT /api/copies/{id}/reserve` - Reserve copy
-- `PUT /api/copies/{id}/undo-reserve` - Cancel reservation
-- `PUT /api/copies/{id}/lost` - Mark copy as lost
+- `PUT /api/copies/{copyId}/borrow/{customerId}` - Borrow copy
+- `PUT /api/copies/{copyId}/return/{customerId}` - Return copy
+- `PUT /api/copies/{copyId}/reserve/{customerId}` - Reserve copy
+- `PUT /api/copies/{copyId}/undo-reserve/{customerId}` - Cancel reservation
+- `PUT /api/copies/{copyId}/lost/{customerId}` - Mark copy as lost
 - `DELETE /api/copies/{id}` - Delete copy
 
 #### Copy Status Values
