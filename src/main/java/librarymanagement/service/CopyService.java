@@ -55,20 +55,12 @@ public class CopyService {
 
     @Transactional
     public Copy borrowCopy(Long copyId, Long customerId) {
-        Optional<Copy> optionalCopy = copyRepository.findById(copyId);
-        if (optionalCopy.isEmpty()) {
-            throw new ResourceNotFoundException("Copy not found with ID: " + copyId);
-        }
-        Copy existingCopy = optionalCopy.get();
+        Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
             throw new IllegalStateException("Copy is not available for borrowing. Current status: " + existingCopy.getStatus());
         }
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + customerId);
-        }
-        Customer customer = optionalCustomer.get();
+        Customer customer = getCustomerOrThrow(customerId);
 
         existingCopy.setCustomer(customer);
         existingCopy.setStatus(CopyStatus.BORROWED);
@@ -77,22 +69,14 @@ public class CopyService {
 
     @Transactional
     public Copy returnCopy(Long copyId, Long customerId) {
-        Optional<Copy> optionalCopy = copyRepository.findById(copyId);
-        if (optionalCopy.isEmpty()) {
-            throw new ResourceNotFoundException("Copy not found with ID: " + copyId);
-        }
-        Copy existingCopy = optionalCopy.get();
+        Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.BORROWED) {
             throw new IllegalStateException("Copy is not currently borrowed. Current status: " + existingCopy.getStatus());
         }
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + customerId);
-        }
-        Customer customer = optionalCustomer.get();
+        Customer customer = getCustomerOrThrow(customerId);
         if (!existingCopy.getCustomer().equals(customer)) {
-            throw new IllegalStateException("This copy is not used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
+            throw new IllegalStateException("Copy is not used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
 
         existingCopy.setCustomer(null);
@@ -102,17 +86,9 @@ public class CopyService {
 
     @Transactional
     public Copy markCopyAsLost(Long copyId, Long customerId) {
-        Optional<Copy> optionalCopy = copyRepository.findById(copyId);
-        if (optionalCopy.isEmpty()) {
-            throw new ResourceNotFoundException("Copy not found with ID: " + copyId);
-        }
-        Copy existingCopy = optionalCopy.get();
+        Copy existingCopy = getCopyOrThrow(copyId);
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + customerId);
-        }
-        Customer customer = optionalCustomer.get();
+        Customer customer = getCustomerOrThrow(customerId);
         if (!existingCopy.getCustomer().equals(customer)) {
             throw new IllegalStateException("Copy is not currently used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
@@ -123,20 +99,12 @@ public class CopyService {
 
     @Transactional
     public Copy reserveCopy(Long copyId, Long customerId) {
-        Optional<Copy> optionalCopy = copyRepository.findById(copyId);
-        if (optionalCopy.isEmpty()) {
-            throw new ResourceNotFoundException("Copy not found with ID: " + copyId);
+        Copy existingCopy = getCopyOrThrow(copyId);
+        if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
+            throw new IllegalStateException("Copy is not available for reservation. Current status: " + existingCopy.getStatus());
         }
-        if (optionalCopy.get().getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException("Copy is not available for reservation. Current status: " + optionalCopy.get().getStatus());
-        }
-        Copy existingCopy = optionalCopy.get();
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + customerId);
-        }
-        Customer customer = optionalCustomer.get();
+        Customer customer = getCustomerOrThrow(customerId);
 
         existingCopy.setCustomer(customer);
         existingCopy.setStatus(CopyStatus.RESERVED);
@@ -144,21 +112,13 @@ public class CopyService {
     }
 
     @Transactional
-    public Copy cancelCopyReservation(Long id, Long customerId) {
-        Optional<Copy> optionalCopy = copyRepository.findById(id);
-        if (optionalCopy.isEmpty()) {
-            throw new ResourceNotFoundException("Copy not found with ID: " + id);
+    public Copy cancelCopyReservation(Long copyId, Long customerId) {
+        Copy existingCopy = getCopyOrThrow(copyId);
+        if (existingCopy.getStatus() != CopyStatus.RESERVED) {
+            throw new IllegalStateException("Copy is not currently reserved. Current status: " + existingCopy.getStatus());
         }
-        if (optionalCopy.get().getStatus() != CopyStatus.RESERVED) {
-            throw new IllegalStateException("Copy is not currently reserved. Current status: " + optionalCopy.get().getStatus());
-        }
-        Copy existingCopy = optionalCopy.get();
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + customerId);
-        }
-        Customer customer = optionalCustomer.get();
+        Customer customer = getCustomerOrThrow(customerId);
         if (!existingCopy.getCustomer().equals(customer)) {
             throw new IllegalStateException("Copy is not currently used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
@@ -173,5 +133,23 @@ public class CopyService {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
         }
         copyRepository.deleteById(id);
+    }
+
+    // Helpers
+
+    public Copy getCopyOrThrow(Long id) {
+        Optional<Copy> optionalCopy = copyRepository.findById(id);
+        if (optionalCopy.isEmpty()) {
+            throw new ResourceNotFoundException("Copy not found with ID: " + id);
+        }
+        return optionalCopy.get();
+    }
+
+    public Customer getCustomerOrThrow(Long customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            throw new ResourceNotFoundException("Customer not found with ID: " + customerId);
+        }
+        return optionalCustomer.get();
     }
 }
