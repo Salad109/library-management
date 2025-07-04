@@ -20,11 +20,11 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public Page<Customer> findAllCustomers(Pageable pageable) {
+    public Page<Customer> getAllCustomers(Pageable pageable) {
         return customerRepository.findAll(pageable);
     }
 
-    public Customer findCustomerById(Long id) {
+    public Customer getCustomerById(Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) {
             throw new ResourceNotFoundException("Customer not found with ID: " + id);
@@ -51,7 +51,6 @@ public class CustomerService {
         if (customerRepository.findByEmail(newEmail).isPresent() && !newEmail.equals(existingCustomer.getEmail())) {
             throw new DuplicateResourceException("Email already exists: " + customer.getEmail());
         }
-
 
         existingCustomer.setFirstName(customer.getFirstName());
         existingCustomer.setLastName(customer.getLastName());
