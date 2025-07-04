@@ -5,8 +5,3 @@ GET http://localhost:8080/api/authors
 
 # Get specific author by name
 GET http://localhost:8080/api/authors/George Orwell
-
-###
-
-# Search authors by name
-GET http://localhost:8080/api/authors/search?name=Orwell

@@ -20,8 +20,3 @@ GET http://localhost:8080/api/copies/book/9781234567890/count
 
 # Get copies for non-existent book
 GET http://localhost:8080/api/copies/book/9999999999999
-
-###
-
-# Search copies by ISBN and status
-GET http://localhost:8080/api/copies/search?isbn=9781234567890&status=goober-ate-it
