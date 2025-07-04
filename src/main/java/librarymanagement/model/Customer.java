@@ -19,10 +19,7 @@ public class Customer {
     @NotNull
     private String lastName;
 
-    @Pattern(
-            regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
-            message = "Email must be a valid email address"
-    )
+    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Email must be a valid email address")
     private String email;
 
     @OneToMany(mappedBy = "customer")
@@ -60,6 +57,14 @@ public class Customer {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Set<Copy> getCopies() {
