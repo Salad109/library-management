@@ -1,6 +1,7 @@
 package librarymanagement.service;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Customer;
 import librarymanagement.repository.CustomerRepository;
@@ -32,6 +33,9 @@ public class CustomerService {
     }
 
     public Customer addCustomer(Customer customer) {
+        if (customerRepository.findByEmail(customer.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("Email already exists: " + customer.getEmail());
+        }
         return customerRepository.save(customer);
     }
 
@@ -41,10 +45,18 @@ public class CustomerService {
         if (optionalCustomer.isEmpty()) {
             throw new ResourceNotFoundException("Customer not found with ID: " + id);
         }
-        optionalCustomer.get().setFirstName(customer.getFirstName());
-        optionalCustomer.get().setLastName(customer.getLastName());
-        optionalCustomer.get().setEmail(customer.getEmail());
-        return customerRepository.save(optionalCustomer.get());
+        Customer existingCustomer = optionalCustomer.get();
+        String newEmail = customer.getEmail();
+        // Check if new email is already taken by another customer
+        if (customerRepository.findByEmail(newEmail).isPresent() && !newEmail.equals(existingCustomer.getEmail())) {
+            throw new DuplicateResourceException("Email already exists: " + customer.getEmail());
+        }
+
+
+        existingCustomer.setFirstName(customer.getFirstName());
+        existingCustomer.setLastName(customer.getLastName());
+        existingCustomer.setEmail(customer.getEmail());
+        return customerRepository.save(existingCustomer);
     }
 
     @Transactional

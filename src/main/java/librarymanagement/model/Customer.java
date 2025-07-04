@@ -19,6 +19,7 @@ public class Customer {
     @NotNull
     private String lastName;
 
+    @Column(unique = true)
     @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Email must be a valid email address")
     private String email;
 
