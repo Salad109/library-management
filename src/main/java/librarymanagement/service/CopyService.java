@@ -40,15 +40,6 @@ public class CopyService {
         return copyRepository.findByBookIsbnAndStatus(isbn, status, pageable);
     }
 
-    public Page<Copy> searchCopies(String isbn, CopyStatus status, Pageable pageable) {
-        // If no parameters provided, return all copies
-        if (isbn == null && status == null) {
-            return copyRepository.findAll(pageable);
-        } else {
-            return copyRepository.searchCopies(isbn, status, pageable);
-        }
-    }
-
     public long countCopiesByBookIsbnAndStatus(String isbn, CopyStatus status) {
         return copyRepository.countByBookIsbnAndStatus(isbn, status);
     }

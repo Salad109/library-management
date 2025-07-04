@@ -8,7 +8,7 @@ A Spring Boot REST API for managing books and their copies in a library.
 - Copy tracking with status management (available, borrowed, reserved, lost)
 - Author management with many-to-many relationships to books
 - Search functionality across books, copies and authors
-- Comprehensive and meaningful test suite with 91% coverage
+- Comprehensive and meaningful integration and unit tests with >70% coverage
 
 ## Tech Stack
 
@@ -18,7 +18,7 @@ A Spring Boot REST API for managing books and their copies in a library.
 - JUnit 5 + MockMvc for testing
 - Maven
 
-## Getting Started
+## Startup Guide
 
 ```bash
 ./mvnw spring-boot:run
@@ -55,8 +55,6 @@ username: `sa`, no password)
 - `GET /api/copies/book/{isbn}` - Get copies of a specific book (paginated)
 - `GET /api/copies/book/{isbn}/available` - Get available copies (paginated)
 - `GET /api/copies/book/{isbn}/count` - Count available copies
-- `GET /api/copies/search` - Search copies by ISBN and status (paginated)
-    - Example: `/api/copies/search?isbn=9781234567890&status=AVAILABLE&page=0&size=10`
 - `POST /api/copies` - Create copy
 - `PUT /api/copies/{id}/borrow` - Borrow copy
 - `PUT /api/copies/{id}/return` - Return copy
@@ -76,8 +74,14 @@ username: `sa`, no password)
 
 - `GET /api/authors` - List all authors (paginated)
 - `GET /api/authors/{name}` - Get author by name
-- `GET /api/authors/search` - Search authors by name (paginated)
-    - Example: `/api/authors/search?name=orwell&page=0&size=20`
+
+### Customers
+
+- `GET /api/customers` - List all customers (paginated)
+- `GET /api/customers/{id}` - Get customer by ID
+- `POST /api/customers` - Create customer
+- `PUT /api/customers/{id}` - Update customer
+- `DELETE /api/customers/{id}` - Delete customer
 
 ## Example Requests
 
@@ -111,6 +115,17 @@ POST /api/copies
 }
 ```
 
+### Create a Customer
+
+```json
+POST /api/customers
+{
+  "firstName": "Joe",
+  "lastName": "Mama", 
+  "email": "joe.mama@example.com"
+}
+```
+
 ## Testing
 
 Run tests with `./mvnw test`. Coverage report generates in `target/site/jacoco/index.html`.
@@ -124,22 +139,21 @@ Run tests with `./mvnw test`. Coverage report generates in `target/site/jacoco/i
 - `src/main/java/librarymanagement/exception/` - Custom exceptions
 - `exampleRequests/` - Sample HTTP requests for testing
 
-## Development Progress
-
-### Milestones
+## Progress
 
 - [x] Basic book CRUD operations
-- [x] ISBN validation (10 or 13 digits)
-- [x] Many-to-many author-book relationships
-- [x] Duplicate ISBN prevention
+- [x] ISBN regex validation and duplicate prevention
+- [x] Many-to-many author-book relationships with author duplicate prevention
 - [x] Book search by title, author, year, ISBN
 - [x] Copy status tracking (available, borrowed, reserved, lost)
 - [x] State transition validation for copies
-- [x] Copy management system
-- [x] Comprehensive test coverage written while procrastinating adding new features
-- [ ] Customer entity
+- [x] Comprehensive test coverage written while procrastinating adding new features (ongoing)
+- [x] Customer management
 - [ ] Borrowing and renting system with customers
 - [ ] Book categories/genres
+- [ ] Logging and monitoring
+- [ ] Proper API documentation
 - [ ] Authentication
 - [ ] PostgreSQL migration from H2
-- [ ] Docker support
+- [ ] Docker
+- [ ] Microcontroller-based book scanner

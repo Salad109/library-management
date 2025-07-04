@@ -11,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-
 @RestController
 public class CopyController {
 
@@ -47,20 +45,6 @@ public class CopyController {
     @GetMapping("/api/copies/book/{isbn}/count")
     public long countAvailableCopies(@PathVariable String isbn) {
         return copyService.countCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
-    }
-
-    @GetMapping("/api/copies/search")
-    public Page<Copy> searchCopies(@RequestParam(required = false) String bookIsbn, @RequestParam(required = false) String status, Pageable pageable) {
-        bookIsbn = (bookIsbn == null || bookIsbn.isBlank()) ? null : bookIsbn;
-        CopyStatus statusEnum = null;
-        if (status != null && !status.isBlank()) {
-            try {
-                statusEnum = CopyStatus.valueOf(status.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid copy status: " + status + ". Valid values are: " + Arrays.toString(CopyStatus.values()));
-            }
-        }
-        return copyService.searchCopies(bookIsbn, statusEnum, pageable);
     }
 
     @PostMapping("/api/copies")

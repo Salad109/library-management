@@ -7,8 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 public class AuthorController {
@@ -24,21 +25,12 @@ public class AuthorController {
         return authorRepository.findAll(pageable);
     }
 
-    @GetMapping("api/authors/{name}")
+    @GetMapping("/api/authors/{name}")
     public Author getAuthorByName(@PathVariable String name) {
-        Author author = authorRepository.findById(name).orElse(null);
-        if (author == null) {
+        Optional<Author> author = authorRepository.findById(name);
+        if (author.isEmpty()) {
             throw new ResourceNotFoundException("Author not found with name: " + name);
         }
-        return author;
-    }
-
-    @GetMapping("/api/authors/search")
-    public Page<Author> searchAuthors(@RequestParam(required = false) String name, Pageable pageable) {
-        if (name == null || name.isBlank()) {
-            return authorRepository.findAll(pageable);
-        } else {
-            return authorRepository.findByNameContainingIgnoreCase(name, pageable);
-        }
+        return author.get();
     }
 }

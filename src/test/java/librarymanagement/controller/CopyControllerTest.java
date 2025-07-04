@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import librarymanagement.model.CopyStatus;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +19,6 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,51 +198,6 @@ class CopyControllerTest {
         assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson().extractingPath("error")
                 .isEqualTo("Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
-    }
-
-    @Test
-    void testSearchCopies() {
-        BookTestData.BookData bookData = BookTestData.getNextBookData();
-
-        // Add a book
-        addBook(bookData);
-
-        // Add a copy of that book
-        String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
-        mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
-
-        // Search for copies by ISBN, status and both
-        MvcTestResult testResultSearchIsbn = mockMvcTester.get()
-                .uri("/api/copies/search?isbn=" + bookData.ISBN)
-                .exchange();
-        MvcTestResult testResultSearchStatus = mockMvcTester.get()
-                .uri("/api/copies/search?status=AVAILABLE").exchange();
-        MvcTestResult testResultSearchBoth = mockMvcTester.get()
-                .uri("/api/copies/search?isbn=" + bookData.ISBN + "&status=AVAILABLE")
-                .exchange();
-
-        assertThat(testResultSearchIsbn).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(1);
-        assertThat(testResultSearchStatus).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(1);
-        assertThat(testResultSearchBoth).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(1);
-    }
-
-    @Test
-    void testInvalidSearchCopies() {
-        // Search for copies with an invalid status
-        MvcTestResult testResult = mockMvcTester.get()
-                .uri("/api/copies/search?status=EATEN")
-                .exchange();
-
-        assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST)
-                .bodyJson().extractingPath("error")
-                .isEqualTo("Invalid copy status: EATEN. Valid values are: " + Arrays.toString(CopyStatus.values()));
     }
 
     @Test

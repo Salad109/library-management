@@ -50,29 +50,4 @@ public class AuthorControllerTest {
                 .bodyJson().extractingPath("error")
                 .isEqualTo("Author not found with name: " + nonExistentAuthorName);
     }
-
-    @Test
-    void testSearchAuthors() {
-        BookTestData.BookData bookData = BookTestData.getNextBookData();
-        String authorName = bookData.AUTHOR1;
-
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(bookData.JSON)
-                .exchange();
-
-        // Search by author's exact name
-        assertThat(mockMvcTester.get().uri("/api/authors/search?name=" + authorName))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson().
-                extractingPath("totalElements").
-                isEqualTo(1);
-
-        // Blank search to get all authors
-        assertThat(mockMvcTester.get().uri("/api/authors/search")).hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("totalElements").
-                isEqualTo(2);
-    }
 }
