@@ -29,22 +29,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class CopyControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    private MockMvcTester mockMvcTester;
-
-    @PostConstruct
-    void setUp() {
-        mockMvcTester = MockMvcTester.create(mockMvc);
-    }
-
     private static final String INVALID_STATUS_COPY_JSON = """
             {
                 "book": {"isbn": "9781234567890"},
                 "status": "INVALID_STATUS"
             }
             """;
+    @Autowired
+    private MockMvc mockMvc;
+    private MockMvcTester mockMvcTester;
+
+    @PostConstruct
+    void setUp() {
+        mockMvcTester = MockMvcTester.create(mockMvc);
+    }
 
     private String createCopyJson(String isbn, String status) {
         return """
@@ -123,7 +121,7 @@ class CopyControllerTest {
     }
 
     @Test
-    void testGetNonexistingCopyById() {
+    void testGetNonexistentCopyById() {
         MvcTestResult testResult = mockMvcTester.get()
                 .uri("/api/copies/999")
                 .exchange();
@@ -181,7 +179,7 @@ class CopyControllerTest {
     }
 
     @Test
-    void testAddCopyNonexistingBook() {
+    void testAddCopyNonexistentBook() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
 
@@ -262,7 +260,7 @@ class CopyControllerTest {
     }
 
     @Test
-    void testDeleteNonexistingCopy() {
+    void testDeleteNonexistentCopy() {
         MvcTestResult deleteResult = mockMvcTester.delete().uri("/api/copies/999").exchange();
 
         assertThat(deleteResult).hasStatus(HttpStatus.NOT_FOUND)
@@ -386,7 +384,7 @@ class CopyControllerTest {
     }
 
     @Test
-    void testStateTransitionNonexistingCopy() throws Exception {
+    void testStateTransitionNonexistentCopy() throws Exception {
         List<String> transitions = new ArrayList<>(5);
         transitions.add("borrow");
         transitions.add("return");

@@ -23,7 +23,6 @@ class CustomerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     private MockMvcTester mockMvcTester;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
