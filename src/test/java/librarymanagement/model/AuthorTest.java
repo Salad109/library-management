@@ -7,7 +7,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AuthorTest {
+class AuthorTest {
+
     @Test
     void testAuthorCreation() {
         Author author1 = new Author("Joe Mama");
@@ -31,23 +32,33 @@ public class AuthorTest {
     void testChangeBookOwnership() {
         Author author = new Author("Joe Mama");
 
-        BookTestData.BookData bookData1 = BookTestData.getNextBookData();
-        Book book1 = new Book(
-                bookData1.ISBN,
-                bookData1.TITLE,
+        BookTestData.BookData oldBookData = BookTestData.getNextBookData();
+        Book oldBook = new Book(
+                oldBookData.ISBN,
+                oldBookData.TITLE,
                 null,
-                bookData1.PUBLICATION_YEAR
+                oldBookData.PUBLICATION_YEAR
         );
-        BookTestData.BookData bookData2 = BookTestData.getNextBookData();
-        Book book2 = new Book(
-                bookData2.ISBN,
-                bookData2.TITLE,
-                null,
-                bookData2.PUBLICATION_YEAR
-        );
-        author.setBooks(Set.of(book1));
-        author.setBooks(Set.of(book2));
 
-        assertThat(book1.getAuthors()).doesNotContain(author);
+        BookTestData.BookData newBookData = BookTestData.getNextBookData();
+        Book newBook = new Book(
+                newBookData.ISBN,
+                newBookData.TITLE,
+                null,
+                newBookData.PUBLICATION_YEAR
+        );
+
+        // Test setting null
+        author.setBooks(null);
+        assertThat(author.getBooks()).isNotNull().isEmpty();
+
+
+        // Test replacing books
+        author.setBooks(Set.of(oldBook));
+        author.setBooks(Set.of(newBook));
+
+        // Old book should no longer be associated with the author
+        assertThat(oldBook.getAuthors()).doesNotContain(author);
+        assertThat(newBook.getAuthors()).contains(author);
     }
 }

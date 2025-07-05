@@ -30,12 +30,6 @@ public class Customer {
         copies = new LinkedHashSet<>();
     }
 
-    public Customer(String firstName, String lastName, Set<Copy> copies) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.copies = copies != null ? new LinkedHashSet<>(copies) : new LinkedHashSet<>();
-    }
-
     public Long getId() {
         return id;
     }
