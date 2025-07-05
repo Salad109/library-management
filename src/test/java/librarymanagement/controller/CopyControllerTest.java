@@ -29,6 +29,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class CopyControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    private MockMvcTester mockMvcTester;
+
+    @PostConstruct
+    void setUp() {
+        mockMvcTester = MockMvcTester.create(mockMvc);
+    }
+
     private static final String INVALID_STATUS_COPY_JSON = """
             {
                 "book": {"isbn": "9781234567890"},
@@ -41,14 +52,6 @@ class CopyControllerTest {
                 "status": "AVAILABLE"
             }
             """;
-    @Autowired
-    private MockMvc mockMvc;
-    private MockMvcTester mockMvcTester;
-
-    @PostConstruct
-    void setUp() {
-        mockMvcTester = MockMvcTester.create(mockMvc);
-    }
 
     private String createCopyJson(String isbn, String status) {
         return """
@@ -81,8 +84,8 @@ class CopyControllerTest {
         MvcResult result = mockMvc.perform(post("/api/customers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(customerJson))
-                        .andExpect(status().isCreated())
-                        .andReturn();
+                .andExpect(status().isCreated())
+                .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -277,8 +280,8 @@ class CopyControllerTest {
         MvcResult createCopyResult = mockMvc.perform(post("/api/copies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(copyJson))
-                        .andExpect(status().isCreated())
-                        .andReturn();
+                .andExpect(status().isCreated())
+                .andReturn();
 
         // Extract the copy ID from the response
         String copyResponseBody = createCopyResult.getResponse().getContentAsString();

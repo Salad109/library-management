@@ -15,13 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class AuthorControllerTest {
+class AuthorControllerTest {
+
     @Autowired
     private MockMvcTester mockMvcTester;
 
     @Test
     void testGetAllAuthors() {
-        assertThat(mockMvcTester.get().uri("/api/authors")).hasStatus(HttpStatus.OK);
+        assertThat(mockMvcTester.get().uri("/api/authors"))
+                .hasStatus(HttpStatus.OK);
     }
 
     @Test
@@ -29,7 +31,6 @@ public class AuthorControllerTest {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         String authorName = bookData.AUTHOR1;
 
-        // Add a book to automatically create the author
         mockMvcTester.post()
                 .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -38,16 +39,19 @@ public class AuthorControllerTest {
 
         assertThat(mockMvcTester.get().uri("/api/authors/" + authorName))
                 .hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("name").isEqualTo(authorName);
+                .bodyJson()
+                .extractingPath("name")
+                .isEqualTo(authorName);
     }
 
     @Test
     void testGetNonExistentAuthorByName() {
-        String nonExistentAuthorName = "This Author Does Not Exist";
+        String nonExistentAuthorName = "Nonexistent Author Jr.";
 
         assertThat(mockMvcTester.get().uri("/api/authors/" + nonExistentAuthorName))
                 .hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson().extractingPath("error")
+                .bodyJson()
+                .extractingPath("error")
                 .isEqualTo("Author not found with name: " + nonExistentAuthorName);
     }
 }

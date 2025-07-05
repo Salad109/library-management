@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 @Transactional
 class BookControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -31,35 +32,40 @@ class BookControllerTest {
 
     @Test
     void testGetAllBooks() {
-        assertThat(mockMvcTester.get().uri("/api/books")).hasStatus(HttpStatus.OK);
+        assertThat(mockMvcTester.get().uri("/api/books"))
+                .hasStatus(HttpStatus.OK);
     }
 
     @Test
     void testAddBook() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
 
-        MvcTestResult testResult = mockMvcTester.post()
+        MvcTestResult result = mockMvcTester.post()
                 .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookData.JSON)
                 .exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.CREATED)
-                .bodyJson().isLenientlyEqualTo(bookData.JSON);
+        assertThat(result)
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .isLenientlyEqualTo(bookData.JSON);
     }
 
     @Test
     void testAddInvalidBook() {
-        MvcTestResult testResult = mockMvcTester.post()
+        MvcTestResult result = mockMvcTester.post()
                 .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(BookTestData.InvalidBookNoTitleInvalidIsbn.JSON)
                 .exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(testResult).bodyJson().extractingPath("isbn")
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson()
+                .extractingPath("isbn")
                 .isEqualTo("ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979");
-        assertThat(testResult).bodyJson().extractingPath("title")
+        assertThat(result).bodyJson()
+                .extractingPath("title")
                 .isEqualTo("Title cannot be blank");
     }
 
@@ -75,14 +81,16 @@ class BookControllerTest {
                 .exchange();
 
         // Add the same book again
-        MvcTestResult testResult = mockMvcTester.post()
+        MvcTestResult result = mockMvcTester.post()
                 .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookData.JSON)
                 .exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.CONFLICT);
-        assertThat(testResult).bodyJson().extractingPath("error")
+        assertThat(result)
+                .hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("error")
                 .isEqualTo("A book with this ISBN already exists: " + bookData.ISBN);
     }
 
@@ -103,8 +111,11 @@ class BookControllerTest {
                 .param("isbn", bookData.ISBN)
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(1);
+        assertThat(result)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("totalElements")
+                .isEqualTo(1);
     }
 
     @Test
@@ -127,7 +138,13 @@ class BookControllerTest {
                         }
                     ]
                 }
-                """.formatted(bookData2.TITLE, bookData1.PUBLICATION_YEAR, bookData2.ISBN, bookData2.AUTHOR1, bookData2.AUTHOR2);
+                """.formatted(
+                bookData2.TITLE,
+                bookData1.PUBLICATION_YEAR,
+                bookData2.ISBN,
+                bookData2.AUTHOR1,
+                bookData2.AUTHOR2
+        );
 
         // Add both books
         mockMvcTester.post()
@@ -135,6 +152,7 @@ class BookControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookData1.JSON)
                 .exchange();
+
         mockMvcTester.post()
                 .uri("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -147,8 +165,11 @@ class BookControllerTest {
                 .param("publicationYear", bookData1.PUBLICATION_YEAR.toString())
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.OK)
-                .bodyJson().extractingPath("totalElements").isEqualTo(2);
+        assertThat(result)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("totalElements")
+                .isEqualTo(2);
     }
 
     @Test
@@ -163,7 +184,7 @@ class BookControllerTest {
                 .exchange();
 
         // Create updated version
-        String updatedBookDataJson = """
+        String updatedBookJson = """
                 {
                     "title": "%s",
                     "publicationYear": %d,
@@ -177,16 +198,26 @@ class BookControllerTest {
                         }
                     ]
                 }
-                """.formatted(bookData.TITLE + "Updated", bookData.PUBLICATION_YEAR + 1, bookData.ISBN, bookData.AUTHOR1 + "Updated", bookData.AUTHOR2 + "Updated");
+                """.formatted(
+                bookData.TITLE + " Updated",
+                bookData.PUBLICATION_YEAR + 1,
+                bookData.ISBN,
+                bookData.AUTHOR1 + " Updated",
+                bookData.AUTHOR2 + " Updated"
+        );
 
         // Update the book
-        MvcTestResult updateResult = mockMvcTester.put()
+        MvcTestResult result = mockMvcTester.put()
                 .uri("/api/books/" + bookData.ISBN)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(updatedBookDataJson)
+                .content(updatedBookJson)
                 .exchange();
 
-        assertThat(updateResult).hasStatus(HttpStatus.OK);
+        // Assert
+        assertThat(result)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .isLenientlyEqualTo(updatedBookJson);
     }
 
     @Test
@@ -201,8 +232,7 @@ class BookControllerTest {
                 .content(bookData.JSON)
                 .exchange();
 
-        // Try to change the ISBN using a different book's ISBN
-        String bookDataInvalidUpdateJson = """
+        String invalidUpdateJson = """
                 {
                     "title": "%s",
                     "isbn": "%s",
@@ -212,16 +242,23 @@ class BookControllerTest {
                         }
                     ]
                 }
-                """.formatted(bookData.TITLE, differentBookData.ISBN, bookData.AUTHOR1);
+                """.formatted(
+                bookData.TITLE,
+                differentBookData.ISBN,
+                bookData.AUTHOR1
+        );
 
-        MvcTestResult updateResult = mockMvcTester.put()
+        // Try to change the ISBN
+        MvcTestResult result = mockMvcTester.put()
                 .uri("/api/books/" + bookData.ISBN)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(bookDataInvalidUpdateJson)
+                .content(invalidUpdateJson)
                 .exchange();
 
-        assertThat(updateResult).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(updateResult).bodyJson().extractingPath("error")
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("error")
                 .isEqualTo("Cannot change ISBN of an existing book");
     }
 
@@ -229,14 +266,16 @@ class BookControllerTest {
     void testUpdateNonExistentBook() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
 
-        MvcTestResult testResult = mockMvcTester.put()
+        MvcTestResult result = mockMvcTester.put()
                 .uri("/api/books/" + bookData.ISBN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookData.JSON)
                 .exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson().extractingPath("error")
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
                 .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
     }
 
@@ -256,22 +295,29 @@ class BookControllerTest {
                 .hasStatus(HttpStatus.NO_CONTENT);
 
         // Verify the book is deleted
-        MvcTestResult getResult = mockMvcTester.get().uri("/api/books/" + bookData.ISBN).exchange();
-        assertThat(getResult).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(getResult).bodyJson().extractingPath("error")
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/books/" + bookData.ISBN)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
                 .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
     }
 
     @Test
-    void testDeleteNonexistentBook() {
+    void testDeleteNonExistentBook() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
 
-        MvcTestResult testResult = mockMvcTester.delete()
+        MvcTestResult result = mockMvcTester.delete()
                 .uri("/api/books/" + bookData.ISBN)
                 .exchange();
 
-        assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson().extractingPath("error")
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
                 .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
     }
 }
