@@ -34,6 +34,108 @@ class CustomerControllerTest {
     }
 
     @Test
+    void testAddCustomer() throws Exception {
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama"
+                }
+                """;
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .extractingPath("firstName")
+                .isEqualTo("Joe");
+    }
+
+    @Test
+    void testAddCustomerWithMissingFields() throws Exception {
+        String customerJson = """
+                {
+                    "email": "goober@example.com"
+                }
+                """;
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("firstName")
+                .isEqualTo("First name cannot be blank");
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("lastName")
+                .isEqualTo("Last name cannot be blank");
+    }
+
+    @Test
+    void testAddCustomerWithInvalidEmail() throws Exception {
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama",
+                    "email": "invalid-email"
+                }
+                """;
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("email")
+                .isEqualTo("Email must be a valid email address");
+    }
+
+    @Test
+    void testAddCustomerWithDuplicateEmail() throws Exception {
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama",
+                    "email": "goober@example.com"
+                }
+                """;
+
+        // Create the first customer
+        mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        // Attempt to create a second customer with the same email
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo("Email already exists: goober@example.com");
+    }
+
+    @Test
     void testGetAllCustomers() {
         assertThat(mockMvcTester.get().uri("/api/customers"))
                 .hasStatus(HttpStatus.OK);

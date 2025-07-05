@@ -13,10 +13,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull(message = "First name cannot be blank")
     private String firstName;
 
-    @NotNull
+    @NotNull(message = "Last name cannot be blank")
     private String lastName;
 
     @Column(unique = true)
