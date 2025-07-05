@@ -70,6 +70,26 @@ class CopyControllerTest {
         }
     }
 
+    private Long addCustomer(String firstName, String lastName) throws Exception {
+        String customerJson = """
+                {
+                    "firstName": "%s",
+                    "lastName": "%s"
+                }
+                """.formatted(firstName, lastName);
+
+        MvcResult result = mockMvc.perform(post("/api/customers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(customerJson))
+                        .andExpect(status().isCreated())
+                        .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return jsonNode.get("id").asLong();
+    }
+
     @Test
     void testGetAllCopies() {
         assertThat(mockMvcTester.get().uri("/api/copies")).hasStatus(HttpStatus.OK);
@@ -250,24 +270,7 @@ class CopyControllerTest {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         addBook(bookData);
 
-        // Create a customer
-        String customerJson = """
-                {
-                    "firstName": "Joe",
-                    "lastName": "Mama"
-                }
-                """;
-        MvcResult createCustomerResult = mockMvc.perform(post("/api/customers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(customerJson))
-                        .andExpect(status().isCreated())
-                        .andReturn();
-
-        // Extract the customer ID from the response
-        String customerResponseBody = createCustomerResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode customerJsonNode = objectMapper.readTree(customerResponseBody);
-        String customerId = customerJsonNode.get("id").asText();
+        Long customerId = addCustomer("Joe", "Mama");
 
         // Create copy with initial status
         String copyJson = createCopyJson(bookData.ISBN, initialStatus);
@@ -279,6 +282,7 @@ class CopyControllerTest {
 
         // Extract the copy ID from the response
         String copyResponseBody = createCopyResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode copyJsonNode = objectMapper.readTree(copyResponseBody);
         String copyId = copyJsonNode.get("id").asText();
 
@@ -302,6 +306,8 @@ class CopyControllerTest {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         addBook(bookData);
 
+        Long customerId = addCustomer("Jane", "Mama");
+
         // Create copy with initial status
         String copyJson = createCopyJson(bookData.ISBN, initialStatus);
         MvcResult createResult = mockMvc.perform(post("/api/copies")
@@ -318,7 +324,7 @@ class CopyControllerTest {
 
         // Attempt invalid state transition
         MvcTestResult result = mockMvcTester.put()
-                .uri("/api/copies/" + copyId + "/" + action)
+                .uri("/api/copies/" + copyId + "/" + action + "/" + customerId)
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
@@ -326,7 +332,7 @@ class CopyControllerTest {
     }
 
     @Test
-    void testStateTransitionNonexistingCopy() {
+    void testStateTransitionNonexistingCopy() throws Exception {
         List<String> transitions = new ArrayList<>(5);
         transitions.add("borrow");
         transitions.add("return");
@@ -334,8 +340,11 @@ class CopyControllerTest {
         transitions.add("reserve");
         transitions.add("undo-reserve");
 
+        Long customerId = addCustomer("The", "Goober");
+
+        // Attempt state transitions on a non-existing copy ID 999
         for (String transition : transitions) {
-            assertThat(mockMvcTester.put().uri("/api/copies/999/" + transition).exchange())
+            assertThat(mockMvcTester.put().uri("/api/copies/999/" + transition + "/" + customerId).exchange())
                     .hasStatus(HttpStatus.NOT_FOUND)
                     .bodyJson()
                     .extractingPath("error")
