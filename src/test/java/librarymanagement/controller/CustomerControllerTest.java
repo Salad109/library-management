@@ -187,6 +187,150 @@ class CustomerControllerTest {
                 .isEqualTo("Customer not found with ID: 999");
     }
 
+    @Test
+    void testUpdateCustomer() throws Exception {
+        // Create a customer
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama",
+                    "email": "joe@example.com"
+                }
+                """;
+
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        String customerId = extractId(createResult);
+
+        // Update the customer
+        String updatedCustomerJson = """
+                {
+                    "firstName": "Joe Jr.",
+                    "lastName": "Mama",
+                    "email": "joe@example.com"
+                }
+                """;
+
+        MvcTestResult updateResult = mockMvcTester.put()
+                .uri("/api/customers/" + customerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedCustomerJson)
+                .exchange();
+
+        assertThat(updateResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("firstName")
+                .isEqualTo("Joe Jr.");
+    }
+
+    @Test
+    void testUpdateCustomerWithDuplicateEmail() throws Exception {
+        // Create the first customer
+        String customerJson1 = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama",
+                    "email": "goober@example.com"
+                }
+                """;
+        MvcTestResult createResult1 = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson1)
+                .exchange();
+
+        assertThat(createResult1).hasStatus(HttpStatus.CREATED);
+
+        String customerId1 = extractId(createResult1);
+
+        // Create the second customer
+        String customerJson2 = """
+                {
+                    "firstName": "Jane",
+                    "lastName": "Mama",
+                    "email": "jane@example.com"
+                    }
+                """;
+
+        MvcTestResult createResult2 = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson2)
+                .exchange();
+
+        assertThat(createResult2).hasStatus(HttpStatus.CREATED);
+
+        // Attempt to update the first customer with the second customer's email
+        String updatedCustomerJson = """
+                {
+                    "firstName": "Joe Updated",
+                    "lastName": "Mama Updated",
+                    "email": "jane@example.com"
+                    }
+                """;
+
+        MvcTestResult updateResult = mockMvcTester.put()
+                .uri("/api/customers/" + customerId1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedCustomerJson)
+                .exchange();
+
+        assertThat(updateResult)
+                .hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo("Email already exists: jane@example.com");
+    }
+
+    @Test
+    void testUpdateCustomerWithNullFields() throws Exception {
+        // Create a customer
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama",
+                    "email": "goober@example.com"
+                }
+                """;
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+        String customerId = extractId(createResult);
+
+        // Update the customer with null fields
+        String updatedCustomerJson = """
+                {
+                }
+                """;
+
+        MvcTestResult updateResult = mockMvcTester.put()
+                .uri("/api/customers/" + customerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedCustomerJson)
+                .exchange();
+
+        assertThat(updateResult)
+                .hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(updateResult)
+                .bodyJson()
+                .extractingPath("firstName")
+                .isEqualTo("First name cannot be blank");
+        assertThat(updateResult)
+                .bodyJson()
+                .extractingPath("lastName")
+                .isEqualTo("Last name cannot be blank");
+    }
+
     // Helper
 
     private String extractId(MvcTestResult result) throws Exception {

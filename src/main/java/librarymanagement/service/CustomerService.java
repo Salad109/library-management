@@ -47,8 +47,10 @@ public class CustomerService {
         }
         Customer existingCustomer = optionalCustomer.get();
         String newEmail = customer.getEmail();
+
         // Check if new email is already taken by another customer
-        if (customerRepository.findByEmail(newEmail).isPresent() && !newEmail.equals(existingCustomer.getEmail())) {
+        Optional<Customer> potentialDuplicateCustomer = customerRepository.findByEmail(newEmail);
+        if (potentialDuplicateCustomer.isPresent() && !potentialDuplicateCustomer.get().getId().equals(id)) {
             throw new DuplicateResourceException("Email already exists: " + customer.getEmail());
         }
 
