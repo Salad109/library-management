@@ -331,6 +331,58 @@ class CustomerControllerTest {
                 .isEqualTo("Last name cannot be blank");
     }
 
+    @Test
+    void testDeleteCustomer() throws Exception {
+        // Create a customer
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama"
+                }
+                """;
+
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        String customerId = extractId(createResult);
+
+        // Delete the customer
+        MvcTestResult deleteResult = mockMvcTester.delete()
+                .uri("/api/customers/" + customerId)
+                .exchange();
+
+        assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
+
+        // Verify the customer is deleted
+        MvcTestResult getResult = mockMvcTester.get()
+                .uri("/api/customers/" + customerId)
+                .exchange();
+
+        assertThat(getResult)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo("Customer not found with ID: " + customerId);
+    }
+
+    @Test
+    void testDeleteNonexistentCustomer() {
+        MvcTestResult result = mockMvcTester.delete()
+                .uri("/api/customers/999")
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo("Customer not found with ID: 999");
+    }
+
     // Helper
 
     private String extractId(MvcTestResult result) throws Exception {
