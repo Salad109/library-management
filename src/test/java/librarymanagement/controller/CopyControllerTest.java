@@ -290,9 +290,9 @@ class CopyControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "LOST, borrow, 'Copy is not available for borrowing. Current status: LOST'",
+            "LOST, borrow, 'Copy is not currently available for borrowing. Current status: LOST'",
             "AVAILABLE, return, 'Copy is not currently borrowed. Current status: AVAILABLE'",
-            "LOST, reserve, 'Copy is not available for reservation. Current status: LOST'",
+            "LOST, reserve, 'Copy is not currently available for reservation. Current status: LOST'",
             "AVAILABLE, undo-reserve, 'Copy is not currently reserved. Current status: AVAILABLE'"
     })
     void testInvalidStateTransitions(String initialStatus, String action, String expectedError) throws Exception {
@@ -320,6 +320,49 @@ class CopyControllerTest {
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result).bodyJson().extractingPath("error").isEqualTo(expectedError);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "BORROWED, return",
+            "AVAILABLE, lost",
+            "RESERVED, undo-reserve"
+    })
+    void testStateTransitionsInvalidCustomer(String initialState, String action) throws Exception {
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+        addBook(bookData);
+
+        // Add customers
+        Long oldCustomerId = addCustomer("Joe", "Mama");
+        Long newCustomerId = addCustomer("Jane", "Mama");
+
+        // Create copy with initial status
+        String copyJson = """
+                {
+                    "book": {"isbn": "%s"},
+                    "status": "%s",
+                    "customer": {"id": %d}
+                }
+                """.formatted(bookData.ISBN, initialState, oldCustomerId);
+        MvcTestResult createCopyResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(createCopyResult).hasStatus(HttpStatus.CREATED);
+
+        String copyId = extractIdFromResponse(createCopyResult);
+
+        // Attempt state transition with a different customer
+        MvcTestResult result = mockMvcTester.put()
+                .uri("/api/copies/" + copyId + "/" + action + "/" + newCustomerId)
+                .exchange();
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo("Copy is not currently used by the specified customer. Current customer: " + oldCustomerId);
     }
 
     @Test

@@ -33,25 +33,28 @@ public class CustomerService {
     }
 
     public Customer addCustomer(Customer customer) {
-        if (customerRepository.findByEmail(customer.getEmail()).isPresent()) {
-            throw new DuplicateResourceException("Email already exists: " + customer.getEmail());
+        String email = customer.getEmail();
+
+        if (email != null && !email.isBlank()) {
+            Optional<Customer> existingCustomer = customerRepository.findByEmail(email);
+            if (existingCustomer.isPresent()) {
+                throw new DuplicateResourceException("Email already exists: " + email);
+            }
         }
         return customerRepository.save(customer);
     }
 
     @Transactional
     public Customer updateCustomer(Long id, Customer customer) {
-        Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if (optionalCustomer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + id);
-        }
-        Customer existingCustomer = optionalCustomer.get();
+        Customer existingCustomer = getCustomerById(id);
+
         String newEmail = customer.getEmail();
 
-        // Check if new email is already taken by another customer
-        Optional<Customer> potentialDuplicateCustomer = customerRepository.findByEmail(newEmail);
-        if (potentialDuplicateCustomer.isPresent() && !potentialDuplicateCustomer.get().getId().equals(id)) {
-            throw new DuplicateResourceException("Email already exists: " + customer.getEmail());
+        if (newEmail != null && !newEmail.isBlank()) {
+            Optional<Customer> duplicateCustomer = customerRepository.findByEmail(newEmail);
+            if (duplicateCustomer.isPresent() && !duplicateCustomer.get().getId().equals(id)) {
+                throw new DuplicateResourceException("Email already exists: " + newEmail);
+            }
         }
 
         existingCustomer.setFirstName(customer.getFirstName());

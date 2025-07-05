@@ -57,7 +57,7 @@ public class CopyService {
     public Copy borrowCopy(Long copyId, Long customerId) {
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException("Copy is not available for borrowing. Current status: " + existingCopy.getStatus());
+            throw new IllegalStateException("Copy is not currently available for borrowing. Current status: " + existingCopy.getStatus());
         }
 
         Customer customer = getCustomerOrThrow(customerId);
@@ -76,7 +76,7 @@ public class CopyService {
 
         Customer customer = getCustomerOrThrow(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
-            throw new IllegalStateException("Copy is not used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
+            throw new IllegalStateException("Copy is not currently used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
 
         existingCopy.setCustomer(null);
@@ -101,7 +101,7 @@ public class CopyService {
     public Copy reserveCopy(Long copyId, Long customerId) {
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException("Copy is not available for reservation. Current status: " + existingCopy.getStatus());
+            throw new IllegalStateException("Copy is not currently available for reservation. Current status: " + existingCopy.getStatus());
         }
 
         Customer customer = getCustomerOrThrow(customerId);
