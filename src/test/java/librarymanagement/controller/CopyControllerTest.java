@@ -185,7 +185,7 @@ class CopyControllerTest {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
 
-        // Attempt to add a copy with a non-existing book
+        // Attempt to add a copy of a non-existing book
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/copies")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -195,6 +195,26 @@ class CopyControllerTest {
         assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson().extractingPath("error")
                 .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
+    }
+
+    @Test
+    void testAddCopyNullBook() {
+        String copyJson = """
+                {
+                    "status": "AVAILABLE"
+                }
+                """;
+
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+        assertThat(testResult)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo("Copy must be associated with an existing book");
     }
 
     @Test
