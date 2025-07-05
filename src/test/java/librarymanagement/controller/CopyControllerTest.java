@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -46,12 +45,6 @@ class CopyControllerTest {
                 "status": "INVALID_STATUS"
             }
             """;
-    private static final String INVALID_BOOK_COPY_JSON = """
-            {
-                "book": {"isbn": "9999999999999"},
-                "status": "AVAILABLE"
-            }
-            """;
 
     private String createCopyJson(String isbn, String status) {
         return """
@@ -81,16 +74,20 @@ class CopyControllerTest {
                 }
                 """.formatted(firstName, lastName);
 
-        MvcResult result = mockMvc.perform(post("/api/customers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(customerJson))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
 
+        return Long.parseLong(extractIdFromResponse(result));
+    }
+
+    public String extractIdFromResponse(MvcTestResult result) throws Exception {
         String responseBody = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("id").asLong();
+        return jsonNode.get("id").asText();
     }
 
     @Test
@@ -115,11 +112,7 @@ class CopyControllerTest {
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
-        // Extract the copy ID from the response
-        String responseBody = createResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        String copyId = jsonNode.get("id").asText();
+        String copyId = extractIdFromResponse(createResult);
 
         // Get the copy by ID
         MvcTestResult testResult = mockMvcTester.get()
@@ -232,17 +225,15 @@ class CopyControllerTest {
 
         // Add a copy of that book
         String copyJson = createCopyJson(bookData.ISBN, "AVAILABLE");
-        MvcResult createResult = mockMvc.perform(post("/api/copies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(copyJson))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
 
-        // Extract the copy ID from the response
-        String responseBody = createResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        String copyId = jsonNode.get("id").asText();
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        String copyId = extractIdFromResponse(createResult);
 
         // Delete the copy
         MvcTestResult deleteResult = mockMvcTester.delete().uri("/api/copies/" + copyId).exchange();
@@ -277,17 +268,16 @@ class CopyControllerTest {
 
         // Create copy with initial status
         String copyJson = createCopyJson(bookData.ISBN, initialStatus);
-        MvcResult createCopyResult = mockMvc.perform(post("/api/copies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(copyJson))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcTestResult createCopyResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(createCopyResult).hasStatus(HttpStatus.CREATED);
 
         // Extract the copy ID from the response
-        String copyResponseBody = createCopyResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode copyJsonNode = objectMapper.readTree(copyResponseBody);
-        String copyId = copyJsonNode.get("id").asText();
+        String copyId = extractIdFromResponse(createCopyResult);
 
         // Perform state transition
         MvcTestResult result = mockMvcTester.put()
@@ -313,17 +303,15 @@ class CopyControllerTest {
 
         // Create copy with initial status
         String copyJson = createCopyJson(bookData.ISBN, initialStatus);
-        MvcResult createResult = mockMvc.perform(post("/api/copies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(copyJson))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
 
-        // Extract the copy ID from the response
-        String responseBody = createResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        String copyId = jsonNode.get("id").asText();
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        String copyId = extractIdFromResponse(createResult);
 
         // Attempt invalid state transition
         MvcTestResult result = mockMvcTester.put()

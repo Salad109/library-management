@@ -31,12 +31,6 @@ class BookControllerTest {
     }
 
     @Test
-    void testGetAllBooks() {
-        assertThat(mockMvcTester.get().uri("/api/books"))
-                .hasStatus(HttpStatus.OK);
-    }
-
-    @Test
     void testAddBook() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
 
@@ -92,6 +86,12 @@ class BookControllerTest {
                 .bodyJson()
                 .extractingPath("error")
                 .isEqualTo("A book with this ISBN already exists: " + bookData.ISBN);
+    }
+
+    @Test
+    void testGetAllBooks() {
+        assertThat(mockMvcTester.get().uri("/api/books"))
+                .hasStatus(HttpStatus.OK);
     }
 
     @Test
