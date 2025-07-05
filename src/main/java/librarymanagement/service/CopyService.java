@@ -75,7 +75,7 @@ public class CopyService {
         }
 
         Customer customer = getCustomerOrThrow(customerId);
-        if (!existingCopy.getCustomer().equals(customer)) {
+        if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             throw new IllegalStateException("Copy is not used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
 
@@ -89,7 +89,7 @@ public class CopyService {
         Copy existingCopy = getCopyOrThrow(copyId);
 
         Customer customer = getCustomerOrThrow(customerId);
-        if (!existingCopy.getCustomer().equals(customer)) {
+        if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             throw new IllegalStateException("Copy is not currently used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
 
@@ -119,7 +119,7 @@ public class CopyService {
         }
 
         Customer customer = getCustomerOrThrow(customerId);
-        if (!existingCopy.getCustomer().equals(customer)) {
+        if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             throw new IllegalStateException("Copy is not currently used by the specified customer. Current customer: " + existingCopy.getCustomer().getId());
         }
 

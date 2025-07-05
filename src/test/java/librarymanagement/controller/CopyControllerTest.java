@@ -250,23 +250,41 @@ class CopyControllerTest {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         addBook(bookData);
 
+        // Create a customer
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama"
+                }
+                """;
+        MvcResult createCustomerResult = mockMvc.perform(post("/api/customers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(customerJson))
+                        .andExpect(status().isCreated())
+                        .andReturn();
+
+        // Extract the customer ID from the response
+        String customerResponseBody = createCustomerResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode customerJsonNode = objectMapper.readTree(customerResponseBody);
+        String customerId = customerJsonNode.get("id").asText();
+
         // Create copy with initial status
         String copyJson = createCopyJson(bookData.ISBN, initialStatus);
-        MvcResult createResult = mockMvc.perform(post("/api/copies")
+        MvcResult createCopyResult = mockMvc.perform(post("/api/copies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(copyJson))
-                .andExpect(status().isCreated())
-                .andReturn();
+                        .andExpect(status().isCreated())
+                        .andReturn();
 
         // Extract the copy ID from the response
-        String responseBody = createResult.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        String copyId = jsonNode.get("id").asText();
+        String copyResponseBody = createCopyResult.getResponse().getContentAsString();
+        JsonNode copyJsonNode = objectMapper.readTree(copyResponseBody);
+        String copyId = copyJsonNode.get("id").asText();
 
         // Perform state transition
         MvcTestResult result = mockMvcTester.put()
-                .uri("/api/copies/" + copyId + "/" + action)
+                .uri("/api/copies/" + copyId + "/" + action + "/" + customerId)
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.OK);
