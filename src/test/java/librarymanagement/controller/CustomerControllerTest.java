@@ -1,7 +1,5 @@
 package librarymanagement.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import librarymanagement.testdata.BookTestData;
@@ -26,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class CustomerControllerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     private MockMvcTester mockMvcTester;
@@ -36,33 +33,8 @@ class CustomerControllerTest {
         mockMvcTester = MockMvcTester.create(mockMvc);
     }
 
-
-    private Long addCustomer(String firstName, String lastName) throws Exception {
-        String customerJson = """
-                {
-                    "firstName": "%s",
-                    "lastName": "%s"
-                }
-                """.formatted(firstName, lastName);
-
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
-
-        return Long.parseLong(extractIdFromResponse(result));
-    }
-
-    public String extractIdFromResponse(MvcTestResult result) throws Exception {
-        String responseBody = result.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("id").asText();
-    }
-
     @Test
-    void testAddCustomer() throws Exception {
+    void testAddCustomer() {
         String customerJson = """
                 {
                     "firstName": "Joe",
@@ -84,7 +56,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void testAddCustomerWithMissingFields() throws Exception {
+    void testAddCustomerWithMissingFields() {
         String customerJson = """
                 {
                     "email": "goober@example.com"
@@ -110,7 +82,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void testAddCustomerWithInvalidEmail() throws Exception {
+    void testAddCustomerWithInvalidEmail() {
         String customerJson = """
                 {
                     "firstName": "Joe",
@@ -133,7 +105,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void testAddCustomerWithDuplicateEmail() throws Exception {
+    void testAddCustomerWithDuplicateEmail() {
         String customerJson = """
                 {
                     "firstName": "Joe",
@@ -188,7 +160,7 @@ class CustomerControllerTest {
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
-        String customerId = extractId(createResult);
+        String customerId = ControllerTestUtils.extractIdFromResponse(createResult);
 
         // Get customer
         MvcTestResult result = mockMvcTester.get()
@@ -234,7 +206,7 @@ class CustomerControllerTest {
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
-        String customerId = extractId(createResult);
+        String customerId = ControllerTestUtils.extractIdFromResponse(createResult);
 
         // Update the customer
         String updatedCustomerJson = """
@@ -276,7 +248,7 @@ class CustomerControllerTest {
 
         assertThat(createResult1).hasStatus(HttpStatus.CREATED);
 
-        String customerId1 = extractId(createResult1);
+        String customerId1 = ControllerTestUtils.extractIdFromResponse(createResult1);
 
         // Create the second customer
         String customerJson2 = """
@@ -333,7 +305,7 @@ class CustomerControllerTest {
                 .content(customerJson)
                 .exchange();
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
-        String customerId = extractId(createResult);
+        String customerId = ControllerTestUtils.extractIdFromResponse(createResult);
 
         // Update the customer with null fields
         String updatedCustomerJson = """
@@ -379,7 +351,7 @@ class CustomerControllerTest {
                 .exchange();
 
         assertThat(customerResult).hasStatus(HttpStatus.CREATED);
-        String customerId = extractId(customerResult);
+        String customerId = ControllerTestUtils.extractIdFromResponse(customerResult);
 
         // Create a book
         BookTestData.BookData bookData = BookTestData.getNextBookData();
@@ -432,7 +404,7 @@ class CustomerControllerTest {
 
     @Test
     void testBorrowReserveNonexistentCopy() throws Exception {
-        Long customerId = addCustomer("The", "Goober");
+        Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "The", "Goober");
 
         List<String> customerOperations = List.of("borrow", "reserve");
 
@@ -463,7 +435,7 @@ class CustomerControllerTest {
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
-        String customerId = extractId(createResult);
+        String customerId = ControllerTestUtils.extractIdFromResponse(createResult);
 
         // Delete the customer
         MvcTestResult deleteResult = mockMvcTester.delete()
@@ -495,13 +467,5 @@ class CustomerControllerTest {
                 .bodyJson()
                 .extractingPath("error")
                 .isEqualTo("Customer not found with ID: 999");
-    }
-
-    // Helper
-
-    private String extractId(MvcTestResult result) throws Exception {
-        String responseBody = result.getResponse().getContentAsString();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("id").asText();
     }
 }
