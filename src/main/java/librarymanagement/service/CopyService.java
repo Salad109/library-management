@@ -61,7 +61,7 @@ public class CopyService {
     public Copy borrowAnyAvailableCopy(String isbn, Long customerId) {
         Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
         if (availableCopies.isEmpty()) {
-            throw new IllegalStateException("No available copies found for book with ISBN: " + isbn);
+            throw new ResourceNotFoundException("No available copies found for book with ISBN: " + isbn);
         }
 
         Copy copyToBorrow = availableCopies.getContent().get(0); // Borrow the first available copy
@@ -116,7 +116,7 @@ public class CopyService {
     public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
         Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
         if (availableCopies.isEmpty()) {
-            throw new IllegalStateException("No available copies found for book with ISBN: " + isbn);
+            throw new ResourceNotFoundException("No available copies found for book with ISBN: " + isbn);
         }
 
         Copy copyToReserve = availableCopies.getContent().get(0); // Reserve the first available copy

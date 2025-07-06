@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -272,10 +271,8 @@ class CopyControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AVAILABLE, borrow, BORROWED",
             "BORROWED, return, AVAILABLE",
             "AVAILABLE, lost, LOST",
-            "AVAILABLE, reserve, RESERVED",
             "RESERVED, undo-reserve, AVAILABLE"
     })
     void testValidStateTransitions(String initialStatus, String action, String expectedFinalStatus) throws Exception {
@@ -308,9 +305,7 @@ class CopyControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "LOST, borrow, 'Copy is not currently available for borrowing. Current status: LOST'",
             "AVAILABLE, return, 'Copy is not currently borrowed. Current status: AVAILABLE'",
-            "LOST, reserve, 'Copy is not currently available for reservation. Current status: LOST'",
             "AVAILABLE, undo-reserve, 'Copy is not currently reserved. Current status: AVAILABLE'"
     })
     void testInvalidStateTransitions(String initialStatus, String action, String expectedError) throws Exception {
@@ -385,22 +380,28 @@ class CopyControllerTest {
 
     @Test
     void testStateTransitionNonexistentCopy() throws Exception {
-        List<String> transitions = new ArrayList<>(5);
-        transitions.add("borrow");
-        transitions.add("return");
-        transitions.add("lost");
-        transitions.add("reserve");
-        transitions.add("undo-reserve");
-
         Long customerId = addCustomer("The", "Goober");
 
-        // Attempt state transitions on a non-existing copy ID 999
-        for (String transition : transitions) {
+        // Test CopyController transitions
+        List<String> copyTransitions = List.of("return", "lost", "undo-reserve");
+
+        for (String transition : copyTransitions) {
             assertThat(mockMvcTester.put().uri("/api/copies/999/" + transition + "/" + customerId).exchange())
                     .hasStatus(HttpStatus.NOT_FOUND)
                     .bodyJson()
                     .extractingPath("error")
                     .isEqualTo("Copy not found with ID: 999");
+        }
+
+        // Test CustomerController transitions
+        List<String> customerOperations = List.of("borrow", "reserve");
+
+        for (String operation : customerOperations) {
+            assertThat(mockMvcTester.post().uri("/api/customers/" + customerId + "/" + operation + "/9781234567890").exchange())
+                    .hasStatus(HttpStatus.NOT_FOUND)
+                    .bodyJson()
+                    .extractingPath("error")
+                    .isEqualTo("No available copies found for book with ISBN: 9781234567890");
         }
     }
 }

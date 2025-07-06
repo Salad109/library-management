@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,11 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class CustomerControllerTest {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     private MockMvcTester mockMvcTester;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostConstruct
     void setUp() {
@@ -328,6 +330,77 @@ class CustomerControllerTest {
                 .bodyJson()
                 .extractingPath("lastName")
                 .isEqualTo("Last name cannot be blank");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "AVAILABLE, borrow, BORROWED",
+            "AVAILABLE, reserve, RESERVED"
+    })
+    void testBorrowReserveCopy(String initialStatus, String action, String expectedFinalStatus) throws Exception {
+        // Create a customer
+        String customerJson = """
+                {
+                    "firstName": "Joe",
+                    "lastName": "Mama"
+                }
+                """;
+        MvcTestResult customerResult = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(customerResult).hasStatus(HttpStatus.CREATED);
+        String customerId = extractId(customerResult);
+
+        // Create a book
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+        MvcTestResult bookResult = mockMvcTester.post()
+                .uri("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(bookData.JSON)
+                .exchange();
+
+        assertThat(bookResult).hasStatus(HttpStatus.CREATED);
+
+        // Create a copy
+        String copyJson = """
+                {
+                    "book": {"isbn": "%s"},
+                    "status": "%s",
+                    "customer": TBD
+                    }
+                """.formatted(bookData.ISBN, initialStatus);
+
+        if (initialStatus.equals("AVAILABLE")) {
+            copyJson = copyJson.replace("TBD", "null"); // No customer for available copies
+        } else {
+            copyJson = copyJson.replace("TBD", """
+                    {
+                        "id": %s
+                    }
+                    """.formatted(customerId)); // Associate customer for reserved or borrowed copies
+        }
+
+        MvcTestResult copyResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(copyResult).hasStatus(HttpStatus.CREATED);
+
+        // Borrow the copy
+        MvcTestResult borrowResult = mockMvcTester.post()
+                .uri("/api/customers/" + customerId + "/" + action + "/" + bookData.ISBN)
+                .exchange();
+
+        assertThat(borrowResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("status")
+                .isEqualTo(expectedFinalStatus);
     }
 
     @Test
