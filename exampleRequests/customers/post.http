@@ -22,6 +22,11 @@ Content-Type: application/json
 
 ###
 
+# Borrow any book
+POST http://localhost:8080/api/customers/1/borrow/9781234567890
+
+###
+
 # Invalid - duplicate email
 POST http://localhost:8080/api/customers
 Content-Type: application/json
