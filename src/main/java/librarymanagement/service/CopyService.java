@@ -150,6 +150,18 @@ public class CopyService {
     }
 
     @Transactional
+    public Copy checkoutReservedCopy(Long copyId) {
+        Copy existingCopy = getCopyOrThrow(copyId);
+
+        if (existingCopy.getStatus() != CopyStatus.RESERVED) {
+            throw new IllegalStateException("Copy is not currently reserved. Current status: " + existingCopy.getStatus());
+        }
+
+        existingCopy.setStatus(CopyStatus.BORROWED);
+        return copyRepository.save(existingCopy);
+    }
+
+    @Transactional
     public void deleteCopy(Long id) {
         if (!copyRepository.existsById(id)) {
             throw new ResourceNotFoundException("Copy not found with ID: " + id);
