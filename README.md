@@ -7,6 +7,8 @@ A Spring Boot REST API for managing books and their copies in a library.
 - Book management with ISBN validation and author relationships
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
+- Customer management with email validation
+- Borrowing and reservation system
 - Search functionality across books, copies and authors
 - Robust integration and unit tests with >80% coverage
 
@@ -56,11 +58,10 @@ username: `sa`, no password)
 - `GET /api/copies/book/{isbn}/available` - Get available copies (paginated)
 - `GET /api/copies/book/{isbn}/count` - Count available copies
 - `POST /api/copies` - Create copy
-- `PUT /api/copies/{copyId}/borrow/{customerId}` - Borrow copy
 - `PUT /api/copies/{copyId}/return/{customerId}` - Return copy
-- `PUT /api/copies/{copyId}/reserve/{customerId}` - Reserve copy
-- `PUT /api/copies/{copyId}/undo-reserve/{customerId}` - Cancel reservation
 - `PUT /api/copies/{copyId}/lost/{customerId}` - Mark copy as lost
+- `PUT /api/copies/{copyId}/undo-reserve/{customerId}` - Cancel reservation
+- `PUT /api/copies/{copyId}/checkout` - Checkout reserved copy (changes status from RESERVED to BORROWED)
 - `DELETE /api/copies/{id}` - Delete copy
 
 #### Copy Status Values
@@ -79,7 +80,10 @@ username: `sa`, no password)
 
 - `GET /api/customers` - List all customers (paginated)
 - `GET /api/customers/{id}` - Get customer by ID
+- `GET /api/customers/{id}/copies` - Get all copies associated with a customer (paginated)
 - `POST /api/customers` - Create customer
+- `POST /api/customers/{customerId}/borrow/{isbn}` - Borrow any available copy of a book
+- `POST /api/customers/{customerId}/reserve/{isbn}` - Reserve any available copy of a book
 - `PUT /api/customers/{id}` - Update customer
 - `DELETE /api/customers/{id}` - Delete customer
 
@@ -126,13 +130,29 @@ POST /api/customers
 }
 ```
 
-### Borrow a Copy
+### Borrow a Book (any available copy)
 
-```json
-PUT /api/copies/1/borrow/1
+```
+POST /api/customers/1/borrow/9789876543210
 ```
 
-This will change the copy status to `BORROWED` and associate it with the customer.
+This will find the first available copy of the book with the given ISBN and change its status to `BORROWED`, associating it with the customer.
+
+### Reserve a Book (any available copy)
+
+```
+POST /api/customers/1/reserve/9789876543210
+```
+
+This will find the first available copy of the book with the given ISBN and change its status to `RESERVED`, associating it with the customer.
+
+### Checkout a Reserved Copy
+
+```
+PUT /api/copies/1/checkout
+```
+
+This changes a reserved copy's status from `RESERVED` to `BORROWED`. The customer association remains the same.
 
 ## Progress
 
@@ -144,7 +164,7 @@ This will change the copy status to `BORROWED` and associate it with the custome
 - [x] State transition validation for copies
 - [x] Comprehensive test coverage written while procrastinating adding new features (ongoing)
 - [x] Customer management
-- [x] Borrowing and renting system with customers
+- [x] Borrowing and reservation system with customers
 - [ ] Book categories/genres
 - [ ] Logging and monitoring
 - [ ] Proper API documentation
