@@ -1,7 +1,9 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
+import librarymanagement.model.Copy;
 import librarymanagement.model.Customer;
+import librarymanagement.service.CopyService;
 import librarymanagement.service.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final CopyService copyService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, CopyService copyService) {
         this.customerService = customerService;
+        this.copyService = copyService;
     }
 
     @GetMapping("/api/customers")
@@ -27,10 +31,25 @@ public class CustomerController {
         return customerService.getCustomerById(id);
     }
 
+    @GetMapping("/api/customers/{id}/copies")
+    public Page<Copy> getCopiesByCustomerId(@PathVariable Long id, Pageable pageable) {
+        return copyService.getCopiesByCustomerId(id, pageable);
+    }
+
     @PostMapping("/api/customers")
     @ResponseStatus(HttpStatus.CREATED)
     public Customer addCustomer(@Valid @RequestBody Customer customer) {
         return customerService.addCustomer(customer);
+    }
+
+    @PostMapping("/api/customers/{customerId}/borrow/{isbn}")
+    public Copy borrowBook(@PathVariable Long customerId, @PathVariable String isbn) {
+        return copyService.borrowAnyAvailableCopy(isbn, customerId);
+    }
+
+    @PostMapping("/api/customers/{customerId}/reserve/{isbn}")
+    public Copy reserveBook(@PathVariable Long customerId, @PathVariable String isbn) {
+        return copyService.reserveAnyAvailableCopy(isbn, customerId);
     }
 
     @PutMapping("/api/customers/{id}")

@@ -61,16 +61,6 @@ public class CopyController {
         return copyService.addCopy(copy);
     }
 
-    @PostMapping("/api/customers/{customerId}/borrow/{isbn}")
-    public Copy borrowBook(@PathVariable Long customerId, @PathVariable String isbn) {
-        return copyService.borrowAnyAvailableCopy(isbn, customerId);
-    }
-
-    @PostMapping("/api/customers/{customerId}/reserve/{isbn}")
-    public Copy reserveBook(@PathVariable Long customerId, @PathVariable String isbn) {
-        return copyService.reserveAnyAvailableCopy(isbn, customerId);
-    }
-
     @PutMapping("/api/copies/{copyId}/return/{customerId}")
     public Copy returnCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
         return copyService.returnCopy(copyId, customerId);
