@@ -392,16 +392,5 @@ class CopyControllerTest {
                     .extractingPath("error")
                     .isEqualTo("Copy not found with ID: 999");
         }
-
-        // Test CustomerController transitions
-        List<String> customerOperations = List.of("borrow", "reserve");
-
-        for (String operation : customerOperations) {
-            assertThat(mockMvcTester.post().uri("/api/customers/" + customerId + "/" + operation + "/9781234567890").exchange())
-                    .hasStatus(HttpStatus.NOT_FOUND)
-                    .bodyJson()
-                    .extractingPath("error")
-                    .isEqualTo("No available copies found for book with ISBN: 9781234567890");
-        }
     }
 }

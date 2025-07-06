@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -32,6 +34,31 @@ class CustomerControllerTest {
     @PostConstruct
     void setUp() {
         mockMvcTester = MockMvcTester.create(mockMvc);
+    }
+
+
+    private Long addCustomer(String firstName, String lastName) throws Exception {
+        String customerJson = """
+                {
+                    "firstName": "%s",
+                    "lastName": "%s"
+                }
+                """.formatted(firstName, lastName);
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        return Long.parseLong(extractIdFromResponse(result));
+    }
+
+    public String extractIdFromResponse(MvcTestResult result) throws Exception {
+        String responseBody = result.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return jsonNode.get("id").asText();
     }
 
     @Test
@@ -401,6 +428,21 @@ class CustomerControllerTest {
                 .bodyJson()
                 .extractingPath("status")
                 .isEqualTo(expectedFinalStatus);
+    }
+
+    @Test
+    void testBorrowReserveNonexistentCopy() throws Exception {
+        Long customerId = addCustomer("The", "Goober");
+
+        List<String> customerOperations = List.of("borrow", "reserve");
+
+        for (String operation : customerOperations) {
+            assertThat(mockMvcTester.post().uri("/api/customers/" + customerId + "/" + operation + "/9781234567890").exchange())
+                    .hasStatus(HttpStatus.NOT_FOUND)
+                    .bodyJson()
+                    .extractingPath("error")
+                    .isEqualTo("No available copies found for book with ISBN: 9781234567890");
+        }
     }
 
     @Test
