@@ -4,11 +4,11 @@ A Spring Boot REST API for managing books and their copies in a library.
 
 ## Features
 
-- Book management with ISBN validation
-- Copy tracking with status management (available, borrowed, reserved, lost)
+- Book management with ISBN validation and author relationships
 - Author management with many-to-many relationships to books
+- Copy tracking with status management (available, borrowed, reserved, lost)
 - Search functionality across books, copies and authors
-- Comprehensive and meaningful integration and unit tests with >70% coverage
+- Robust integration and unit tests with >80% coverage
 
 ## Tech Stack
 
@@ -27,7 +27,7 @@ A Spring Boot REST API for managing books and their copies in a library.
 The API runs on `http://localhost:8080`. H2 console is available at `/h2-console` (JDBC URL: `jdbc:h2:mem:testdb`,
 username: `sa`, no password)
 
-## API Overview
+## API Endpoints
 
 ### Response Codes
 
@@ -43,7 +43,7 @@ username: `sa`, no password)
 - `GET /api/books` - List all books (paginated)
 - `GET /api/books/{isbn}` - Get book by ISBN
 - `GET /api/books/search` - Search books by title, author, year, ISBN (paginated)
-    - Example: `/api/books/search?title=gatsby&authorName=fitzgerald&page=0&size=10`
+    - Example: `/api/books/search?title=...&authorName=...&page=...&size=...`
 - `POST /api/books` - Create book
 - `PUT /api/books/{isbn}` - Update book
 - `DELETE /api/books/{isbn}` - Delete book
@@ -126,18 +126,13 @@ POST /api/customers
 }
 ```
 
-## Testing
+### Borrow a Copy
 
-Run tests with `./mvnw test`. Coverage report generates in `target/site/jacoco/index.html`.
+```json
+PUT /api/copies/1/borrow/1
+```
 
-## Project Structure
-
-- `src/main/java/librarymanagement/controller/` - REST endpoints
-- `src/main/java/librarymanagement/model/` - Entity classes
-- `src/main/java/librarymanagement/repository/` - Database interaction
-- `src/main/java/librarymanagement/service/` - Business logic
-- `src/main/java/librarymanagement/exception/` - Custom exceptions
-- `exampleRequests/` - Sample HTTP requests for testing
+This will change the copy status to `BORROWED` and associate it with the customer.
 
 ## Progress
 
@@ -149,7 +144,7 @@ Run tests with `./mvnw test`. Coverage report generates in `target/site/jacoco/i
 - [x] State transition validation for copies
 - [x] Comprehensive test coverage written while procrastinating adding new features (ongoing)
 - [x] Customer management
-- [ ] Borrowing and renting system with customers
+- [x] Borrowing and renting system with customers
 - [ ] Book categories/genres
 - [ ] Logging and monitoring
 - [ ] Proper API documentation
