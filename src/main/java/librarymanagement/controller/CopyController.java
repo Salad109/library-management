@@ -81,6 +81,11 @@ public class CopyController {
         return copyService.markCopyAsLost(copyId, customerId);
     }
 
+    @PostMapping("/api/customers/{customerId}/reserve/{isbn}")
+    public Copy reserveBook(@PathVariable Long customerId, @PathVariable String isbn) {
+        return copyService.reserveAnyAvailableCopy(isbn, customerId);
+    }
+
     @PutMapping("/api/copies/{copyId}/reserve/{customerId}")
     public Copy reserveCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
         return copyService.reserveCopy(copyId, customerId);

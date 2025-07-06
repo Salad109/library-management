@@ -109,6 +109,17 @@ public class CopyService {
     }
 
     @Transactional
+    public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
+        Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
+        if (availableCopies.isEmpty()) {
+            throw new IllegalStateException("No available copies found for book with ISBN: " + isbn);
+        }
+
+        Copy copyToReserve = availableCopies.getContent().get(0); // Reserve the first available copy
+        return reserveCopy(copyToReserve.getId(), customerId);
+    }
+
+    @Transactional
     public Copy reserveCopy(Long copyId, Long customerId) {
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
