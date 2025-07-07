@@ -5,6 +5,7 @@ import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Role;
 import librarymanagement.model.User;
 import librarymanagement.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User addUser(String username, String password, Role role) {
@@ -26,14 +29,18 @@ public class UserService {
 
         User user = new User();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setRole(role);
         return userRepository.save(user);
     }
 
     public User login(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty() || !user.get().getPassword().equals(password)) {
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("Invalid username or password");
+        }
+
+        if (!passwordEncoder.matches(password, user.get().getPassword())) {
             throw new ResourceNotFoundException("Invalid username or password");
         }
         return user.get();
