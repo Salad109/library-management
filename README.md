@@ -88,8 +88,10 @@ username: `sa`, no password)
 - `DELETE /api/customers/{id}` - Delete customer
 
 ## Example Request Flow
-These examples demonstrate the entire business logic of the library management system, from creating a book 
-to a customer borrowing a copy. The following requests and more can be found in the `\exampleRequests` folder, ready to be executed. 
+
+These examples demonstrate the entire business logic of the library management system, from creating a book
+to a customer borrowing a copy. The following requests and more can be found in the `\exampleRequests` folder, ready to
+be executed.
 
 ### Create a Book
 
@@ -138,7 +140,8 @@ POST /api/customers
 POST /api/customers/1/borrow/9789876543210
 ```
 
-This will find the first available copy of the book with the given ISBN and change its status to `BORROWED`, associating it with the customer.
+This will find the first available copy of the book with the given ISBN and change its status to `BORROWED`, associating
+it with the customer.
 
 ### Reserve a Book (any available copy)
 
@@ -146,7 +149,8 @@ This will find the first available copy of the book with the given ISBN and chan
 POST /api/customers/1/reserve/9789876543210
 ```
 
-This will find the first available copy of the book with the given ISBN and change its status to `RESERVED`, associating it with the customer.
+This will find the first available copy of the book with the given ISBN and change its status to `RESERVED`, associating
+it with the customer.
 
 ### Checkout a Reserved Copy
 

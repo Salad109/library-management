@@ -18,6 +18,7 @@ public class Book {
     )
     private String isbn;
 
+    @Column(nullable = false)
     @NotBlank(message = "Title cannot be blank")
     private String title;
 

@@ -10,6 +10,8 @@ public class Copy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JoinColumn(nullable = false)
+    @NotNull(message = "Book cannot be null")
     @ManyToOne
     private Book book;
 
