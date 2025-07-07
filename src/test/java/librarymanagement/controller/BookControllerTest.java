@@ -1,6 +1,5 @@
 package librarymanagement.controller;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -21,14 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BookControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
     private MockMvcTester mockMvcTester;
-
-    @PostConstruct
-    void setUp() {
-        mockMvcTester = MockMvcTester.create(mockMvc);
-    }
 
     @Test
     void testAddBook() {

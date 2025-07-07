@@ -87,7 +87,9 @@ username: `sa`, no password)
 - `PUT /api/customers/{id}` - Update customer
 - `DELETE /api/customers/{id}` - Delete customer
 
-## Example Requests
+## Example Request Flow
+These examples demonstrate the entire business logic of the library management system, from creating a book 
+to a customer borrowing a copy. The following requests and more can be found in the `\exampleRequests` folder, ready to be executed. 
 
 ### Create a Book
 
@@ -149,7 +151,7 @@ This will find the first available copy of the book with the given ISBN and chan
 ### Checkout a Reserved Copy
 
 ```
-PUT /api/copies/1/checkout
+PUT /api/copies/2/checkout
 ```
 
 This changes a reserved copy's status from `RESERVED` to `BORROWED`. The customer association remains the same.
