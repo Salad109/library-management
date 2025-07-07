@@ -28,6 +28,7 @@ class CopyControllerTest {
                 "status": "INVALID_STATUS"
             }
             """;
+
     @Autowired
     private MockMvcTester mockMvcTester;
 
@@ -154,8 +155,30 @@ class CopyControllerTest {
         assertThat(testResult)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
+                .extractingPath("book")
+                .isEqualTo("Book cannot be null");
+    }
+
+    @Test
+    void testAddCopyNullBookIsbn() {
+        String copyJson = """
+                {
+                    "book": {},
+                    "status": "AVAILABLE"
+                }
+                """;
+
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(testResult)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Copy must be associated with an existing book");
+                .isEqualTo("Book ISBN cannot be null");
     }
 
     @Test

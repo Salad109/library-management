@@ -50,8 +50,8 @@ public class CopyController {
     @PostMapping("/api/copies")
     @ResponseStatus(HttpStatus.CREATED)
     public Copy addCopy(@Valid @RequestBody Copy copy) {
-        if (copy.getBook() == null || copy.getBook().getIsbn() == null) {
-            throw new IllegalArgumentException("Copy must be associated with an existing book");
+        if (copy.getBook().getIsbn() == null) {
+            throw new IllegalArgumentException("Book ISBN cannot be null");
         }
 
         // Make the copy associated with an existing book
