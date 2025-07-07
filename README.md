@@ -129,7 +129,7 @@ POST /api/copies
 POST /api/customers
 {
   "firstName": "Joe",
-  "lastName": "Mama", 
+  "lastName": "Mama",
   "email": "joe.mama@example.com"
 }
 ```
