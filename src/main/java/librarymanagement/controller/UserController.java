@@ -26,4 +26,12 @@ public class UserController {
         }
         return userService.addUser(user.getUsername(), user.getPassword(), user.getRole());
     }
+
+    @PostMapping("/api/login")
+    public User login(@Valid @RequestBody User user) {
+        if (user.getUsername() == null || user.getPassword() == null) {
+            throw new IllegalArgumentException("Username and password cannot be null");
+        }
+        return userService.login(user.getUsername(), user.getPassword());
+    }
 }

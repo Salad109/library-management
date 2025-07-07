@@ -31,9 +31,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean validatePassword(String username, String password) {
+    public User login(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
-        return user.isPresent() && user.get().getPassword().equals(password);
+        if (user.isEmpty() || !user.get().getPassword().equals(password)) {
+            throw new ResourceNotFoundException("Invalid username or password");
+        }
+        return user.get();
     }
 
     public User getUserByUsername(String username) {
