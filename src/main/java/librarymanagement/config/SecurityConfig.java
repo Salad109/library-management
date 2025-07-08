@@ -35,6 +35,10 @@ public class SecurityConfig {
                         .successHandler(this::loginSuccess)
                         .failureHandler(this::loginFailure)
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessHandler(this::logoutSuccess)
+                )
                 .csrf(csrf -> csrf.disable())
                 .build();
     }
@@ -52,5 +56,12 @@ public class SecurityConfig {
         response.setStatus(401);
         response.setContentType("text/plain");
         response.getWriter().write("Login failed!");
+    }
+
+    private void logoutSuccess(HttpServletRequest request,
+                               HttpServletResponse response,
+                               Authentication authentication) throws java.io.IOException {
+        response.setContentType("text/plain");
+        response.getWriter().write("Logout successful!");
     }
 }

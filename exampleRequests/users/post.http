@@ -16,3 +16,8 @@ Content-Type: application/x-www-form-urlencoded
 
 username = librarian1 &
 password = secret123
+
+###
+
+# Logout the librarian
+POST http://localhost:8080/api/logout
