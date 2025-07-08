@@ -34,18 +34,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User login(String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("Invalid username or password");
-        }
-
-        if (!passwordEncoder.matches(password, user.get().getPassword())) {
-            throw new ResourceNotFoundException("Invalid username or password");
-        }
-        return user.get();
-    }
-
     public User getUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {

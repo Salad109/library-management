@@ -1,6 +1,6 @@
 package librarymanagement.model;
 
 public enum Role {
-    LIBRARIAN,
-    CUSTOMER
+    ROLE_LIBRARIAN,
+    ROLE_CUSTOMER
 }
