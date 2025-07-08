@@ -1,0 +1,2 @@
+# Check who is logged in
+GET http://localhost:8080/api/whoami
