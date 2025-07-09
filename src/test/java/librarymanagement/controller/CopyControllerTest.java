@@ -418,7 +418,7 @@ class CopyControllerTest {
 
         String copyId = ControllerTestUtils.extractIdFromResponse(createResult);
 
-        // Attempt to checkout the copy without reserving it first
+        // Attempt to check out the copy without reserving it first
         MvcTestResult checkoutResult = mockMvcTester.put()
                 .uri("/api/copies/" + copyId + "/checkout")
                 .exchange();

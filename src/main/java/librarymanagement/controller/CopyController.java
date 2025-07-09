@@ -37,11 +37,6 @@ public class CopyController {
         return copyService.getCopiesByBookIsbn(isbn, pageable);
     }
 
-    @GetMapping("/api/copies/book/{isbn}/available")
-    public Page<Copy> getAvailableCopies(@PathVariable String isbn, Pageable pageable) {
-        return copyService.getCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, pageable);
-    }
-
     @GetMapping("/api/copies/book/{isbn}/count")
     public long countAvailableCopies(@PathVariable String isbn) {
         return copyService.countCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);

@@ -40,10 +40,6 @@ public class CopyService {
         return copyRepository.findByBookIsbn(isbn, pageable);
     }
 
-    public Page<Copy> getCopiesByBookIsbnAndStatus(String isbn, CopyStatus status, Pageable pageable) {
-        return copyRepository.findByBookIsbnAndStatus(isbn, status, pageable);
-    }
-
     public Page<Copy> getCopiesByCustomerId(Long customerId, Pageable pageable) {
         return copyRepository.findByCustomerId(customerId, pageable);
     }
