@@ -9,6 +9,8 @@ A Spring Boot REST API for managing books and their copies in a library.
 - Copy tracking with status management (available, borrowed, reserved, lost)
 - Customer management with email validation
 - Borrowing and reservation system
+- Authentication and authorization with Spring Security
+- Password hashing and secure user management
 - Search functionality across books, copies and authors
 - Robust integration and unit tests with >80% coverage
 
@@ -16,6 +18,7 @@ A Spring Boot REST API for managing books and their copies in a library.
 
 - Java 21 + Spring Boot 3.5.0
 - Spring Data JPA with H2 (planning PostgreSQL migration)
+- Spring Security for authentication and role-based authorization
 - Undertow web server (replaced default Tomcat for better performance)
 - JUnit 5 + MockMvc for testing
 - Maven
@@ -37,8 +40,22 @@ username: `sa`, no password)
 - `201 Created` - Successful POST
 - `204 No Content` - Successful DELETE
 - `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
 - `404 Not Found` - Resource doesn't exist
 - `409 Conflict` - Duplicate resource (e.g., ISBN already exists)
+
+### Authentication
+
+- `POST /api/register` - Register a new user
+- `POST /api/login` - Login with username/password (form data)
+- `POST /api/logout` - Logout current user
+- `GET /api/whoami` - Check current authentication status
+
+#### User Roles
+
+- `ROLE_LIBRARIAN` - Full access to manage everything
+- `ROLE_CUSTOMER` - Limited access for browsing and reservations
 
 ### Books
 
@@ -92,6 +109,26 @@ username: `sa`, no password)
 These examples demonstrate the entire business logic of the library management system, from creating a book
 to a customer borrowing a copy. The following requests and more can be found in the `\exampleRequests` folder, ready to
 be executed.
+
+### Register a User
+
+```json
+POST /api/register
+{
+  "username": "librarian1",
+  "password": "secret123",
+  "role": "ROLE_LIBRARIAN"
+}
+```
+
+### Login
+
+```
+POST /api/login
+Content-Type: application/x-www-form-urlencoded
+
+username=librarian1&password=secret123
+```
 
 ### Create a Book
 
@@ -171,10 +208,12 @@ This changes a reserved copy's status from `RESERVED` to `BORROWED`. The custome
 - [x] Comprehensive test coverage written while procrastinating adding new features (ongoing)
 - [x] Customer management
 - [x] Borrowing and reservation system with customers
+- [x] Authentication and authorization with Spring Security
+- [x] Password hashing and secure user management
+- [ ] Role-based access control (Librarian vs Customer)
 - [ ] Book categories/genres
 - [ ] Logging and monitoring
 - [ ] Proper API documentation
-- [ ] Authentication
 - [ ] PostgreSQL migration from H2
 - [ ] Docker
 - [ ] Microcontroller-based book scanner
