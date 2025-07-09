@@ -21,3 +21,22 @@ password = secret123
 
 # Logout the librarian
 POST http://localhost:8080/api/logout
+
+###
+
+# Invalid registration attempt - missing role
+POST localhost:8080/api/register
+Content-Type: application/json
+
+{
+  "username": "goober",
+  "password": "123"
+}
+
+###
+
+# Invalid registration attempt - missing everything
+POST localhost:8080/api/register
+Content-Type: application/json
+
+{}
