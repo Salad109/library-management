@@ -10,8 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-import java.io.UnsupportedEncodingException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -53,25 +51,24 @@ class SecurityConfigurationTest {
 
     @Test
     void testLoginFailure() throws Exception {
-        // Try to log in with bad credentials
+        // Log in as a user that does not exist
         MvcTestResult result = mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("username=Goober&password=Goober123")
                 .exchange();
 
-        // Assert
         assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
         assertThat(result.getResponse().getContentAsString()).isEqualTo("Login failed!");
     }
 
     @Test
     void testLogoutSuccess() throws Exception {
-        // Act - logout (doesn't need to be logged in to test the handler)
         MvcTestResult result = mockMvcTester.post().uri("/api/logout").exchange();
 
-        // Assert
         assertThat(result).hasStatus(HttpStatus.OK);
         assertThat(result.getResponse().getContentAsString()).isEqualTo("Logout successful!");
     }
+
+    // todo test authorization of select endpoints
 }

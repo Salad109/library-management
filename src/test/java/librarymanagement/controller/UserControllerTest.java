@@ -87,7 +87,7 @@ public class UserControllerTest {
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
                 .bodyJson()
-                .extractingPath("password")
+                .extractingPath("error")
                 .isEqualTo("Password cannot be blank");
     }
 }
