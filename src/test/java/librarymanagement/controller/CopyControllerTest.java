@@ -360,4 +360,71 @@ class CopyControllerTest {
                     .isEqualTo("Copy not found with ID: 999");
         }
     }
+
+    @Test
+    void testCheckoutReservedCopy() throws Exception {
+        // Add a book
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+        ControllerTestUtils.addBook(mockMvcTester, bookData);
+
+        // Create a copy
+        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
+
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        String copyId = ControllerTestUtils.extractIdFromResponse(createResult);
+
+        // Reserve the copy
+        Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "Joe", "Mama");
+
+        MvcTestResult reserveResult = mockMvcTester.post()
+                .uri("/api/customers/" + customerId + "/reserve/" + bookData.ISBN)
+                .exchange();
+
+        assertThat(reserveResult).hasStatus(HttpStatus.OK)
+                .bodyJson().extractingPath("id").isEqualTo(Integer.parseInt(copyId));
+
+        // Checkout the reserved copy
+        MvcTestResult checkoutResult = mockMvcTester.put()
+                .uri("/api/copies/" + copyId + "/checkout")
+                .exchange();
+
+        assertThat(checkoutResult).hasStatus(HttpStatus.OK);
+        assertThat(checkoutResult).bodyJson().extractingPath("status").isEqualTo("BORROWED");
+    }
+
+    @Test
+    void testCheckoutUnreservedCopy() throws Exception {
+        // Add a book
+        BookTestData.BookData bookData = BookTestData.getNextBookData();
+        ControllerTestUtils.addBook(mockMvcTester, bookData);
+
+        // Create a copy
+        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
+
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        String copyId = ControllerTestUtils.extractIdFromResponse(createResult);
+
+        // Attempt to checkout the copy without reserving it first
+        MvcTestResult checkoutResult = mockMvcTester.put()
+                .uri("/api/copies/" + copyId + "/checkout")
+                .exchange();
+
+        assertThat(checkoutResult).hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("error")
+                .isEqualTo("Copy is not currently reserved. Current status: AVAILABLE");
+    }
 }
