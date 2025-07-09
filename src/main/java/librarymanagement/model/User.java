@@ -2,6 +2,7 @@ package librarymanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users")
@@ -11,14 +12,15 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @NotBlank
+    @NotBlank(message = "Username cannot be blank")
     private String username;
 
     @Column(nullable = false)
-    @NotBlank
     private String password;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Role cannot be null")
     private Role role;
 
     @OneToOne

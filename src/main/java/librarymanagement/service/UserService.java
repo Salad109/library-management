@@ -22,6 +22,10 @@ public class UserService {
     }
 
     public User addUser(String username, String password, Role role) {
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password cannot be blank");
+        }
+
         Optional<User> existingUser = userRepository.findByUsername(username);
         if (existingUser.isPresent()) {
             throw new DuplicateResourceException("User already exists with username: " + username);
