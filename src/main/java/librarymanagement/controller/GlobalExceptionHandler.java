@@ -72,6 +72,8 @@ public class GlobalExceptionHandler {
             error.put("error", "Invalid request format");
         } else if (message.contains("CopyStatus")) {
             error.put("error", "Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
+        } else if (message.contains("Role")) {
+            error.put("error", "Invalid role. Must be one of: ROLE_LIBRARIAN, ROLE_CUSTOMER");
         } else {
             error.put("error", message);
         }
