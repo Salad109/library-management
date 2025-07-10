@@ -9,6 +9,7 @@ import librarymanagement.service.CopyService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -67,6 +68,7 @@ public class CopyController {
     }
 
     @PutMapping("/api/copies/{copyId}/undo-reserve/{customerId}")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
     public Copy unreserveCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
         return copyService.cancelCopyReservation(copyId, customerId);
     }

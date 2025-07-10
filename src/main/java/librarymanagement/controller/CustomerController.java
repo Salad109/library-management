@@ -8,6 +8,7 @@ import librarymanagement.service.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,11 +28,13 @@ public class CustomerController {
     }
 
     @GetMapping("/api/customers/{id}")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
     public Customer getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
     }
 
     @GetMapping("/api/customers/{id}/copies")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
     public Page<Copy> getCopiesByCustomerId(@PathVariable Long id, Pageable pageable) {
         return copyService.getCopiesByCustomerId(id, pageable);
     }
@@ -48,6 +51,7 @@ public class CustomerController {
     }
 
     @PostMapping("/api/customers/{customerId}/reserve/{isbn}")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
     public Copy reserveBook(@PathVariable Long customerId, @PathVariable String isbn) {
         return copyService.reserveAnyAvailableCopy(isbn, customerId);
     }
