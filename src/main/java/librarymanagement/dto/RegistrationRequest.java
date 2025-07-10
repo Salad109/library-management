@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import librarymanagement.model.Role;
 
 public class RegistrationRequest {
-    @NotBlank
+    @NotBlank(message = "Username cannot be blank")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
-    @NotNull
+    @NotNull(message = "Role cannot be null")
     private Role role;
 
     String firstName;
