@@ -3,6 +3,7 @@ package librarymanagement.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import librarymanagement.constants.Messages;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,12 +15,12 @@ public class Book {
     @Column(unique = true)
     @Pattern(
             regexp = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$",
-            message = "ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979"
+            message = Messages.BOOK_ISBN_VALIDATION_MESSAGE
     )
     private String isbn;
 
     @Column(nullable = false)
-    @NotBlank(message = "Title cannot be blank")
+    @NotBlank(message = Messages.BOOK_TITLE_VALIDATION_MESSAGE)
     private String title;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

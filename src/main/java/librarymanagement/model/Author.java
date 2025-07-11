@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import librarymanagement.constants.Messages;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Table(name = "authors")
 public class Author {
     @Id
-    @NotBlank(message = "Name cannot be blank")
+    @NotBlank(message = Messages.AUTHOR_NAME_VALIDATION_MESSAGE)
     private String name;
 
     @ManyToMany(mappedBy = "authors")

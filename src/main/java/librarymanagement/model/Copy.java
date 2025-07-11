@@ -2,6 +2,7 @@ package librarymanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import librarymanagement.constants.Messages;
 
 @Entity
 @Table(name = "copies")
@@ -11,14 +12,14 @@ public class Copy {
     private Long id;
 
     @JoinColumn(nullable = false)
-    @NotNull(message = "Book cannot be null")
+    @NotNull(message = Messages.COPY_BOOK_VALIDATION_MESSAGE)
     @ManyToOne
     private Book book;
 
     @ManyToOne
     private Customer customer;
 
-    @NotNull(message = "Status cannot be null")
+    @NotNull(message = Messages.COPY_STATUS_VALIDATION_MESSAGE)
     @Enumerated(EnumType.STRING)
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
 

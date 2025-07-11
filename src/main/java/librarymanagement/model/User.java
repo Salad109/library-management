@@ -3,6 +3,7 @@ package librarymanagement.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import librarymanagement.constants.Messages;
 
 @Entity
 @Table(name = "users")
@@ -12,7 +13,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @NotBlank(message = "Username cannot be blank")
+    @NotBlank(message = Messages.USER_USERNAME_VALIDATION_MESSAGE)
     private String username;
 
     @Column(nullable = false)
@@ -20,7 +21,7 @@ public class User {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Role cannot be null")
+    @NotNull(message = Messages.USER_ROLE_VALIDATION_MESSAGE)
     private Role role;
 
     @OneToOne

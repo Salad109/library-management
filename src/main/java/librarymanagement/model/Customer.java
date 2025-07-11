@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import librarymanagement.constants.Messages;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,14 +15,14 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "First name cannot be blank")
+    @NotBlank(message = Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE)
     private String firstName;
 
-    @NotBlank(message = "Last name cannot be blank")
+    @NotBlank(message = Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE)
     private String lastName;
 
     @Column(unique = true)
-    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Email must be a valid email address")
+    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE)
     private String email;
 
     @OneToMany(mappedBy = "customer")
