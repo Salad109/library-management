@@ -1,6 +1,7 @@
 package librarymanagement.config;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,7 +47,7 @@ class SecurityConfigurationTest {
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("Login successful!");
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(Messages.SECURITY_LOGIN_SUCCESS);
     }
 
     @Test
@@ -59,7 +60,7 @@ class SecurityConfigurationTest {
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("Login failed!");
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
     }
 
     @Test
@@ -67,7 +68,7 @@ class SecurityConfigurationTest {
         MvcTestResult result = mockMvcTester.post().uri("/api/logout").exchange();
 
         assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("Logout successful!");
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(Messages.SECURITY_LOGOUT_SUCCESS);
     }
 
     // todo test authorization of select endpoints

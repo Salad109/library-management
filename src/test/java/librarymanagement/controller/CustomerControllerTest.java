@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,11 +68,11 @@ class CustomerControllerTest {
         assertThat(result)
                 .bodyJson()
                 .extractingPath("firstName")
-                .isEqualTo("First name cannot be blank");
+                .isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
         assertThat(result)
                 .bodyJson()
                 .extractingPath("lastName")
-                .isEqualTo("Last name cannot be blank");
+                .isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -94,7 +95,7 @@ class CustomerControllerTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("email")
-                .isEqualTo("Email must be a valid email address");
+                .isEqualTo(Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -125,7 +126,7 @@ class CustomerControllerTest {
                 .hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Email already exists: goober@example.com");
+                .isEqualTo(Messages.CUSTOMER_EMAIL_DUPLICATE + "goober@example.com");
     }
 
     @Test
@@ -179,7 +180,7 @@ class CustomerControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Customer not found with ID: 999");
+                .isEqualTo(Messages.CUSTOMER_NOT_FOUND + "999");
     }
 
     @Test
@@ -281,11 +282,11 @@ class CustomerControllerTest {
                 .hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Email already exists: jane@example.com");
+                .isEqualTo(Messages.CUSTOMER_EMAIL_DUPLICATE + "jane@example.com");
     }
 
     @Test
-    void testUpdateCustomerWithNullFields() throws Exception {
+    void testUpdateCustomerWithMissingFields() throws Exception {
         // Create a customer
         String customerJson = """
                 {
@@ -319,11 +320,11 @@ class CustomerControllerTest {
         assertThat(updateResult)
                 .bodyJson()
                 .extractingPath("firstName")
-                .isEqualTo("First name cannot be blank");
+                .isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
         assertThat(updateResult)
                 .bodyJson()
                 .extractingPath("lastName")
-                .isEqualTo("Last name cannot be blank");
+                .isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
     }
 
     @ParameterizedTest
@@ -410,7 +411,7 @@ class CustomerControllerTest {
                     .hasStatus(HttpStatus.NOT_FOUND)
                     .bodyJson()
                     .extractingPath("error")
-                    .isEqualTo("No available copies found for book with ISBN: 9781234567890");
+                    .isEqualTo(Messages.COPY_NO_AVAILABLE + "9781234567890");
         }
     }
 
@@ -451,7 +452,7 @@ class CustomerControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Customer not found with ID: " + customerId);
+                .isEqualTo(Messages.CUSTOMER_NOT_FOUND + customerId);
     }
 
     @Test
@@ -464,6 +465,6 @@ class CustomerControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Customer not found with ID: 999");
+                .isEqualTo(Messages.CUSTOMER_NOT_FOUND + "999");
     }
 }

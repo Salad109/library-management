@@ -1,5 +1,6 @@
 package librarymanagement.service;
 
+import librarymanagement.constants.Messages;
 import librarymanagement.model.Role;
 import librarymanagement.model.User;
 import librarymanagement.repository.UserRepository;
@@ -50,7 +51,7 @@ class CustomUserDetailsServiceTest {
             userDetailsService.loadUserByUsername("Goober");
             fail("Expected UsernameNotFoundException to be thrown");
         } catch (UsernameNotFoundException e) {
-            assertThat(e.getMessage()).isEqualTo("User not found: Goober");
+            assertThat(e.getMessage()).isEqualTo(Messages.USERNAME_NOT_FOUND + "Goober");
         }
     }
 }

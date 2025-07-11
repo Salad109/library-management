@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,6 @@ class AuthorControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Author not found with name: " + nonExistentAuthorName);
+                .isEqualTo(Messages.AUTHOR_NOT_FOUND + nonExistentAuthorName);
     }
 }

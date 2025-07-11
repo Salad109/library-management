@@ -3,6 +3,7 @@ package librarymanagement.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import librarymanagement.constants.Messages;
 import librarymanagement.testdata.BookTestData;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -62,7 +63,7 @@ class ControllerTestUtils {
                     .assertThat()
                     .hasStatus(org.springframework.http.HttpStatus.CREATED);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to add book: " + bookData.ISBN, e);
+            throw new RuntimeException(Messages.ERROR_ADDING_BOOK + bookData.ISBN, e);
         }
     }
 

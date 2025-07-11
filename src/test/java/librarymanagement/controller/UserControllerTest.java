@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -63,11 +64,11 @@ public class UserControllerTest {
         assertThat(result)
                 .bodyJson()
                 .extractingPath("username")
-                .isEqualTo("Username cannot be blank");
+                .isEqualTo(Messages.USER_USERNAME_VALIDATION_MESSAGE);
         assertThat(result)
                 .bodyJson()
                 .extractingPath("role")
-                .isEqualTo("Role cannot be null");
+                .isEqualTo(Messages.USER_ROLE_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -90,6 +91,6 @@ public class UserControllerTest {
         assertThat(result)
                 .bodyJson()
                 .extractingPath("password")
-                .isEqualTo("Password cannot be blank");
+                .isEqualTo(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
     }
 }

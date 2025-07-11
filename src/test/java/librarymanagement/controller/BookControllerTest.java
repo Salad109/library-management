@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,10 @@ class BookControllerTest {
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result).bodyJson()
                 .extractingPath("isbn")
-                .isEqualTo("ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979");
+                .isEqualTo(Messages.BOOK_ISBN_VALIDATION_MESSAGE);
         assertThat(result).bodyJson()
                 .extractingPath("title")
-                .isEqualTo("Title cannot be blank");
+                .isEqualTo(Messages.BOOK_TITLE_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -76,7 +77,7 @@ class BookControllerTest {
                 .hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("A book with this ISBN already exists: " + bookData.ISBN);
+                .isEqualTo(Messages.BOOK_DUPLICATE + bookData.ISBN);
     }
 
     @Test
@@ -250,7 +251,7 @@ class BookControllerTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Cannot change ISBN of an existing book");
+                .isEqualTo(Messages.BOOK_CHANGE_ISBN);
     }
 
     @Test
@@ -267,7 +268,7 @@ class BookControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
+                .isEqualTo(Messages.BOOK_NOT_FOUND + bookData.ISBN);
     }
 
     @Test
@@ -294,7 +295,7 @@ class BookControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
+                .isEqualTo(Messages.BOOK_NOT_FOUND + bookData.ISBN);
     }
 
     @Test
@@ -309,6 +310,6 @@ class BookControllerTest {
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
+                .isEqualTo(Messages.BOOK_NOT_FOUND + bookData.ISBN);
     }
 }

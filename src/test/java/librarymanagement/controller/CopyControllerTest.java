@@ -2,6 +2,7 @@ package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
 import librarymanagement.testdata.BookTestData;
+import librarymanagement.constants.Messages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -68,7 +69,7 @@ class CopyControllerTest {
 
         assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson().extractingPath("error")
-                .isEqualTo("Copy not found with ID: 999");
+                .isEqualTo(Messages.COPY_NOT_FOUND + "999");
     }
 
     @Test
@@ -116,7 +117,7 @@ class CopyControllerTest {
 
         assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson().extractingPath("error")
-                .isEqualTo("Book not found with ISBN: " + bookData.ISBN);
+                .isEqualTo(Messages.BOOK_NOT_FOUND + bookData.ISBN);
     }
 
     @Test
@@ -148,12 +149,12 @@ class CopyControllerTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("book")
-                .isEqualTo("Book cannot be null");
+                .isEqualTo(Messages.COPY_BOOK_VALIDATION_MESSAGE);
         assertThat(nullIsbnResult)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Book ISBN cannot be null");
+                .isEqualTo(Messages.BOOK_NULL_ISBN);
     }
 
     @Test
@@ -172,7 +173,7 @@ class CopyControllerTest {
 
         assertThat(testResult).hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson().extractingPath("error")
-                .isEqualTo("Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
+                .isEqualTo(Messages.ERROR_INVALID_COPY_STATUS);
     }
 
     @Test
@@ -201,7 +202,7 @@ class CopyControllerTest {
 
         assertThat(deleteResult).hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson().extractingPath("error")
-                .isEqualTo("Copy not found with ID: 999");
+                .isEqualTo(Messages.COPY_NOT_FOUND + "999");
     }
 
     // STATUS TRANSITION TESTS
@@ -285,7 +286,7 @@ class CopyControllerTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("error")
-                .isEqualTo("Copy is not currently used by the specified customer. Current customer: " + oldCustomerId);
+                .isEqualTo(Messages.COPY_WRONG_CUSTOMER + oldCustomerId);
     }
 
     @Test
@@ -301,7 +302,7 @@ class CopyControllerTest {
                     .hasStatus(HttpStatus.NOT_FOUND)
                     .bodyJson()
                     .extractingPath("error")
-                    .isEqualTo("Copy not found with ID: 999");
+                    .isEqualTo(Messages.COPY_NOT_FOUND + "999");
         }
     }
 
@@ -358,6 +359,6 @@ class CopyControllerTest {
 
         assertThat(checkoutResult).hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson().extractingPath("error")
-                .isEqualTo("Copy is not currently reserved. Current status: AVAILABLE");
+                .isEqualTo(Messages.COPY_NOT_RESERVED + "AVAILABLE");
     }
 }
