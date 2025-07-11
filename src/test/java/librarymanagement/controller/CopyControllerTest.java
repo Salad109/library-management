@@ -46,12 +46,7 @@ class CopyControllerTest {
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
         // Add a copy of that book
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
-        MvcTestResult createResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
+        MvcTestResult createResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
@@ -83,15 +78,9 @@ class CopyControllerTest {
         // Add a book
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
-        // Add a copy of that book
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
+        // Create multiple copies for the same book
         for (int i = 0; i < 5; i++) {
-            // Create multiple copies for the same book
-            MvcTestResult createResult = mockMvcTester.post()
-                    .uri("/api/copies")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(copyJson)
-                    .exchange();
+            MvcTestResult createResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
             assertThat(createResult).hasStatus(HttpStatus.CREATED);
         }
@@ -113,12 +102,7 @@ class CopyControllerTest {
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
         // Add a copy of that book
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
+        MvcTestResult testResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
         assertThat(testResult).hasStatus(HttpStatus.CREATED);
     }
@@ -126,14 +110,9 @@ class CopyControllerTest {
     @Test
     void testAddCopyNonexistentBook() {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
 
         // Attempt to add a copy of a non-existing book
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
+        MvcTestResult testResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
         assertThat(testResult).hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson().extractingPath("error")
@@ -204,12 +183,7 @@ class CopyControllerTest {
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
         // Add a copy of that book
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
-        MvcTestResult createResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
+        MvcTestResult createResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
@@ -249,7 +223,12 @@ class CopyControllerTest {
         Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "Joe", "Mama");
 
         // Create copy with initial status
-        String copyId = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, initialStatus);
+        MvcTestResult createResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, initialStatus);
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        // Extract the copy ID from the response
+        String copyId = ControllerTestUtils.extractIdFromResponse(createResult);
 
         // Perform state transition
         MvcTestResult result = mockMvcTester.put()
@@ -334,13 +313,7 @@ class CopyControllerTest {
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
         // Create a copy
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
-
-        MvcTestResult createResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
+        MvcTestResult createResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
@@ -372,13 +345,7 @@ class CopyControllerTest {
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
         // Create a copy
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, "AVAILABLE");
-
-        MvcTestResult createResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
+        MvcTestResult createResult = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, "AVAILABLE");
 
         assertThat(createResult).hasStatus(HttpStatus.CREATED);
 
