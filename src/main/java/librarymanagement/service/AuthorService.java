@@ -1,5 +1,6 @@
 package librarymanagement.service;
 
+import librarymanagement.constants.Messages;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Author;
 import librarymanagement.repository.AuthorRepository;
@@ -25,7 +26,7 @@ public class AuthorService {
     public Author getAuthorByName(String name) {
         Optional<Author> author = authorRepository.findById(name);
         if (author.isEmpty()) {
-            throw new ResourceNotFoundException("Author not found with name: " + name);
+            throw new ResourceNotFoundException(Messages.AUTHOR_NOT_FOUND + name);
         }
         return author.get();
     }

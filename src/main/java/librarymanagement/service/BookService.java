@@ -1,6 +1,7 @@
 package librarymanagement.service;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Book;
@@ -27,7 +28,7 @@ public class BookService {
     public Book getBookByIsbn(String isbn) {
         Optional<Book> book = bookRepository.findByIsbn(isbn);
         if (book.isEmpty()) {
-            throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
+            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
         return book.get();
     }
@@ -43,7 +44,7 @@ public class BookService {
 
     public Book addBook(Book book) {
         if (bookRepository.findByIsbn(book.getIsbn()).isPresent()) {
-            throw new DuplicateResourceException("A book with this ISBN already exists: " + book.getIsbn());
+            throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + book.getIsbn());
         }
         return bookRepository.save(book);
     }
@@ -52,7 +53,7 @@ public class BookService {
     public Book updateBook(String isbn, Book book) {
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty()) {
-            throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
+            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
 
         Book existingBook = optionalBook.get();
@@ -66,7 +67,7 @@ public class BookService {
     @Transactional
     public void deleteBook(String isbn) {
         if (!bookRepository.existsById(isbn)) {
-            throw new ResourceNotFoundException("Book not found with ISBN: " + isbn);
+            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
         bookRepository.deleteById(isbn);
     }

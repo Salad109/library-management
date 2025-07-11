@@ -1,5 +1,6 @@
 package librarymanagement.service;
 
+import librarymanagement.constants.Messages;
 import librarymanagement.model.User;
 import librarymanagement.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException("User not found: " + username);
+            throw new UsernameNotFoundException(Messages.USERNAME_NOT_FOUND + username);
         }
         User user = optionalUser.get();
 

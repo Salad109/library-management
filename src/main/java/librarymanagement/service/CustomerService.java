@@ -1,6 +1,7 @@
 package librarymanagement.service;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Customer;
@@ -27,7 +28,7 @@ public class CustomerService {
     public Customer getCustomerById(Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + id);
+            throw new ResourceNotFoundException(Messages.CUSTOMER_NOT_FOUND + id);
         }
         return customer.get();
     }
@@ -38,7 +39,7 @@ public class CustomerService {
         if (email != null && !email.isBlank()) {
             Optional<Customer> existingCustomer = customerRepository.findByEmail(email);
             if (existingCustomer.isPresent()) {
-                throw new DuplicateResourceException("Email already exists: " + email);
+                throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + email);
             }
         }
         return customerRepository.save(customer);
@@ -53,7 +54,7 @@ public class CustomerService {
         if (newEmail != null && !newEmail.isBlank()) {
             Optional<Customer> duplicateCustomer = customerRepository.findByEmail(newEmail);
             if (duplicateCustomer.isPresent() && !duplicateCustomer.get().getId().equals(id)) {
-                throw new DuplicateResourceException("Email already exists: " + newEmail);
+                throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + newEmail);
             }
         }
 
@@ -66,7 +67,7 @@ public class CustomerService {
     @Transactional
     public void deleteCustomer(Long id) {
         if (!customerRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Customer not found with ID: " + id);
+            throw new ResourceNotFoundException(Messages.CUSTOMER_NOT_FOUND + id);
         }
         customerRepository.deleteById(id);
     }

@@ -1,9 +1,9 @@
 package librarymanagement.service;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import librarymanagement.dto.RegistrationRequest;
 import librarymanagement.exception.DuplicateResourceException;
-import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Customer;
 import librarymanagement.model.User;
 import librarymanagement.repository.CustomerRepository;
@@ -30,7 +30,7 @@ public class UserService {
     public User addUser(RegistrationRequest request) {
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
-            throw new DuplicateResourceException("User already exists with username: " + request.username());
+            throw new DuplicateResourceException(Messages.USER_DUPLICATE + request.username());
         }
 
         User user = new User();
@@ -40,7 +40,7 @@ public class UserService {
 
         if (request.isCustomer()) {
             if (!request.hasRequiredFieldsForCustomer()) {
-                throw new IllegalArgumentException("First name and last name are required for customers.");
+                throw new IllegalArgumentException(Messages.USER_MISSING_CUSTOMER_FIELDS);
             }
             Customer customer = new Customer();
             customer.setFirstName(request.firstName());
@@ -51,13 +51,5 @@ public class UserService {
         }
 
         return userRepository.save(user);
-    }
-
-    public User getUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("User not found with username: " + username);
-        }
-        return user.get();
     }
 }
