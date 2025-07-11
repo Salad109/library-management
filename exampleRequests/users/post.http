@@ -26,7 +26,9 @@ Content-Type: application/json
 {
   "username": "customer1",
   "password": "customer123",
-  "role": "ROLE_CUSTOMER"
+  "role": "ROLE_CUSTOMER",
+  "firstName": "Joe",
+  "lastName": "Mama"
 }
 
 ###

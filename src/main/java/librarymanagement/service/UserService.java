@@ -29,24 +29,24 @@ public class UserService {
 
     @Transactional
     public User addUser(RegistrationRequest request) {
-        Optional<User> existingUser = userRepository.findByUsername(request.getUsername());
+        Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
-            throw new DuplicateResourceException("User already exists with username: " + request.getUsername());
+            throw new DuplicateResourceException("User already exists with username: " + request.username());
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
+        user.setUsername(request.username());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setRole(request.role());
 
-        if (request.getRole().equals(Role.ROLE_CUSTOMER)) {
-            if (isNullOrBlank(request.getFirstName()) || isNullOrBlank(request.getLastName())) {
+        if (request.role().equals(Role.ROLE_CUSTOMER)) {
+            if (isNullOrBlank(request.firstName()) || isNullOrBlank(request.lastName())) {
                 throw new IllegalArgumentException("First name and last name are required for customers.");
             }
             Customer customer = new Customer();
-            customer.setFirstName(request.getFirstName());
-            customer.setLastName(request.getLastName());
-            customer.setEmail(request.getEmail());
+            customer.setFirstName(request.firstName());
+            customer.setLastName(request.lastName());
+            customer.setEmail(request.email());
             customer = customerRepository.save(customer);
             user.setCustomer(customer);
         }
