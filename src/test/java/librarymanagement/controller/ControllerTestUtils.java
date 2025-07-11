@@ -4,9 +4,12 @@ package librarymanagement.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import librarymanagement.testdata.BookTestData;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ControllerTestUtils {
 
@@ -64,5 +67,20 @@ class ControllerTestUtils {
         } catch (Exception e) {
             throw new RuntimeException("Failed to add book: " + bookData.ISBN, e);
         }
+    }
+
+    /**
+     * @return the ID of the newly created copy
+     */
+    static String createCopyAndPost(MockMvcTester mockMvcTester, String isbn, String status) throws Exception {
+        String copyJson = ControllerTestUtils.createCopyJson(isbn, status);
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+        return ControllerTestUtils.extractIdFromResponse(createResult);
     }
 }

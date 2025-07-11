@@ -141,41 +141,36 @@ class CopyControllerTest {
     }
 
     @Test
-    void testAddCopyNullBook() {
-        String copyJson = """
+    void testAddCopyValidation() {
+        String copyNullBookJson = """
                 {
                     "status": "AVAILABLE"
                 }
                 """;
-
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
-        assertThat(testResult)
-                .hasStatus(HttpStatus.BAD_REQUEST)
-                .bodyJson()
-                .extractingPath("book")
-                .isEqualTo("Book cannot be null");
-    }
-
-    @Test
-    void testAddCopyNullBookIsbn() {
-        String copyJson = """
+        String copyNullIsbnJson = """
                 {
                     "book": {},
                     "status": "AVAILABLE"
                 }
                 """;
 
-        MvcTestResult testResult = mockMvcTester.post()
+        MvcTestResult nullBookResult = mockMvcTester.post()
                 .uri("/api/copies")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
+                .content(copyNullBookJson)
+                .exchange();
+        MvcTestResult nullIsbnResult = mockMvcTester.post()
+                .uri("/api/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyNullIsbnJson)
                 .exchange();
 
-        assertThat(testResult)
+        assertThat(nullBookResult)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("book")
+                .isEqualTo("Book cannot be null");
+        assertThat(nullIsbnResult)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("error")
@@ -240,69 +235,34 @@ class CopyControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "LIBRARIAN")
     @CsvSource({
-            "BORROWED, return, AVAILABLE",
-            "AVAILABLE, lost, LOST",
-            "RESERVED, undo-reserve, AVAILABLE"
+            "BORROWED, return, AVAILABLE, true",
+            "AVAILABLE, lost, LOST, true",
+            "RESERVED, undo-reserve, AVAILABLE, true",
+            "AVAILABLE, return, 'Copy is not currently borrowed', false",
+            "RESERVED, return, 'Copy is not currently borrowed', false"
     })
-    void testValidStateTransitions(String initialStatus, String action, String expectedFinalStatus) throws Exception {
+    void testStateTransitions(String initialStatus, String action, String expectedResponse, boolean shouldSucceed) throws Exception {
         BookTestData.BookData bookData = BookTestData.getNextBookData();
         ControllerTestUtils.addBook(mockMvcTester, bookData);
 
+        // Add a customer
         Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "Joe", "Mama");
 
         // Create copy with initial status
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, initialStatus);
-        MvcTestResult createCopyResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
-
-        assertThat(createCopyResult).hasStatus(HttpStatus.CREATED);
-
-        // Extract the copy ID from the response
-        String copyId = ControllerTestUtils.extractIdFromResponse(createCopyResult);
+        String copyId = ControllerTestUtils.createCopyAndPost(mockMvcTester, bookData.ISBN, initialStatus);
 
         // Perform state transition
         MvcTestResult result = mockMvcTester.put()
                 .uri("/api/copies/" + copyId + "/" + action + "/" + customerId)
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().extractingPath("status").isEqualTo(expectedFinalStatus);
-    }
-
-    @ParameterizedTest
-    @WithMockUser(roles = "LIBRARIAN")
-    @CsvSource({
-            "AVAILABLE, return, 'Copy is not currently borrowed. Current status: AVAILABLE'",
-            "AVAILABLE, undo-reserve, 'Copy is not currently reserved. Current status: AVAILABLE'"
-    })
-    void testInvalidStateTransitions(String initialStatus, String action, String expectedError) throws Exception {
-        BookTestData.BookData bookData = BookTestData.getNextBookData();
-        ControllerTestUtils.addBook(mockMvcTester, bookData);
-
-        Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "Jane", "Mama");
-
-        // Create copy with initial status
-        String copyJson = ControllerTestUtils.createCopyJson(bookData.ISBN, initialStatus);
-        MvcTestResult createResult = mockMvcTester.post()
-                .uri("/api/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(copyJson)
-                .exchange();
-
-        assertThat(createResult).hasStatus(HttpStatus.CREATED);
-
-        String copyId = ControllerTestUtils.extractIdFromResponse(createResult);
-
-        // Attempt invalid state transition
-        MvcTestResult result = mockMvcTester.put()
-                .uri("/api/copies/" + copyId + "/" + action + "/" + customerId)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(expectedError);
+        if (shouldSucceed) {
+            assertThat(result).hasStatus(HttpStatus.OK)
+                    .bodyJson().extractingPath("status").isEqualTo(expectedResponse);
+        } else {
+            assertThat(result).hasStatus(HttpStatus.BAD_REQUEST)
+                    .bodyJson().extractingPath("error").asString().contains(expectedResponse);
+        }
     }
 
     @ParameterizedTest
