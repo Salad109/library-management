@@ -73,9 +73,9 @@ public class CopyController {
         return copyService.cancelCopyReservation(copyId, customerId);
     }
 
-    @PutMapping("/api/copies/{copyId}/checkout")
-    public Copy checkoutReservedCopy(@PathVariable Long copyId) {
-        return copyService.checkoutReservedCopy(copyId);
+    @PutMapping("/api/copies/{id}/checkout")
+    public Copy checkoutReservedCopy(@PathVariable Long id) {
+        return copyService.checkoutReservedCopy(id);
     }
 
     @DeleteMapping("/api/copies/{id}")

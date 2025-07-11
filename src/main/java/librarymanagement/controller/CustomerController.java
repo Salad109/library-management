@@ -28,13 +28,13 @@ public class CustomerController {
     }
 
     @GetMapping("/api/customers/{id}")
-    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#id)")
     public Customer getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
     }
 
     @GetMapping("/api/customers/{id}/copies")
-    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#id)")
     public Page<Copy> getCopiesByCustomerId(@PathVariable Long id, Pageable pageable) {
         return copyService.getCopiesByCustomerId(id, pageable);
     }
@@ -45,15 +45,15 @@ public class CustomerController {
         return customerService.addCustomer(customer);
     }
 
-    @PostMapping("/api/customers/{customerId}/borrow/{isbn}")
-    public Copy borrowBook(@PathVariable Long customerId, @PathVariable String isbn) {
-        return copyService.borrowAnyAvailableCopy(isbn, customerId);
+    @PostMapping("/api/customers/{id}/borrow/{isbn}")
+    public Copy borrowBook(@PathVariable Long id, @PathVariable String isbn) {
+        return copyService.borrowAnyAvailableCopy(isbn, id);
     }
 
-    @PostMapping("/api/customers/{customerId}/reserve/{isbn}")
-    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
-    public Copy reserveBook(@PathVariable Long customerId, @PathVariable String isbn) {
-        return copyService.reserveAnyAvailableCopy(isbn, customerId);
+    @PostMapping("/api/customers/{id}/reserve/{isbn}")
+    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#id)")
+    public Copy reserveBook(@PathVariable Long id, @PathVariable String isbn) {
+        return copyService.reserveAnyAvailableCopy(isbn, id);
     }
 
     @PutMapping("/api/customers/{id}")
