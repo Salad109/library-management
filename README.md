@@ -210,7 +210,8 @@ This changes a reserved copy's status from `RESERVED` to `BORROWED`. The custome
 - [x] Borrowing and reservation system with customers
 - [x] Authentication and authorization with Spring Security
 - [x] Password hashing and secure user management
-- [ ] Role-based access control (Librarian vs Customer)
+- [x] Role-based access control (Librarian vs Customer)
+- [x] Centralized messages
 - [ ] Book categories/genres
 - [ ] Logging and monitoring
 - [ ] Proper API documentation
