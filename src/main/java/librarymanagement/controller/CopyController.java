@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
+import librarymanagement.constants.Messages;
 import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
@@ -47,7 +48,7 @@ public class CopyController {
     @ResponseStatus(HttpStatus.CREATED)
     public Copy addCopy(@Valid @RequestBody Copy copy) {
         if (copy.getBook().getIsbn() == null) {
-            throw new IllegalArgumentException("Book ISBN cannot be null");
+            throw new IllegalArgumentException(Messages.BOOK_NULL_ISBN);
         }
 
         // Make the copy associated with an existing book

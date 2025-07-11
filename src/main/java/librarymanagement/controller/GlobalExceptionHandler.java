@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import io.undertow.util.BadRequestException;
+import librarymanagement.constants.Messages;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -71,9 +72,9 @@ public class GlobalExceptionHandler {
         if (message == null) {
             error.put("error", "Invalid request format");
         } else if (message.contains("CopyStatus")) {
-            error.put("error", "Invalid status. Must be one of: AVAILABLE, RESERVED, BORROWED, LOST");
+            error.put("error", Messages.ERROR_INVALID_COPY_STATUS);
         } else if (message.contains("Role")) {
-            error.put("error", "Invalid role. Must be one of: ROLE_LIBRARIAN, ROLE_CUSTOMER");
+            error.put("error", Messages.ERROR_INVALID_ROLE);
         } else {
             error.put("error", message);
         }

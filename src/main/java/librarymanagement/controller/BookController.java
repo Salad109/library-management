@@ -2,6 +2,7 @@ package librarymanagement.controller;
 
 import io.undertow.util.BadRequestException;
 import jakarta.validation.Valid;
+import librarymanagement.constants.Messages;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Book;
 import librarymanagement.service.BookService;
@@ -55,7 +56,7 @@ public class BookController {
     @PutMapping("/api/books/{isbn}")
     public Book updateBook(@PathVariable String isbn, @Valid @RequestBody Book book) throws BadRequestException, ResourceNotFoundException {
         if (!isbn.equals(book.getIsbn())) {
-            throw new BadRequestException("Cannot change ISBN of an existing book");
+            throw new BadRequestException(Messages.BOOK_CHANGE_ISBN);
         }
 
         return bookService.updateBook(isbn, book);

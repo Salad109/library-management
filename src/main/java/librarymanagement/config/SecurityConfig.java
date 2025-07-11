@@ -2,6 +2,7 @@ package librarymanagement.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import librarymanagement.constants.Messages;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -60,7 +61,7 @@ public class SecurityConfig {
                               HttpServletResponse response,
                               Authentication authentication) throws java.io.IOException {
         response.setContentType("text/plain");
-        response.getWriter().write("Login successful!");
+        response.getWriter().write(Messages.SECURITY_LOGIN_SUCCESS);
     }
 
     private void loginFailure(HttpServletRequest request,
@@ -68,13 +69,13 @@ public class SecurityConfig {
                               AuthenticationException exception) throws java.io.IOException {
         response.setStatus(401);
         response.setContentType("text/plain");
-        response.getWriter().write("Login failed!");
+        response.getWriter().write(Messages.SECURITY_LOGIN_FAILURE);
     }
 
     private void logoutSuccess(HttpServletRequest request,
                                HttpServletResponse response,
                                Authentication authentication) throws java.io.IOException {
         response.setContentType("text/plain");
-        response.getWriter().write("Logout successful!");
+        response.getWriter().write(Messages.SECURITY_LOGOUT_SUCCESS);
     }
 }
