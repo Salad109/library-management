@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -237,6 +238,7 @@ class CopyControllerTest {
     // STATUS TRANSITION TESTS
 
     @ParameterizedTest
+    @WithMockUser(roles = "LIBRARIAN")
     @CsvSource({
             "BORROWED, return, AVAILABLE",
             "AVAILABLE, lost, LOST",
@@ -271,6 +273,7 @@ class CopyControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "LIBRARIAN")
     @CsvSource({
             "AVAILABLE, return, 'Copy is not currently borrowed. Current status: AVAILABLE'",
             "AVAILABLE, undo-reserve, 'Copy is not currently reserved. Current status: AVAILABLE'"
@@ -303,6 +306,7 @@ class CopyControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "LIBRARIAN")
     @CsvSource({
             "BORROWED, return",
             "AVAILABLE, lost",
@@ -346,6 +350,7 @@ class CopyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testStateTransitionNonexistentCopy() throws Exception {
         Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "The", "Goober");
 
@@ -362,6 +367,7 @@ class CopyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testCheckoutReservedCopy() throws Exception {
         // Add a book
         BookTestData.BookData bookData = BookTestData.getNextBookData();

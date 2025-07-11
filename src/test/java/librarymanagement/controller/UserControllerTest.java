@@ -24,9 +24,11 @@ public class UserControllerTest {
     void testRegister() {
         String customerJson = """
                 {
-                    "username": "goober",
-                    "password": "goober123",
-                    "role": "ROLE_CUSTOMER"
+                    "username": "joe.mama",
+                    "password": "joe123",
+                    "role": "ROLE_CUSTOMER",
+                    "firstName": "Joe",
+                    "lastName": "Mama"
                 }
                 """;
 
@@ -87,7 +89,7 @@ public class UserControllerTest {
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("password")
                 .isEqualTo("Password cannot be blank");
     }
 }

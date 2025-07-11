@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -134,6 +135,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testGetCustomerById() throws Exception {
         // Create a customer
         String customerJson = """
@@ -167,6 +169,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testGetNonExistentCustomer() {
         MvcTestResult result = mockMvcTester.get()
                 .uri("/api/customers/999")
@@ -324,6 +327,7 @@ class CustomerControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "LIBRARIAN")
     @CsvSource({
             "AVAILABLE, borrow, BORROWED",
             "AVAILABLE, reserve, RESERVED"
@@ -395,6 +399,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testBorrowReserveNonexistentCopy() throws Exception {
         Long customerId = ControllerTestUtils.addCustomer(mockMvcTester, "The", "Goober");
 
@@ -410,6 +415,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testDeleteCustomer() throws Exception {
         // Create a customer
         String customerJson = """
