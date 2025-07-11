@@ -11,4 +11,28 @@ public record RegistrationRequest(
         String firstName,
         String lastName,
         String email) {
+
+    public RegistrationRequest {
+        if (username != null) {
+            username = username.trim();
+        }
+        if (firstName != null) {
+            firstName = firstName.trim();
+        }
+        if (lastName != null) {
+            lastName = lastName.trim();
+        }
+        if (email != null) {
+            email = email.trim();
+        }
+    }
+
+    public boolean isCustomer() {
+        return role == Role.ROLE_CUSTOMER;
+    }
+
+    public boolean hasRequiredFieldsForCustomer() {
+        return firstName != null && !firstName.isBlank() &&
+                lastName != null && !lastName.isBlank();
+    }
 }

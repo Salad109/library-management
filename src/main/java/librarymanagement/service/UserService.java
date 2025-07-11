@@ -5,7 +5,6 @@ import librarymanagement.dto.RegistrationRequest;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Customer;
-import librarymanagement.model.Role;
 import librarymanagement.model.User;
 import librarymanagement.repository.CustomerRepository;
 import librarymanagement.repository.UserRepository;
@@ -39,8 +38,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(request.role());
 
-        if (request.role().equals(Role.ROLE_CUSTOMER)) {
-            if (isNullOrBlank(request.firstName()) || isNullOrBlank(request.lastName())) {
+        if (request.isCustomer()) {
+            if (!request.hasRequiredFieldsForCustomer()) {
                 throw new IllegalArgumentException("First name and last name are required for customers.");
             }
             Customer customer = new Customer();
@@ -60,9 +59,5 @@ public class UserService {
             throw new ResourceNotFoundException("User not found with username: " + username);
         }
         return user.get();
-    }
-
-    private boolean isNullOrBlank(String str) {
-        return str == null || str.isBlank();
     }
 }
