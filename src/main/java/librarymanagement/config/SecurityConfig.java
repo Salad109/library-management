@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/copies/book/*/count").permitAll()
 
                         // Customer operations like managing their reservations
+                        .requestMatchers(HttpMethod.POST, "/api/reservations").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.POST, "/api/customers/*/reserve/*").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.PUT, "/api/copies/*/undo-reserve/*").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/api/customers/*/copies").hasRole("CUSTOMER")
