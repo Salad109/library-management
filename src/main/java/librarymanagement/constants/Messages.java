@@ -18,6 +18,7 @@ public class Messages {
     public static final String BOOK_DUPLICATE = "A book with this ISBN already exists: ";
     public static final String BOOK_ISBN_VALIDATION_MESSAGE = "ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979";
     public static final String BOOK_TITLE_VALIDATION_MESSAGE = "Title cannot be blank";
+    public static final String BOOK_ISBN_REGEX = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$";
 
     // Error
     public static final String ERROR_INVALID_COPY_STATUS = "Invalid status. Must be one of: " + Arrays.toString(CopyStatus.values())
@@ -50,6 +51,7 @@ public class Messages {
     public static final String CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE = "First name cannot be blank";
     public static final String CUSTOMER_LASTNAME_VALIDATION_MESSAGE = "Last name cannot be blank";
     public static final String CUSTOMER_EMAIL_VALIDATION_MESSAGE = "Email must be a valid email address";
+    public static final String CUSTOMER_EMAIL_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
 
     // User
     public static final String USERNAME_NOT_FOUND = "User not found: ";

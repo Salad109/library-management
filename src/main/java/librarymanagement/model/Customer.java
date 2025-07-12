@@ -22,7 +22,8 @@ public class Customer {
     private String lastName;
 
     @Column(unique = true)
-    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE)
+    @Pattern(regexp = Messages.CUSTOMER_EMAIL_REGEX,
+            message = Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE)
     private String email;
 
     @OneToMany(mappedBy = "customer")

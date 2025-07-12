@@ -14,7 +14,7 @@ public class Book {
     @Id
     @Column(unique = true)
     @Pattern(
-            regexp = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$",
+            regexp = Messages.BOOK_ISBN_REGEX,
             message = Messages.BOOK_ISBN_VALIDATION_MESSAGE
     )
     private String isbn;
