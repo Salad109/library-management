@@ -71,7 +71,7 @@ public class CopyController {
     @PutMapping("/api/copies/{copyId}/undo-reserve/{customerId}")
     @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
     public Copy unreserveCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
-        return copyService.cancelCopyReservation(copyId, customerId);
+        return copyService.cancelReservation(copyId, customerId);
     }
 
     @PutMapping("/api/copies/{id}/checkout")

@@ -5,14 +5,14 @@ import librarymanagement.dto.ReservationRequest;
 import librarymanagement.model.Copy;
 import librarymanagement.service.CopyService;
 import librarymanagement.service.SecurityService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@PreAuthorize("hasRole('CUSTOMER')")
 public class ReservationController {
 
     private final CopyService copyService;
@@ -23,11 +23,23 @@ public class ReservationController {
         this.securityService = securityService;
     }
 
+    @GetMapping("/api/reservations/mine")
+    public Page<Copy> getMyReservations(Pageable pageable) {
+        Long customerId = securityService.getCurrentCustomerId();
+        return copyService.getReservationsByCustomerId(customerId, pageable);
+    }
+
     @PostMapping("/api/reservations")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('CUSTOMER')")
     public Copy createReservation(@Valid @RequestBody ReservationRequest request) {
         Long customerId = securityService.getCurrentCustomerId();
         return copyService.reserveAnyAvailableCopy(request.bookIsbn(), customerId);
+    }
+
+    @DeleteMapping("/api/reservations/{copyId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelReservation(@PathVariable Long copyId) {
+        Long customerId = securityService.getCurrentCustomerId();
+        copyService.cancelReservation(copyId, customerId);
     }
 }

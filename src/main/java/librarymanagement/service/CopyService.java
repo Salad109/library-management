@@ -45,6 +45,10 @@ public class CopyService {
         return copyRepository.findByCustomerId(customerId, pageable);
     }
 
+    public Page<Copy> getReservationsByCustomerId(Long customerId, Pageable pageable) {
+        return copyRepository.findByCustomerIdAndStatus(customerId, CopyStatus.RESERVED, pageable);
+    }
+
     public long countCopiesByBookIsbnAndStatus(String isbn, CopyStatus status) {
         return copyRepository.countByBookIsbnAndStatus(isbn, status);
     }
@@ -143,7 +147,7 @@ public class CopyService {
     }
 
     @Transactional
-    public Copy cancelCopyReservation(Long copyId, Long customerId) {
+    public Copy cancelReservation(Long copyId, Long customerId) {
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.RESERVED) {
             throw new IllegalStateException(Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
@@ -154,6 +158,7 @@ public class CopyService {
             throw new IllegalStateException(Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
         }
 
+        existingCopy.setCustomer(null);
         existingCopy.setStatus(CopyStatus.AVAILABLE);
         return copyRepository.save(existingCopy);
     }
