@@ -1,6 +1,7 @@
 package librarymanagement.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import librarymanagement.constants.Messages;
@@ -26,6 +27,7 @@ public class Book {
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Author> authors;
 
+    @Min(value = 1, message = Messages.BOOK_PUBLICATION_YEAR_VALIDATION_MESSAGE)
     private Integer publicationYear;
 
 
