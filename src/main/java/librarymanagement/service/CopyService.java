@@ -110,6 +110,14 @@ public class CopyService {
     }
 
     @Transactional
+    public Copy markLost(Long copyId) {
+        Copy existingCopy = getCopyOrThrow(copyId);
+
+        existingCopy.setStatus(CopyStatus.LOST);
+        return copyRepository.save(existingCopy);
+    }
+
+    @Transactional
     public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
         Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
         if (availableCopies.isEmpty()) {
