@@ -42,6 +42,8 @@ public class Messages {
     public static final String COPY_NOT_RESERVED = "Copy is not currently reserved. Current status: ";
     public static final String COPY_UNAVAILABLE_FOR_BORROWING = "Copy is not currently available for borrowing. Current status: ";
     public static final String COPY_UNAVAILABLE_FOR_RESERVATION = "Copy is not currently available for reservation. Current status: ";
+    public static final String COPY_UNAVAILABLE_FOR_CHECKOUT = "Copy is not available for checkout. Current status: ";
+    public static final String COPY_RESERVED_FOR_ANOTHER_CUSTOMER = "Copy is reserved for another customer. Customer ID: ";
     public static final String COPY_BOOK_VALIDATION_MESSAGE = "Book cannot be null";
     public static final String COPY_STATUS_VALIDATION_MESSAGE = "Status cannot be null";
 

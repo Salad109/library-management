@@ -163,6 +163,38 @@ public class CopyService {
     }
 
     @Transactional
+    public Copy checkout(Long copyId, Long customerId) {
+        Copy copy = getCopyOrThrow(copyId);
+        Customer customer = getCustomerOrThrow(customerId);
+
+        // Reserved copy checkout
+        if (copy.getStatus() == CopyStatus.RESERVED) {
+            return checkoutReservedCopy(copy, customer);
+        }
+
+        // Direct checkout
+        if (copy.getStatus() == CopyStatus.AVAILABLE) {
+            return checkoutAvailableCopy(copy, customer);
+        }
+
+        throw new IllegalStateException(Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
+    }
+
+    private Copy checkoutReservedCopy(Copy copy, Customer customer) {
+        if (!copy.getCustomer().getId().equals(customer.getId())) {
+            throw new IllegalStateException(Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
+        }
+        copy.setStatus(CopyStatus.BORROWED);
+        return copyRepository.save(copy);
+    }
+
+    private Copy checkoutAvailableCopy(Copy copy, Customer customer) {
+        copy.setCustomer(customer);
+        copy.setStatus(CopyStatus.BORROWED);
+        return copyRepository.save(copy);
+    }
+
+    @Transactional
     public void deleteCopy(Long id) {
         if (!copyRepository.existsById(id)) {
             throw new ResourceNotFoundException(Messages.COPY_NOT_FOUND + id);
