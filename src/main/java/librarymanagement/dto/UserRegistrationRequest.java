@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import librarymanagement.constants.Messages;
 import librarymanagement.model.Role;
 
-public record RegistrationRequest(
+public record UserRegistrationRequest(
         @NotBlank(message = Messages.USER_USERNAME_VALIDATION_MESSAGE) String username,
         @NotBlank(message = Messages.USER_PASSWORD_VALIDATION_MESSAGE) String password,
         @NotNull(message = Messages.USER_ROLE_VALIDATION_MESSAGE) Role role,
@@ -13,7 +13,7 @@ public record RegistrationRequest(
         String lastName,
         String email) {
 
-    public RegistrationRequest {
+    public UserRegistrationRequest {
         if (username != null) {
             username = username.trim();
         }

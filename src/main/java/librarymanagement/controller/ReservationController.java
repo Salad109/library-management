@@ -1,7 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
-import librarymanagement.dto.ReservationRequest;
+import librarymanagement.dto.CopyReservationRequest;
 import librarymanagement.model.Copy;
 import librarymanagement.service.CopyService;
 import librarymanagement.service.SecurityService;
@@ -31,7 +31,7 @@ public class ReservationController {
 
     @PostMapping("/api/reservations")
     @ResponseStatus(HttpStatus.CREATED)
-    public Copy createReservation(@Valid @RequestBody ReservationRequest request) {
+    public Copy createReservation(@Valid @RequestBody CopyReservationRequest request) {
         Long customerId = securityService.getCurrentCustomerId();
         return copyService.reserveAnyAvailableCopy(request.bookIsbn(), customerId);
     }

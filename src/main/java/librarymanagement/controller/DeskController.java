@@ -1,9 +1,9 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
-import librarymanagement.dto.CheckoutRequest;
-import librarymanagement.dto.MarkLostRequest;
-import librarymanagement.dto.ReturnRequest;
+import librarymanagement.dto.CopyCheckoutRequest;
+import librarymanagement.dto.CopyMarkLostRequest;
+import librarymanagement.dto.CopyReturnRequest;
 import librarymanagement.model.Copy;
 import librarymanagement.service.CopyService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PreAuthorize("hasRole('LIBRARIAN')")
 public class DeskController {
 
     private final CopyService copyService;
@@ -21,20 +22,17 @@ public class DeskController {
     }
 
     @PostMapping("/api/desk/checkout")
-    @PreAuthorize("hasRole('LIBRARIAN')")
-    public Copy checkout(@Valid @RequestBody CheckoutRequest request) {
+    public Copy checkout(@Valid @RequestBody CopyCheckoutRequest request) {
         return copyService.checkout(request.copyId(), request.customerId());
     }
 
     @PostMapping("/api/desk/return")
-    @PreAuthorize("hasRole('LIBRARIAN')")
-    public Copy returnCopy(@Valid @RequestBody ReturnRequest request) {
+    public Copy returnCopy(@Valid @RequestBody CopyReturnRequest request) {
         return copyService.returnCopy(request.copyId(), request.customerId());
     }
 
     @PostMapping("/api/desk/mark-lost")
-    @PreAuthorize("hasRole('LIBRARIAN')")
-    public Copy markLost(@Valid @RequestBody MarkLostRequest request) {
+    public Copy markLost(@Valid @RequestBody CopyMarkLostRequest request) {
         return copyService.markLost(request.copyId());
     }
 

@@ -1,7 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.validation.Valid;
-import librarymanagement.dto.RegistrationRequest;
+import librarymanagement.dto.UserRegistrationRequest;
 import librarymanagement.model.User;
 import librarymanagement.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,8 @@ public class UserController {
 
     @PostMapping("/api/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public User register(@Valid @RequestBody RegistrationRequest registrationRequest) {
-        return userService.addUser(registrationRequest);
+    public User register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
+        return userService.addUser(userRegistrationRequest);
     }
 
     @GetMapping("/api/whoami")

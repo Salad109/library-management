@@ -2,7 +2,7 @@ package librarymanagement.service;
 
 import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
-import librarymanagement.dto.RegistrationRequest;
+import librarymanagement.dto.UserRegistrationRequest;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.model.Customer;
 import librarymanagement.model.User;
@@ -27,7 +27,7 @@ public class UserService {
     }
 
     @Transactional
-    public User addUser(RegistrationRequest request) {
+    public User addUser(UserRegistrationRequest request) {
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
             throw new DuplicateResourceException(Messages.USER_DUPLICATE + request.username());
