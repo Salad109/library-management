@@ -7,8 +7,8 @@ import librarymanagement.constants.Messages;
 
 public record CopyCreateRequest(
         @Pattern(regexp = Messages.BOOK_ISBN_REGEX, message = Messages.BOOK_ISBN_VALIDATION_MESSAGE) String bookIsbn,
-        @Min(value = 1, message = "Quantity must be at least 1")
-        @Max(value = 100, message = "Cannot create more than 100 copies at once")
+        @Min(value = 1, message = Messages.COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE)
+        @Max(value = 100, message = Messages.COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE)
         Integer quantity) {
     public CopyCreateRequest {
         if (quantity == null) {

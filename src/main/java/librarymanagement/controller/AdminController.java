@@ -2,14 +2,14 @@ package librarymanagement.controller;
 
 import jakarta.validation.Valid;
 import librarymanagement.dto.BookCreateRequest;
+import librarymanagement.dto.BookUpdateRequest;
 import librarymanagement.dto.CopyCreateRequest;
+import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.service.BookService;
 import librarymanagement.service.CopyService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,8 +26,13 @@ public class AdminController {
     }
 
     @PostMapping("/api/admin/books")
-    public void createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
-        bookService.addBook(bookCreateRequest.toBook());
+    public Book createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
+        return bookService.addBook(bookCreateRequest.toBook());
+    }
+
+    @PutMapping("/api/admin/books/{isbn}")
+    public Book updateBook(@PathVariable String isbn, @Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
+        return bookService.updateBook(isbn, bookUpdateRequest.toBook());
     }
 
     @PostMapping("/api/admin/copies")
