@@ -1,0 +1,68 @@
+# Admin Copy Management
+# Login as librarian first
+
+### Get all copies
+GET http://localhost:8080/api/admin/copies
+
+###
+
+### Get all copies with pagination
+GET http://localhost:8080/api/admin/copies?page=0&size=5
+
+###
+
+### Get specific copy by ID
+GET http://localhost:8080/api/admin/copies/1
+
+###
+
+### Get all copies of a specific book
+GET http://localhost:8080/api/admin/copies/book/9781234567890
+
+###
+
+### Create copies of a book
+POST http://localhost:8080/api/admin/copies
+Content-Type: application/json
+
+{
+  "bookIsbn": "9781234567890",
+  "quantity": 3
+}
+
+###
+
+### Create copies of another book
+POST http://localhost:8080/api/admin/copies
+Content-Type: application/json
+
+{
+  "bookIsbn": "123456789X"
+}
+
+###
+
+### Try to create copies for non-existent book
+POST http://localhost:8080/api/admin/copies
+Content-Type: application/json
+
+{
+  "bookIsbn": "9789999999999",
+  "quantity": 1
+}
+
+###
+
+### Try to create copies with invalid quantity
+POST http://localhost:8080/api/admin/copies
+Content-Type: application/json
+
+{
+  "bookIsbn": "9781234567890",
+  "quantity": 0
+}
+
+###
+
+### Try to get non-existent copy
+GET http://localhost:8080/api/admin/copies/999

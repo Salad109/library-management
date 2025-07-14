@@ -1,0 +1,66 @@
+# Admin Customer Management
+# Login as librarian first
+
+### Get all customers
+GET http://localhost:8080/api/admin/customers
+
+###
+
+### Get all customers with pagination
+GET http://localhost:8080/api/admin/customers?page=0&size=5
+
+###
+
+### Get specific customer by ID
+GET http://localhost:8080/api/admin/customers/1
+
+###
+
+### Update customer information
+PUT http://localhost:8080/api/admin/customers/1
+Content-Type: application/json
+
+{
+  "firstName": "Joe Jr.",
+  "lastName": "Mama Updated",
+  "email": "joe.updated@example.com"
+}
+
+###
+
+### Try to update with invalid email format
+PUT http://localhost:8080/api/admin/customers/1
+Content-Type: application/json
+
+{
+  "firstName": "Joe",
+  "lastName": "Mama",
+  "email": "not-an-email"
+}
+
+###
+
+### Try to update with missing required fields
+PUT http://localhost:8080/api/admin/customers/1
+Content-Type: application/json
+
+{
+  "email": "joe@example.com"
+}
+
+###
+
+### Try to get non-existent customer
+GET http://localhost:8080/api/admin/customers/999
+
+###
+
+### Try to update non-existent customer
+PUT http://localhost:8080/api/admin/customers/999
+Content-Type: application/json
+
+{
+  "firstName": "The",
+  "lastName": "Goober",
+  "email": "goober@example.com"
+}

@@ -1,0 +1,50 @@
+# Customer Self-Service
+# Login as customer first
+
+### Get my reservations
+GET http://localhost:8080/api/reservations/mine
+
+###
+
+### Reserve a book (need to create book first via admin)
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{
+  "bookIsbn": "9781234567890"
+}
+
+###
+
+### Reserve another book
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{
+  "bookIsbn": "123456789X"
+}
+
+###
+
+### Cancel specific reservation
+DELETE http://localhost:8080/api/reservations/1
+
+###
+
+### Try to reserve with invalid ISBN format
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{
+  "bookIsbn": "not-an-isbn"
+}
+
+###
+
+### Try to reserve non-existent book
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{
+  "bookIsbn": "9789999999999"
+}

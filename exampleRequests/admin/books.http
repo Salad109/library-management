@@ -1,0 +1,110 @@
+# Admin Book Management
+# Login as librarian first
+
+### Create a new book
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "title": "The Goober Chronicles",
+  "publicationYear": 1999,
+  "isbn": "9781234567890",
+  "authorNames": [
+    "The Goober"
+  ]
+}
+
+###
+
+### Create a new book with multiple authors
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "title": "The Mama Family",
+  "publicationYear": 1984,
+  "isbn": "123456789X",
+  "authorNames": [
+    "Joe Mama",
+    "Jane Mama"
+  ]
+}
+
+###
+
+### Update existing book
+PUT http://localhost:8080/api/admin/books/9781234567890
+Content-Type: application/json
+
+{
+  "title": "The Goober Chronicles - Revised Edition",
+  "publicationYear": 2025,
+  "authorNames": [
+    "The Goober",
+    "Goober Jr."
+  ]
+}
+
+###
+
+### Delete a book
+DELETE http://localhost:8080/api/admin/books/123456789X
+
+###
+
+### Try to create book with invalid ISBN
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "title": "Bad Book",
+  "isbn": "not-an-isbn",
+  "authorNames": [
+    "Bad Author"
+  ]
+}
+
+###
+
+### Try to create book without title
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781234567891",
+  "authorNames": [
+    "Some Author"
+  ]
+}
+
+###
+
+### Try to create duplicate ISBN
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "title": "Duplicate Book",
+  "isbn": "9781234567890",
+  "authorNames": [
+    "Another Author"
+  ]
+}
+
+###
+
+### Try to update non-existent book
+PUT http://localhost:8080/api/admin/books/9789999999999
+Content-Type: application/json
+
+{
+  "title": "Ghost Book",
+  "authorNames": [
+    "OoooOOOoooo"
+  ]
+}
+
+###
+
+### Try to delete non-existent book
+DELETE http://localhost:8080/api/admin/books/9789999999999

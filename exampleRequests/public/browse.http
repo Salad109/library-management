@@ -1,0 +1,59 @@
+# Public Browsing (No Authentication Required)
+
+### Get all books
+GET http://localhost:8080/api/books
+
+###
+
+### Get specific book by ISBN
+GET http://localhost:8080/api/books/9781234567890
+
+###
+
+### Search books by title
+GET http://localhost:8080/api/books/search?title=Gatsby
+
+###
+
+### Search books by author
+GET http://localhost:8080/api/books/search?authorName=Orwell
+
+###
+
+### Search books with pagination
+GET http://localhost:8080/api/books/search?authorName=Joe&size=2&page=0
+
+###
+
+### Search books by publication year
+GET http://localhost:8080/api/books/search?publicationYear=1984
+
+###
+
+### Search books by ISBN
+GET http://localhost:8080/api/books/search?isbn=9781234567890
+
+###
+
+### Get all authors
+GET http://localhost:8080/api/authors
+
+###
+
+### Get specific author by name
+GET http://localhost:8080/api/authors/George%20Orwell
+
+###
+
+### Check available copy count for a book
+GET http://localhost:8080/api/copies/book/9781234567890/count
+
+###
+
+### Try to get non-existent book
+GET http://localhost:8080/api/books/9999999999999
+
+###
+
+### Try to get non-existent author
+GET http://localhost:8080/api/authors/Nonexistent%20Author

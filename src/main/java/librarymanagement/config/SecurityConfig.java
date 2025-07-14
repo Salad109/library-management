@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,20 +31,13 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints like browsing
-                        .requestMatchers("/api/register", "/api/whoami").permitAll()
+                        .requestMatchers("/api/register", "/api/login", "/api/logout", "/api/whoami").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/authors/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/copies/book/*/count").permitAll()
 
-                        // Customer operations like managing their reservations
-                        .requestMatchers(HttpMethod.POST, "/api/reservations").hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.POST, "/api/customers/*/reserve/*").hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.PUT, "/api/copies/*/undo-reserve/*").hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.GET, "/api/customers/*/copies").hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.GET, "/api/customers/*").hasRole("CUSTOMER")
-
-                        // Librarian can do everything else
-                        .anyRequest().hasRole("LIBRARIAN")
+                        // Authentication required for everything else
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/login")
@@ -54,7 +48,7 @@ public class SecurityConfig {
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler(this::logoutSuccess)
                 )
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 

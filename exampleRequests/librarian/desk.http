@@ -1,0 +1,43 @@
+# Librarian Desk Operations
+# Login as librarian first
+
+### Checkout reserved copy to customer
+POST http://localhost:8080/api/desk/checkout
+Content-Type: application/json
+
+{
+  "copyId": 1,
+  "customerId": 1
+}
+
+###
+
+### Return a copy
+POST http://localhost:8080/api/desk/return
+Content-Type: application/json
+
+{
+  "copyId": 1,
+  "customerId": 1
+}
+
+###
+
+### Mark copy as lost
+POST http://localhost:8080/api/desk/mark-lost
+Content-Type: application/json
+
+{
+  "copyId": 3
+}
+
+###
+
+### Try to checkout non-existent copy
+POST http://localhost:8080/api/desk/checkout
+Content-Type: application/json
+
+{
+  "copyId": 999,
+  "customerId": 1
+}

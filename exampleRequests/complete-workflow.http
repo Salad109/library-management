@@ -1,0 +1,132 @@
+# Complete Library Workflow Example
+# This demonstrates a full library use case from start to finish
+
+### 1. Register a librarian
+POST http://localhost:8080/api/register
+Content-Type: application/json
+
+{
+  "username": "librarian1",
+  "password": "secret123",
+  "role": "ROLE_LIBRARIAN"
+}
+
+###
+
+### 2. Login as librarian
+POST http://localhost:8080/api/login
+Content-Type: application/x-www-form-urlencoded
+
+username = librarian1 &
+password = secret123
+
+###
+
+### 3. Create a book
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "title": "1984",
+  "publicationYear": 1984,
+  "isbn": "9789876543210",
+  "authorNames": [
+    "George Orwell"
+  ]
+}
+
+###
+
+### 4. Create copies of the book
+POST http://localhost:8080/api/admin/copies
+Content-Type: application/json
+
+{
+  "bookIsbn": "9789876543210",
+  "quantity": 3
+}
+
+###
+
+### 5. Register a customer
+POST http://localhost:8080/api/register
+Content-Type: application/json
+
+{
+  "username": "customer1",
+  "password": "customer123",
+  "role": "ROLE_CUSTOMER",
+  "firstName": "Joe",
+  "lastName": "Mama",
+  "email": "joe.mama@example.com"
+}
+
+###
+
+### 6. Login as customer
+POST http://localhost:8080/api/login
+Content-Type: application/x-www-form-urlencoded
+
+username = customer1 &
+password = customer123
+
+###
+
+### 7. Customer browses books (public endpoint)
+GET http://localhost:8080/api/books/search?title=1984
+
+###
+
+### 8. Customer checks availability
+GET http://localhost:8080/api/copies/book/9789876543210/count
+
+###
+
+### 9. Customer reserves a copy
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{
+  "bookIsbn": "9789876543210"
+}
+
+###
+
+### 10. Customer checks their reservations
+GET http://localhost:8080/api/reservations/mine
+
+###
+
+### 11. Login back as librarian for checkout
+POST http://localhost:8080/api/login
+Content-Type: application/x-www-form-urlencoded
+
+username = librarian1 &
+password = secret123
+
+###
+
+### 12. Librarian checks out the reserved copy
+POST http://localhost:8080/api/desk/checkout
+Content-Type: application/json
+
+{
+  "copyId": 1,
+  "customerId": 1
+}
+
+###
+
+### 13. Librarian processes return
+POST http://localhost:8080/api/desk/return
+Content-Type: application/json
+
+{
+  "copyId": 1,
+  "customerId": 1
+}
+
+###
+
+### 14. Available copy count should be 3 again
+GET http://localhost:8080/api/copies/book/9789876543210/count
