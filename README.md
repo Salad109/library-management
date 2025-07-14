@@ -47,155 +47,100 @@ username: `sa`, no password)
 
 ### Authentication
 
-- `POST /api/register` - Register a new user
-- `POST /api/login` - Login with username/password (form data)
-- `POST /api/logout` - Logout current user
-- `GET /api/whoami` - Check current authentication status
+```http
+POST /api/register                          # Register a new user
+POST /api/login                             # Login with username/password (form data)
+POST /api/logout                            # Logout current user
+GET  /api/whoami                            # Check current authentication status
+```
 
 #### User Roles
 
 - `ROLE_LIBRARIAN` - Full access to manage everything
 - `ROLE_CUSTOMER` - Limited access for browsing and reservations
 
-### Books
+### Public Endpoints (No Authentication Required)
 
-- `GET /api/books` - List all books (paginated)
-- `GET /api/books/{isbn}` - Get book by ISBN
-- `GET /api/books/search` - Search books by title, author, year, ISBN (paginated)
-    - Example: `/api/books/search?title=...&authorName=...&page=...&size=...`
-- `POST /api/books` - Create book
-- `PUT /api/books/{isbn}` - Update book
-- `DELETE /api/books/{isbn}` - Delete book
+```http
+GET  /api/books                             # List all books (paginated)
+GET  /api/books/{isbn}                      # Get book by ISBN
+GET  /api/books/search                      # Search books (paginated)
+GET  /api/authors                           # List all authors (paginated)
+GET  /api/authors/{name}                    # Get author by name
+GET  /api/copies/book/{isbn}/count          # Count available copies
+```
 
-### Copies
+### Admin Endpoints (Librarian Only)
 
-- `GET /api/copies` - List all copies (paginated)
-- `GET /api/copies/{id}` - Get copy by ID
-- `GET /api/copies/book/{isbn}` - Get copies of a specific book (paginated)
-- `GET /api/copies/book/{isbn}/available` - Get available copies (paginated)
-- `GET /api/copies/book/{isbn}/count` - Count available copies
-- `POST /api/copies` - Create copy
-- `PUT /api/copies/{copyId}/return/{customerId}` - Return copy
-- `PUT /api/copies/{copyId}/lost/{customerId}` - Mark copy as lost
-- `PUT /api/copies/{copyId}/undo-reserve/{customerId}` - Cancel reservation
-- `PUT /api/copies/{copyId}/checkout` - Checkout reserved copy (changes status from RESERVED to BORROWED)
-- `DELETE /api/copies/{id}` - Delete copy
+#### Book Management
+```http
+POST   /api/admin/books                     # Create book
+PUT    /api/admin/books/{isbn}              # Update book
+DELETE /api/admin/books/{isbn}              # Delete book
+```
 
-#### Copy Status Values
+#### Copy Management
+```http
+GET    /api/admin/copies                    # List all copies (paginated)
+GET    /api/admin/copies/{id}               # Get copy by ID
+GET    /api/admin/copies/book/{isbn}        # Get copies of a book (paginated)
+POST   /api/admin/copies                    # Create copies (batch)
+```
+
+#### Customer Management
+```http
+GET    /api/admin/customers                 # List all customers (paginated)
+GET    /api/admin/customers/{id}            # Get customer by ID
+PUT    /api/admin/customers/{id}            # Update customer
+```
+
+### Desk Operations (Librarian Only)
+
+```http
+POST /api/desk/checkout                     # Check out copy to customer
+POST /api/desk/return                       # Return a copy
+POST /api/desk/mark-lost                    # Mark copy as lost
+```
+
+### Customer Self-Service (Customer Only)
+
+```http
+GET    /api/reservations/mine               # Get my reservations (paginated)
+POST   /api/reservations                    # Reserve a book
+DELETE /api/reservations/{copyId}           # Cancel reservation
+```
+
+### Search Parameters
+
+- Books: `?title=...&authorName=...&publicationYear=...&isbn=...&page=...&size=...`
+- Pagination: `?page=0&size=20` (default size: 20, max: 100)
+
+### Copy Status Values
 
 - `AVAILABLE` - Can be borrowed or reserved
 - `BORROWED` - Currently checked out
 - `RESERVED` - On hold for a customer
 - `LOST` - Missing from inventory
 
-### Authors
+## Example HTTP Requests
 
-- `GET /api/authors` - List all authors (paginated)
-- `GET /api/authors/{name}` - Get author by name
-
-### Customers
-
-- `GET /api/customers` - List all customers (paginated)
-- `GET /api/customers/{id}` - Get customer by ID
-- `GET /api/customers/{id}/copies` - Get all copies associated with a customer (paginated)
-- `POST /api/customers` - Create customer
-- `POST /api/customers/{customerId}/borrow/{isbn}` - Borrow any available copy of a book
-- `POST /api/customers/{customerId}/reserve/{isbn}` - Reserve any available copy of a book
-- `PUT /api/customers/{id}` - Update customer
-- `DELETE /api/customers/{id}` - Delete customer
-
-## Example Request Flow
-
-These examples demonstrate the entire business logic of the library management system, from creating a book
-to a customer borrowing a copy. The following requests and more can be found in the `\exampleRequests` folder, ready to
-be executed.
-
-### Register a User
-
-```json
-POST /api/register
-{
-  "username": "librarian1",
-  "password": "secret123",
-  "role": "ROLE_LIBRARIAN"
-}
-```
-
-### Login
+The `exampleRequests` directory contains ready-to-use HTTP requests:
 
 ```
-POST /api/login
-Content-Type: application/x-www-form-urlencoded
-
-username=librarian1&password=secret123
+exampleRequests/
+├── admin/
+│   ├── books.http        # Book CRUD operations
+│   ├── copies.http       # Copy management
+│   └── customers.http    # Customer management
+├── customer/
+│   └── reservations.http # Customer self-service
+├── librarian/
+│   └── desk.http        # Desk operations
+├── public/
+│   ├── auth.http        # Authentication flows
+│   └── browse.http      # Public browsing
+└── complete-workflow.http # Full use case example
 ```
-
-### Create a Book
-
-```json
-POST /api/books
-{
-  "title": "1984",
-  "publicationYear": 1984,
-  "isbn": "9789876543210",
-  "authors": [
-    {
-      "name": "George Orwell"
-    }
-  ]
-}
-```
-
-Authors will be matched and created automatically if they don't exist yet.
-
-### Create a Copy
-
-```json
-POST /api/copies
-{
-  "book": {
-    "isbn": "9789876543210"
-  },
-  "status": "AVAILABLE"
-}
-```
-
-### Create a Customer
-
-```json
-POST /api/customers
-{
-  "firstName": "Joe",
-  "lastName": "Mama",
-  "email": "joe.mama@example.com"
-}
-```
-
-### Borrow a Book (any available copy)
-
-```
-POST /api/customers/1/borrow/9789876543210
-```
-
-This will find the first available copy of the book with the given ISBN and change its status to `BORROWED`, associating
-it with the customer.
-
-### Reserve a Book (any available copy)
-
-```
-POST /api/customers/1/reserve/9789876543210
-```
-
-This will find the first available copy of the book with the given ISBN and change its status to `RESERVED`, associating
-it with the customer.
-
-### Checkout a Reserved Copy
-
-```
-PUT /api/copies/2/checkout
-```
-
-This changes a reserved copy's status from `RESERVED` to `BORROWED`. The customer association remains the same.
 
 ## Progress
 
@@ -212,6 +157,7 @@ This changes a reserved copy's status from `RESERVED` to `BORROWED`. The custome
 - [x] Password hashing and secure user management
 - [x] Role-based access control (Librarian vs Customer)
 - [x] Centralized messages
+- [x] Proper separation of admin, desk, and customer endpoints
 - [ ] Book categories/genres
 - [ ] Logging and monitoring
 - [ ] Proper API documentation
