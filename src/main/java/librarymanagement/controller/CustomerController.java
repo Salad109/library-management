@@ -45,17 +45,6 @@ public class CustomerController {
         return customerService.addCustomer(customer);
     }
 
-    @PostMapping("/api/customers/{id}/borrow/{isbn}")
-    public Copy borrowBook(@PathVariable Long id, @PathVariable String isbn) {
-        return copyService.borrowAnyAvailableCopy(isbn, id);
-    }
-
-    @PostMapping("/api/customers/{id}/reserve/{isbn}")
-    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#id)")
-    public Copy reserveBook(@PathVariable Long id, @PathVariable String isbn) {
-        return copyService.reserveAnyAvailableCopy(isbn, id);
-    }
-
     @PutMapping("/api/customers/{id}")
     public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
         return customerService.updateCustomer(id, customer);

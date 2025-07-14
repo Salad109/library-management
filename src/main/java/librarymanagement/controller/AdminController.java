@@ -8,6 +8,7 @@ import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.service.BookService;
 import librarymanagement.service.CopyService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,8 @@ public class AdminController {
         this.copyService = copyService;
     }
 
+    // Book Management
+
     @PostMapping("/api/admin/books")
     public Book createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
         return bookService.addBook(bookCreateRequest.toBook());
@@ -34,6 +37,14 @@ public class AdminController {
     public Book updateBook(@PathVariable String isbn, @Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
         return bookService.updateBook(isbn, bookUpdateRequest.toBook());
     }
+
+    @DeleteMapping("/api/books/{isbn}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBook(@PathVariable String isbn) {
+        bookService.deleteBook(isbn);
+    }
+
+    // Copy Management
 
     @PostMapping("/api/admin/copies")
     public List<Copy> createCopies(@Valid @RequestBody CopyCreateRequest copyCreateRequest) {

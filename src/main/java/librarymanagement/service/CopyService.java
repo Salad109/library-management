@@ -60,11 +60,6 @@ public class CopyService {
     }
 
     @Transactional
-    public Copy addCopy(Copy copy) {
-        return copyRepository.save(copy);
-    }
-
-    @Transactional
     public List<Copy> addCopies(String isbn, int quantity) {
         Book book = bookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn));
@@ -77,31 +72,6 @@ public class CopyService {
             copies.add(copy);
         }
         return copyRepository.saveAll(copies);
-    }
-
-    @Transactional
-    public Copy borrowAnyAvailableCopy(String isbn, Long customerId) {
-        Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
-        if (availableCopies.isEmpty()) {
-            throw new ResourceNotFoundException(Messages.COPY_NO_AVAILABLE + isbn);
-        }
-
-        Copy copyToBorrow = availableCopies.getContent().get(0); // Borrow the first available copy
-        return borrowCopy(copyToBorrow.getId(), customerId);
-    }
-
-    @Transactional
-    public Copy borrowCopy(Long copyId, Long customerId) {
-        Copy existingCopy = getCopyOrThrow(copyId);
-        if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException(Messages.COPY_UNAVAILABLE_FOR_BORROWING + existingCopy.getStatus());
-        }
-
-        Customer customer = getCustomerOrThrow(customerId);
-
-        existingCopy.setCustomer(customer);
-        existingCopy.setStatus(CopyStatus.BORROWED);
-        return copyRepository.save(existingCopy);
     }
 
     @Transactional
@@ -118,19 +88,6 @@ public class CopyService {
 
         existingCopy.setCustomer(null);
         existingCopy.setStatus(CopyStatus.AVAILABLE);
-        return copyRepository.save(existingCopy);
-    }
-
-    @Transactional
-    public Copy markCopyAsLost(Long copyId, Long customerId) {
-        Copy existingCopy = getCopyOrThrow(copyId);
-
-        Customer customer = getCustomerOrThrow(customerId);
-        if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
-            throw new IllegalStateException(Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
-        }
-
-        existingCopy.setStatus(CopyStatus.LOST);
         return copyRepository.save(existingCopy);
     }
 
@@ -156,10 +113,6 @@ public class CopyService {
     @Transactional
     public Copy reserveCopy(Long copyId, Long customerId) {
         Copy existingCopy = getCopyOrThrow(copyId);
-        if (existingCopy.getStatus() != CopyStatus.AVAILABLE) {
-            throw new IllegalStateException(Messages.COPY_UNAVAILABLE_FOR_RESERVATION + existingCopy.getStatus());
-        }
-
         Customer customer = getCustomerOrThrow(customerId);
 
         existingCopy.setCustomer(customer);
@@ -181,18 +134,6 @@ public class CopyService {
 
         existingCopy.setCustomer(null);
         existingCopy.setStatus(CopyStatus.AVAILABLE);
-        return copyRepository.save(existingCopy);
-    }
-
-    @Transactional
-    public Copy checkoutReservedCopy(Long copyId) {
-        Copy existingCopy = getCopyOrThrow(copyId);
-
-        if (existingCopy.getStatus() != CopyStatus.RESERVED) {
-            throw new IllegalStateException(Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
-        }
-
-        existingCopy.setStatus(CopyStatus.BORROWED);
         return copyRepository.save(existingCopy);
     }
 

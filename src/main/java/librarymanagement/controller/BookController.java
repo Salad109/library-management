@@ -1,15 +1,13 @@
 package librarymanagement.controller;
 
-import io.undertow.util.BadRequestException;
-import jakarta.validation.Valid;
-import librarymanagement.constants.Messages;
-import librarymanagement.exception.ResourceNotFoundException;
 import librarymanagement.model.Book;
 import librarymanagement.service.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -45,26 +43,5 @@ public class BookController {
             return null;
         else
             return str;
-    }
-
-    @PostMapping("/api/books")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Book addBook(@Valid @RequestBody Book book) {
-        return bookService.addBook(book);
-    }
-
-    @PutMapping("/api/books/{isbn}")
-    public Book updateBook(@PathVariable String isbn, @Valid @RequestBody Book book) throws BadRequestException, ResourceNotFoundException {
-        if (!isbn.equals(book.getIsbn())) {
-            throw new BadRequestException(Messages.BOOK_CHANGE_ISBN);
-        }
-
-        return bookService.updateBook(isbn, book);
-    }
-
-    @DeleteMapping("/api/books/{isbn}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBook(@PathVariable String isbn) {
-        bookService.deleteBook(isbn);
     }
 }

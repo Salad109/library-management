@@ -23,7 +23,7 @@ public class ReservationController {
         this.securityService = securityService;
     }
 
-    @GetMapping("/api/reservations/mine")
+    @GetMapping("/api/reservations/mine") // todo refactor this to return all associated copies instead
     public Page<Copy> getMyReservations(Pageable pageable) {
         Long customerId = securityService.getCurrentCustomerId();
         return copyService.getReservationsByCustomerId(customerId, pageable);
@@ -38,8 +38,8 @@ public class ReservationController {
 
     @DeleteMapping("/api/reservations/{copyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelReservation(@PathVariable Long copyId) {
+    public Copy cancelReservation(@PathVariable Long copyId) {
         Long customerId = securityService.getCurrentCustomerId();
-        copyService.cancelReservation(copyId, customerId);
+        return copyService.cancelReservation(copyId, customerId);
     }
 }

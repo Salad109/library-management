@@ -1,8 +1,5 @@
 package librarymanagement.controller;
 
-import jakarta.validation.Valid;
-import librarymanagement.constants.Messages;
-import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.service.BookService;
@@ -10,18 +7,15 @@ import librarymanagement.service.CopyService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CopyController {
 
     private final CopyService copyService;
-    private final BookService bookService;
 
     public CopyController(CopyService copyService, BookService bookService) {
         this.copyService = copyService;
-        this.bookService = bookService;
     }
 
     @GetMapping("/api/copies")
@@ -42,41 +36,6 @@ public class CopyController {
     @GetMapping("/api/copies/book/{isbn}/count")
     public long countAvailableCopies(@PathVariable String isbn) {
         return copyService.countCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
-    }
-
-    @PostMapping("/api/copies")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Copy addCopy(@Valid @RequestBody Copy copy) {
-        if (copy.getBook().getIsbn() == null) {
-            throw new IllegalArgumentException(Messages.BOOK_NULL_ISBN);
-        }
-
-        // Make the copy associated with an existing book
-        Book existingBook = bookService.getBookByIsbn(copy.getBook().getIsbn());
-        copy.setBook(existingBook);
-
-        return copyService.addCopy(copy);
-    }
-
-    @PutMapping("/api/copies/{copyId}/return/{customerId}")
-    public Copy returnCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
-        return copyService.returnCopy(copyId, customerId);
-    }
-
-    @PutMapping("/api/copies/{copyId}/lost/{customerId}")
-    public Copy markCopyAsLost(@PathVariable Long copyId, @PathVariable Long customerId) {
-        return copyService.markCopyAsLost(copyId, customerId);
-    }
-
-    @PutMapping("/api/copies/{copyId}/undo-reserve/{customerId}")
-    @PreAuthorize("hasRole('LIBRARIAN') or @securityService.isCurrentUser(#customerId)")
-    public Copy unreserveCopy(@PathVariable Long copyId, @PathVariable Long customerId) {
-        return copyService.cancelReservation(copyId, customerId);
-    }
-
-    @PutMapping("/api/copies/{id}/checkout")
-    public Copy checkoutReservedCopy(@PathVariable Long id) {
-        return copyService.checkoutReservedCopy(id);
     }
 
     @DeleteMapping("/api/copies/{id}")
