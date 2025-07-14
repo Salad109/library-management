@@ -47,10 +47,6 @@ public class CopyService {
         return copyRepository.findByBookIsbn(isbn, pageable);
     }
 
-    public Page<Copy> getCopiesByCustomerId(Long customerId, Pageable pageable) {
-        return copyRepository.findByCustomerId(customerId, pageable);
-    }
-
     public Page<Copy> getReservationsByCustomerId(Long customerId, Pageable pageable) {
         return copyRepository.findByCustomerIdAndStatus(customerId, CopyStatus.RESERVED, pageable);
     }
@@ -167,14 +163,6 @@ public class CopyService {
         copy.setCustomer(customer);
         copy.setStatus(CopyStatus.BORROWED);
         return copyRepository.save(copy);
-    }
-
-    @Transactional
-    public void deleteCopy(Long id) {
-        if (!copyRepository.existsById(id)) {
-            throw new ResourceNotFoundException(Messages.COPY_NOT_FOUND + id);
-        }
-        copyRepository.deleteById(id);
     }
 
     // Helpers

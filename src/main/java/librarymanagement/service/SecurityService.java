@@ -16,16 +16,6 @@ public class SecurityService {
         this.userRepository = userRepository;
     }
 
-    public boolean isCurrentUser(Long customerId) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isEmpty() || optionalUser.get().getCustomer() == null) {
-            return false;
-        }
-        return optionalUser.get().getCustomer().getId().equals(customerId);
-    }
-
     public Long getCurrentCustomerId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
