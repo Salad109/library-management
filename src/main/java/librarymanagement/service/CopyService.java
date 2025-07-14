@@ -3,25 +3,31 @@ package librarymanagement.service;
 import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.exception.ResourceNotFoundException;
+import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.model.Customer;
+import librarymanagement.repository.BookRepository;
 import librarymanagement.repository.CopyRepository;
 import librarymanagement.repository.CustomerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CopyService {
 
     private final CopyRepository copyRepository;
+    private final BookRepository bookRepository;
     private final CustomerRepository customerRepository;
 
-    public CopyService(CopyRepository copyRepository, CustomerRepository customerRepository) {
+    public CopyService(CopyRepository copyRepository, BookRepository bookRepository, CustomerRepository customerRepository) {
         this.copyRepository = copyRepository;
+        this.bookRepository = bookRepository;
         this.customerRepository = customerRepository;
     }
 
@@ -56,6 +62,21 @@ public class CopyService {
     @Transactional
     public Copy addCopy(Copy copy) {
         return copyRepository.save(copy);
+    }
+
+    @Transactional
+    public List<Copy> addCopies(String isbn, int quantity) {
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn));
+
+        List<Copy> copies = new ArrayList<>(quantity);
+        for (int i = 0; i < quantity; i++) {
+            Copy copy = new Copy();
+            copy.setBook(book);
+            copy.setStatus(CopyStatus.AVAILABLE);
+            copies.add(copy);
+        }
+        return copyRepository.saveAll(copies);
     }
 
     @Transactional
