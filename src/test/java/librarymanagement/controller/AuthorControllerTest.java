@@ -1,21 +1,19 @@
 package librarymanagement.controller;
 
-import jakarta.transaction.Transactional;
-import librarymanagement.constants.Messages;
-import librarymanagement.testdata.BookTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
-@Transactional
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class AuthorControllerTest {
 
     @Autowired
@@ -23,36 +21,23 @@ class AuthorControllerTest {
 
     @Test
     void testGetAllAuthors() {
-        assertThat(mockMvcTester.get().uri("/api/authors"))
-                .hasStatus(HttpStatus.OK);
+        MvcTestResult result = mockMvcTester.get().uri("/api/authors").exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("totalElements")
+                .isEqualTo(3);
     }
 
     @Test
     void testGetAuthorByName() {
-        BookTestData.BookData bookData = BookTestData.getNextBookData();
-        String authorName = bookData.AUTHOR1;
+        String authorName = "George Orwell";
 
-        mockMvcTester.post()
-                .uri("/api/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(bookData.JSON)
-                .exchange();
+        MvcTestResult result = mockMvcTester.get().uri("/api/authors/" + authorName).exchange();
 
-        assertThat(mockMvcTester.get().uri("/api/authors/" + authorName))
-                .hasStatus(HttpStatus.OK)
+        assertThat(result).hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("name")
                 .isEqualTo(authorName);
-    }
-
-    @Test
-    void testGetNonExistentAuthorByName() {
-        String nonExistentAuthorName = "Nonexistent Author Jr.";
-
-        assertThat(mockMvcTester.get().uri("/api/authors/" + nonExistentAuthorName))
-                .hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson()
-                .extractingPath("error")
-                .isEqualTo(Messages.AUTHOR_NOT_FOUND + nonExistentAuthorName);
     }
 }

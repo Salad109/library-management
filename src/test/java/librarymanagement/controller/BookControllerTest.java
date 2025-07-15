@@ -42,6 +42,16 @@ class BookControllerTest {
     }
 
     @Test
+    void testGetAvailableCopiesCount() {
+        MvcTestResult result = mockMvcTester.get().uri("/api/books/9781234567890/count").exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.OK)
+                .bodyText()
+                .isEqualTo("2");
+    }
+
+    @Test
     void searchBookByTitle() {
         MvcTestResult result = mockMvcTester.get().uri("/api/books/search?title=1984").exchange();
 

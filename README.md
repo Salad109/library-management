@@ -73,6 +73,7 @@ GET  /api/books/{isbn}/count                # Count available copies
 ### Admin Endpoints (Librarian Only)
 
 #### Book Management
+
 ```http
 POST   /api/admin/books                     # Create book
 PUT    /api/admin/books/{isbn}              # Update book
@@ -80,6 +81,7 @@ DELETE /api/admin/books/{isbn}              # Delete book
 ```
 
 #### Copy Management
+
 ```http
 GET    /api/admin/copies                    # List all copies (paginated)
 GET    /api/admin/copies/{id}               # Get copy by ID
@@ -88,6 +90,7 @@ POST   /api/admin/copies                    # Create copies (batch)
 ```
 
 #### Customer Management
+
 ```http
 GET    /api/admin/customers                 # List all customers (paginated)
 GET    /api/admin/customers/{id}            # Get customer by ID
