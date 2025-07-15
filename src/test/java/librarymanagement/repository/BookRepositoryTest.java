@@ -8,12 +8,14 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 class BookRepositoryTest {
     @Autowired
     private BookRepository bookRepository;
@@ -31,9 +33,8 @@ class BookRepositoryTest {
     void shouldSearchBooksByTitle() {
         // Put a book in the database
         Author author = new Author("The Goober");
-        Book book = new Book("9781234567890", "The Goober Lore", Set.of(author), 2025);
+        Book book = new Book("112233445X", "The Goober Lore", Set.of(author), 2025);
 
-        testEntityManager.persistAndFlush(author);
         testEntityManager.persistAndFlush(book);
 
         Page<Book> results = bookRepository.searchBooks("Goober", null, null, null, PageRequest.of(0, 10));
