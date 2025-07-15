@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import librarymanagement.constants.Messages;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,14 +32,26 @@ class BookControllerTest {
     }
 
     @Test
-    void getBookByIsbn() {
+    void getBook() {
         MvcTestResult result = mockMvcTester.get().uri("/api/books/123456789X").exchange();
 
         assertThat(result)
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
-                .extractingPath("title")
-                .isEqualTo("The Little Prince");
+                .extractingPath("isbn")
+                .isEqualTo("123456789X");
+    }
+
+    @Test
+    void getNonExistentBook() {
+        String nonExistentIsbn = "987654321X";
+        MvcTestResult result = mockMvcTester.get().uri("/api/books/" + nonExistentIsbn).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.BOOK_NOT_FOUND + nonExistentIsbn);
     }
 
     @Test

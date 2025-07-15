@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import librarymanagement.constants.Messages;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +31,7 @@ class AuthorControllerTest {
     }
 
     @Test
-    void testGetAuthorByName() {
+    void testGetAuthor() {
         String authorName = "George Orwell";
 
         MvcTestResult result = mockMvcTester.get().uri("/api/authors/" + authorName).exchange();
@@ -39,5 +40,18 @@ class AuthorControllerTest {
                 .bodyJson()
                 .extractingPath("name")
                 .isEqualTo(authorName);
+    }
+
+    @Test
+    void testGetNonExistentAuthor() {
+        String nonExistentAuthorName = "Sir Goober";
+
+        MvcTestResult result = mockMvcTester.get().uri("/api/authors/" + nonExistentAuthorName).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.AUTHOR_NOT_FOUND + nonExistentAuthorName);
     }
 }
