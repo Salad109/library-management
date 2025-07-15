@@ -67,7 +67,7 @@ GET  /api/books/{isbn}                      # Get book by ISBN
 GET  /api/books/search                      # Search books (paginated)
 GET  /api/authors                           # List all authors (paginated)
 GET  /api/authors/{name}                    # Get author by name
-GET  /api/copies/book/{isbn}/count          # Count available copies
+GET  /api/books/{isbn}/count                # Count available copies
 ```
 
 ### Admin Endpoints (Librarian Only)

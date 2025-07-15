@@ -78,7 +78,7 @@ GET http://localhost:8080/api/books/search?title=1984
 ###
 
 ### 8. Customer checks availability
-GET http://localhost:8080/api/copies/book/9789876543210/count
+GET http://localhost:8080/api/books/9789876543210/count
 
 ###
 
@@ -129,4 +129,4 @@ Content-Type: application/json
 ###
 
 ### 14. Available copy count should be 3 again
-GET http://localhost:8080/api/copies/book/9789876543210/count
+GET http://localhost:8080/api/books/9789876543210/count

@@ -46,7 +46,7 @@ GET http://localhost:8080/api/authors/George%20Orwell
 ###
 
 ### Check available copy count for a book
-GET http://localhost:8080/api/copies/book/9781234567890/count
+GET http://localhost:8080/api/books/9781234567890/count
 
 ###
 

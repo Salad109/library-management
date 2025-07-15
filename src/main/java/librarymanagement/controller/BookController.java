@@ -1,7 +1,9 @@
 package librarymanagement.controller;
 
 import librarymanagement.model.Book;
+import librarymanagement.model.CopyStatus;
 import librarymanagement.service.BookService;
+import librarymanagement.service.CopyService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookController {
 
     private final BookService bookService;
+    private final CopyService copyService;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, CopyService copyService) {
         this.bookService = bookService;
+        this.copyService = copyService;
     }
 
     @GetMapping("/api/books")
@@ -27,6 +31,11 @@ public class BookController {
     @GetMapping("/api/books/{isbn}")
     public Book getBookByIsbn(@PathVariable String isbn) {
         return bookService.getBookByIsbn(isbn);
+    }
+
+    @GetMapping("/api/books/{isbn}/count")
+    public long countAvailableCopies(@PathVariable String isbn) {
+        return copyService.countCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
     }
 
     @GetMapping("/api/books/search")

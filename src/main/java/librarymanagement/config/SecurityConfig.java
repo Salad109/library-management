@@ -34,7 +34,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/register", "/api/login", "/api/logout", "/api/whoami").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/authors/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/copies/book/*/count").permitAll()
 
                         // Authentication required for everything else
                         .anyRequest().authenticated()
