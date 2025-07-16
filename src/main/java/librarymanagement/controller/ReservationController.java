@@ -23,10 +23,10 @@ public class ReservationController {
         this.securityService = securityService;
     }
 
-    @GetMapping("/api/reservations/mine") // todo refactor this to return all associated copies instead
+    @GetMapping("/api/reservations/mine")
     public Page<Copy> getMyReservations(Pageable pageable) {
         Long customerId = securityService.getCurrentCustomerId();
-        return copyService.getReservationsByCustomerId(customerId, pageable);
+        return copyService.getCopiesByCustomerId(customerId, pageable);
     }
 
     @PostMapping("/api/reservations")

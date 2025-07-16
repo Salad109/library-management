@@ -47,8 +47,8 @@ public class CopyService {
         return copyRepository.findByBookIsbn(isbn, pageable);
     }
 
-    public Page<Copy> getReservationsByCustomerId(Long customerId, Pageable pageable) {
-        return copyRepository.findByCustomerIdAndStatus(customerId, CopyStatus.RESERVED, pageable);
+    public Page<Copy> getCopiesByCustomerId(Long customerId, Pageable pageable) {
+        return copyRepository.findByCustomerId(customerId, pageable);
     }
 
     public long countCopiesByBookIsbnAndStatus(String isbn, CopyStatus status) {

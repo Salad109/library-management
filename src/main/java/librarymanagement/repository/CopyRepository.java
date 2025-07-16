@@ -15,7 +15,5 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
 
     Page<Copy> findByCustomerId(Long customerId, Pageable pageable);
 
-    Page<Copy> findByCustomerIdAndStatus(Long customerId, CopyStatus status, Pageable pageable);
-
     long countByBookIsbnAndStatus(String isbn, CopyStatus status);
 }
