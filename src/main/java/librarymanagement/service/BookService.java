@@ -34,12 +34,7 @@ public class BookService {
     }
 
     public Page<Book> searchBooks(String title, String authorName, Integer publicationYear, String isbn, Pageable pageable) {
-        // If no parameters provided, return all books
-        if (title == null && authorName == null && publicationYear == null && isbn == null) {
-            return bookRepository.findAll(pageable);
-        } else {
             return bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
-        }
     }
 
     public Book addBook(Book book) {

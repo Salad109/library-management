@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
+    // If no parameters provided, return all books
     @Query("SELECT DISTINCT b FROM Book b " +
             "LEFT JOIN b.authors a " +
             "WHERE (:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +

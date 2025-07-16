@@ -1,6 +1,7 @@
 package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
+import librarymanagement.constants.Messages;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -40,6 +41,29 @@ public class AdminControllerTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
+    void testCreateDuplicateBook() {
+        // Create a book
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/admin/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.TestBook1.JSON)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        // Create it again
+        MvcTestResult duplicateResult = mockMvcTester.post()
+                .uri("/api/admin/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.TestBook1.JSON)
+                .exchange();
+
+        assertThat(duplicateResult).hasStatus(HttpStatus.CONFLICT);
+        assertThat(duplicateResult).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_DUPLICATE + BookTestData.TestBook1.ISBN);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testUpdateBook() {
         // Verify initial state
         MvcTestResult initialResult = mockMvcTester.get()
@@ -64,6 +88,20 @@ public class AdminControllerTest {
         assertThat(result).bodyJson().extractingPath("title").isEqualTo(BookTestData.TestBook2.TITLE);
         assertThat(result).bodyJson().extractingPath("publicationYear").isEqualTo(BookTestData.TestBook2.PUBLICATION_YEAR);
         assertThat(result).bodyJson().extractingPath("authors[0].name").isEqualTo(BookTestData.TestBook2.AUTHOR_NAME);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testUpdateNonExistentBook() {
+        String isbn = "9784567891230"; // Nonexistent ISBN
+        MvcTestResult result = mockMvcTester.put()
+                .uri("/api/admin/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BookTestData.TestBook2.JSON)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 
     @Test
@@ -98,5 +136,17 @@ public class AdminControllerTest {
                 .exchange();
 
         assertThat(afterDeleteResult).hasStatus(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testDeleteNonExistentBook() {
+        String isbn = "9784567891230"; // Nonexistent ISBN
+        MvcTestResult result = mockMvcTester.delete()
+                .uri("/api/admin/books/" + isbn)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 }
