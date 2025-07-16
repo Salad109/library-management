@@ -33,6 +33,18 @@ public class CustomerService {
         return customer.get();
     }
 
+    public Customer addCustomer(Customer customer) {
+        String email = customer.getEmail();
+        if (email != null && !email.isBlank()) {
+            Optional<Customer> duplicateCustomer = customerRepository.findByEmail(email);
+            if (duplicateCustomer.isPresent()) {
+                throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + email);
+            }
+        }
+
+        return customerRepository.save(customer);
+    }
+
     @Transactional
     public Customer updateCustomer(Long id, Customer customer) {
         Customer existingCustomer = getCustomerById(id);

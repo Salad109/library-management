@@ -93,6 +93,7 @@ POST   /api/admin/copies                    # Create copies (batch)
 
 ```http
 GET    /api/admin/customers                 # List all customers (paginated)
+POST   /api/admin/customers                 # Create customer (walk-in)
 GET    /api/admin/customers/{id}            # Get customer by ID
 PUT    /api/admin/customers/{id}            # Update customer
 ```

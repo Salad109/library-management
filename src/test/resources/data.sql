@@ -18,3 +18,7 @@ VALUES ('9781234567890', 'AVAILABLE'),
        ('9781234567890', 'AVAILABLE'),
        ('9781234567890', 'LOST'),
        ('9799876543210', 'AVAILABLE');
+
+INSERT INTO customer (first_name, last_name, email) VALUES
+('Joe', 'Mama', 'joemama@example.com'),
+('Jane', 'Mama', null);

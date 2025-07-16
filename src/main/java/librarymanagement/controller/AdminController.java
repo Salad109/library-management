@@ -86,6 +86,12 @@ public class AdminController {
         return customerService.getCustomerById(id);
     }
 
+    @PostMapping("/api/admin/customers")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Customer createCustomer(@Valid @RequestBody Customer customer) {
+        return customerService.addCustomer(customer);
+    }
+
     @PutMapping("/api/admin/customers/{id}")
     public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
         return customerService.updateCustomer(id, customer);

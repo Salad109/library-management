@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-public class AdminControllerTest {
+class AdminControllerTest {
 
     @Autowired
     private MockMvcTester mockMvcTester;
@@ -199,6 +199,7 @@ public class AdminControllerTest {
         assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
     }
 
+
     @Test
     @WithMockUser(roles = "LIBRARIAN")
     void testCreateCopies() {
@@ -274,5 +275,146 @@ public class AdminControllerTest {
 
         assertThat(invalidIsbnResult).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(invalidIsbnResult).bodyJson().extractingPath("bookIsbn").isEqualTo(Messages.BOOK_ISBN_VALIDATION_MESSAGE);
+    }
+
+    // CUSTOMER MANAGEMENT TESTS
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetAllCustomers() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/customers")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetCustomerById() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/customers/1")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo("Joe");
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetNonExistentCustomerById() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/customers/9999")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.CUSTOMER_NOT_FOUND + "9999");
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testCreateCustomer() {
+        String customerJson = """
+                {
+                    "firstName": "Joe Jr.",
+                    "lastName": "Mama",
+                    "email": "joemamajr@example.com"
+                }
+                """;
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/admin/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo("Joe Jr.");
+        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo("Mama");
+        assertThat(result).bodyJson().extractingPath("email").isEqualTo("joemamajr@example.com");
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testCreateInvalidCustomer() {
+        String invalidCustomerJson = """
+                {
+                    "email": "goober@example.com"
+                    }
+                """;
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/admin/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidCustomerJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testUpdateCustomer() {
+        String updateJson = """
+                {
+                    "firstName": "Jane",
+                    "lastName": "Mama",
+                    "email": "janemama@example.com"
+                    }
+                """;
+
+        MvcTestResult result = mockMvcTester.put()
+                .uri("/api/admin/customers/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo("Jane");
+        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo("Mama");
+        assertThat(result).bodyJson().extractingPath("email").isEqualTo("janemama@example.com");
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testUpdateCustomerMissingFields() {
+        String updateJson = """
+                {
+                    "email": "goober@example.com"
+                    }
+                """;
+
+        MvcTestResult result = mockMvcTester.put()
+                .uri("/api/admin/customers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testUpdateCustomerDuplicateEmail() {
+        String updateJson = """
+                {
+                    "firstName": "The",
+                    "lastName": "Goober",
+                    "email": "joemama@example.com"
+                    }
+                """;
+
+        MvcTestResult result = mockMvcTester.put()
+                .uri("/api/admin/customers/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateJson)
+                .exchange();
+        assertThat(result).hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.CUSTOMER_EMAIL_DUPLICATE + "joemama@example.com");
     }
 }
