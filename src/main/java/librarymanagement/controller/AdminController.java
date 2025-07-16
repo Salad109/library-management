@@ -69,6 +69,7 @@ public class AdminController {
     }
 
     @PostMapping("/api/admin/copies")
+    @ResponseStatus(HttpStatus.CREATED)
     public List<Copy> createCopies(@Valid @RequestBody CopyCreateRequest copyCreateRequest) {
         return copyService.addCopies(copyCreateRequest.bookIsbn(), copyCreateRequest.quantity());
     }

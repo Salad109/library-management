@@ -24,6 +24,8 @@ public class AdminControllerTest {
     @Autowired
     private MockMvcTester mockMvcTester;
 
+    // BOOK MANAGEMENT TESTS
+
     @Test
     @WithMockUser(roles = "LIBRARIAN")
     void testCreateBook() {
@@ -148,5 +150,70 @@ public class AdminControllerTest {
 
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
         assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
+    }
+
+    // COPY MANAGEMENT TESTS
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetAllCopies() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/copies")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetCopyById() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/copies/1")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("id").isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetCopiesByBookIsbn() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/copies/book/9781234567890")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testCreateCopies() {
+        String requestJson = """
+                {
+                    "bookIsbn": "123456789X",
+                    "quantity": 5
+                }
+                """;
+
+        MvcTestResult createResult = mockMvcTester.post()
+                .uri("/api/admin/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)
+                .exchange();
+
+        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+
+        // Verify the number of copies created
+        MvcTestResult getResult = mockMvcTester.get()
+                .uri("/api/admin/copies/book/123456789X")
+                .exchange();
+
+        assertThat(getResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("numberOfElements")
+                .isEqualTo(5);
     }
 }
