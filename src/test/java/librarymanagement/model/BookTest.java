@@ -12,41 +12,37 @@ class BookTest {
 
     @Test
     void testBookCreation() {
-        String title = BookTestData.getNextBookData().TITLE;
+        String isbn = BookTestData.TestBook1.ISBN;
+        String title = BookTestData.TestBook1.TITLE;
         Set<Author> authors = new LinkedHashSet<>();
-        authors.add(new Author(BookTestData.getCurrentBookData().AUTHOR1));
-        authors.add(new Author(BookTestData.getCurrentBookData().AUTHOR2));
-        Integer publicationYear = BookTestData.getCurrentBookData().PUBLICATION_YEAR;
-        String isbn = BookTestData.getCurrentBookData().ISBN;
+        authors.add(new Author(BookTestData.TestBook1.AUTHOR_NAME));
+        Integer publicationYear = BookTestData.TestBook1.PUBLICATION_YEAR;
 
         Book book = new Book();
+        book.setIsbn(isbn);
         book.setTitle(title);
         book.setAuthors(authors);
         book.setPublicationYear(publicationYear);
-        book.setIsbn(isbn);
 
+        assertThat(book.getIsbn()).isEqualTo(isbn);
         assertThat(book.getTitle()).isEqualTo(title);
         assertThat(book.getAuthors()).isEqualTo(authors);
         assertThat(book.getPublicationYear()).isEqualTo(publicationYear);
-        assertThat(book.getIsbn()).isEqualTo(isbn);
     }
 
     @Test
     void testBookEquality() {
         Book book1 = new Book();
-        BookTestData.BookData bookData = BookTestData.getNextBookData();
-        book1.setIsbn(bookData.ISBN);
-        book1.setTitle(bookData.TITLE);
-        book1.setPublicationYear(bookData.PUBLICATION_YEAR);
-        book1.getAuthors().add(new Author(bookData.AUTHOR1));
-        book1.getAuthors().add(new Author(bookData.AUTHOR2));
+        book1.setIsbn(BookTestData.TestBook1.ISBN);
+        book1.setTitle(BookTestData.TestBook1.TITLE);
+        book1.setPublicationYear(BookTestData.TestBook1.PUBLICATION_YEAR);
+        book1.getAuthors().add(new Author(BookTestData.TestBook1.AUTHOR_NAME));
 
         Book book2 = new Book();
-        book2.setIsbn(bookData.ISBN);
-        book2.setTitle(bookData.TITLE);
-        book2.setPublicationYear(bookData.PUBLICATION_YEAR);
-        book2.getAuthors().add(new Author(bookData.AUTHOR1));
-        book2.getAuthors().add(new Author(bookData.AUTHOR2));
+        book2.setIsbn(BookTestData.TestBook1.ISBN);
+        book2.setTitle(BookTestData.TestBook1.TITLE);
+        book2.setPublicationYear(BookTestData.TestBook1.PUBLICATION_YEAR);
+        book2.getAuthors().add(new Author(BookTestData.TestBook1.AUTHOR_NAME));
 
         assertThat(book1.hashCode()).isEqualTo(book2.hashCode());
         assertThat(book1).isEqualTo(book2);

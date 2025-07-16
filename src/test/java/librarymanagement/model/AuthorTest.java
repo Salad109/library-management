@@ -14,12 +14,11 @@ class AuthorTest {
         Author author1 = new Author("Joe Mama");
         Author author2 = new Author("Joe Mama");
 
-        BookTestData.BookData bookData = BookTestData.getNextBookData();
         Book book = new Book(
-                bookData.ISBN,
-                bookData.TITLE,
+                BookTestData.TestBook1.ISBN,
+                BookTestData.TestBook1.TITLE,
                 null,
-                bookData.PUBLICATION_YEAR
+                BookTestData.TestBook1.PUBLICATION_YEAR
         );
 
         author1.getBooks().add(book);
@@ -32,20 +31,18 @@ class AuthorTest {
     void testChangeBookOwnership() {
         Author author = new Author("Joe Mama");
 
-        BookTestData.BookData oldBookData = BookTestData.getNextBookData();
         Book oldBook = new Book(
-                oldBookData.ISBN,
-                oldBookData.TITLE,
+                BookTestData.TestBook1.ISBN,
+                BookTestData.TestBook1.TITLE,
                 null,
-                oldBookData.PUBLICATION_YEAR
+                BookTestData.TestBook1.PUBLICATION_YEAR
         );
 
-        BookTestData.BookData newBookData = BookTestData.getNextBookData();
         Book newBook = new Book(
-                newBookData.ISBN,
-                newBookData.TITLE,
+                BookTestData.TestBook2.ISBN,
+                BookTestData.TestBook2.TITLE,
                 null,
-                newBookData.PUBLICATION_YEAR
+                BookTestData.TestBook2.PUBLICATION_YEAR
         );
 
         // Test setting null
