@@ -179,6 +179,17 @@ public class AdminControllerTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
+    void testGetNonexistentCopyById() {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/admin/copies/9999")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.COPY_NOT_FOUND + "9999");
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
     void testGetCopiesByBookIsbn() {
         MvcTestResult result = mockMvcTester.get()
                 .uri("/api/admin/copies/book/9781234567890")
@@ -216,5 +227,52 @@ public class AdminControllerTest {
                 .bodyJson()
                 .extractingPath("numberOfElements")
                 .isEqualTo(5);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testCreateCopiesInvalidParameters() {
+        String tooManyCopiesBadIsbnRequestJson = """
+                {
+                    "bookIsbn": "9781234567890",
+                    "quantity": 9999999
+                }
+                """;
+        String tooLittleCopiesRequestJson = """
+                {
+                    "bookIsbn": "123456789X",
+                    "quantity": 0
+                }
+                """;
+        String invalidIsbnRequestJson = """
+                {
+                    "bookIsbn": "invalid-isbn"
+                }
+                """;
+
+        MvcTestResult manyResult = mockMvcTester.post()
+                .uri("/api/admin/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tooManyCopiesBadIsbnRequestJson)
+                .exchange();
+        MvcTestResult negativeResult = mockMvcTester.post()
+                .uri("/api/admin/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tooLittleCopiesRequestJson)
+                .exchange();
+        MvcTestResult invalidIsbnResult = mockMvcTester.post()
+                .uri("/api/admin/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidIsbnRequestJson)
+                .exchange();
+
+        assertThat(manyResult).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(manyResult).bodyJson().extractingPath("quantity").isEqualTo(Messages.COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE);
+
+        assertThat(negativeResult).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(negativeResult).bodyJson().extractingPath("quantity").isEqualTo(Messages.COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE);
+
+        assertThat(invalidIsbnResult).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(invalidIsbnResult).bodyJson().extractingPath("bookIsbn").isEqualTo(Messages.BOOK_ISBN_VALIDATION_MESSAGE);
     }
 }
