@@ -35,6 +35,7 @@ public class AdminController {
     // Book Management
 
     @PostMapping("/api/admin/books")
+    @ResponseStatus(HttpStatus.CREATED)
     public Book createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
         return bookService.addBook(bookCreateRequest.toBook());
     }
