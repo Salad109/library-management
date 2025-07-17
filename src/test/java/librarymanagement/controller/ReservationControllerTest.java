@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -57,6 +58,13 @@ public class ReservationControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.get("id").asLong();
+    }
+
+    private Long extractCustomerIdFromRegistration(MvcTestResult result) throws Exception {
+        String responseBody = result.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return jsonNode.get("customer").get("id").asLong();
     }
 
     @Test
@@ -151,6 +159,78 @@ public class ReservationControllerTest {
                 .bodyJson()
                 .extractingPath("error")
                 .isEqualTo(Messages.COPY_NO_AVAILABLE + nonExistentIsbn);
+    }
+
+    @Test
+    void testCancelOtherCustomersReservation() throws Exception {
+        // Customer A reserves a book
+        MvcTestResult registrationResultA = registerCustomer("customerA", "Joe", "Mama");
+        assertThat(registrationResultA).hasStatus(HttpStatus.CREATED);
+
+        Long customerAId = extractCustomerIdFromRegistration(registrationResultA);
+
+        MvcTestResult loginResultA = loginAsCustomer("customerA");
+        assertThat(loginResultA).hasStatus(HttpStatus.OK);
+
+        MockHttpSession sessionA = (MockHttpSession) loginResultA.getRequest().getSession();
+        assertThat(sessionA).isNotNull();
+
+        String reservationJson = """
+                {
+                    "bookIsbn": "9799876543210"
+                }
+                """;
+
+        MvcTestResult reservationResult = mockMvcTester.post()
+                .uri("/api/reservations")
+                .session(sessionA)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson)
+                .exchange();
+
+        assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
+        Long reservationId = extractIdFromResponse(reservationResult);
+
+        // Customer B tries to delete Customer A's reservation
+        MvcTestResult registrationResultB = registerCustomer("customerB", "Evil Joe", "Mama");
+        assertThat(registrationResultB).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult loginResultB = loginAsCustomer("customerB");
+        assertThat(loginResultB).hasStatus(HttpStatus.OK);
+
+        MockHttpSession sessionB = (MockHttpSession) loginResultB.getRequest().getSession();
+        assertThat(sessionB).isNotNull();
+
+        // Invalid delete request by Customer B
+        MvcTestResult deleteResult = mockMvcTester.delete()
+                .uri("/api/reservations/" + reservationId)
+                .session(sessionB)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange();
+
+        assertThat(deleteResult)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.COPY_WRONG_CUSTOMER + customerAId);
+    }
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testLibrarianCannotReserve() {
+        String reservationJson = """
+                {
+                    "bookIsbn": "9781234567890"
+                }
+                """;
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.FORBIDDEN);
     }
 
     @Test
