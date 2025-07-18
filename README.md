@@ -162,9 +162,9 @@ exampleRequests/
 - [x] Role-based access control (Librarian vs Customer)
 - [x] Centralized messages
 - [x] Proper separation of admin, desk, and customer endpoints
-- [ ] Book categories/genres
+- [x] PostgreSQL migration from H2
+- [x] Docker support
 - [ ] Logging and monitoring
+- [ ] Deployment
 - [ ] Proper API documentation
-- [ ] PostgreSQL migration from H2
-- [ ] Docker
 - [ ] Microcontroller-based book scanner
