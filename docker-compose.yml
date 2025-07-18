@@ -1,0 +1,18 @@
+services:
+  library-management-app:
+    build: .
+    env_file: .env
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    env_file: .env
+    ports:
+      - "5433:5432"
