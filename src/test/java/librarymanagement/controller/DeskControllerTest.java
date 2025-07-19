@@ -183,4 +183,69 @@ public class DeskControllerTest {
                 .asNumber()
                 .isEqualTo(copyId);
     }
+
+    @Test
+    void returnNotBorrowedCopy() throws Exception {
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian3");
+        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult librarianLoginResult = ControllerTestUtils.login(mockMvcTester, "librarian3");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.OK);
+
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        assertThat(librarianSession).isNotNull();
+
+        String returnJson = """
+                {
+                    "copyId": 1,
+                    "customerId": 1
+                }
+                """;
+
+        MvcTestResult returnResult = mockMvcTester.post()
+                .uri("/api/desk/return")
+                .session(librarianSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(returnJson)
+                .exchange();
+
+        assertThat(returnResult).hasStatus(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void testMarkLost() {
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian3");
+        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult librarianLoginResult = ControllerTestUtils.login(mockMvcTester, "librarian3");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.OK);
+
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        assertThat(librarianSession).isNotNull();
+
+        String markLostJson = """
+                {
+                    "copyId": 1
+                }
+                """;
+
+        MvcTestResult markLostResult = mockMvcTester.post()
+                .uri("/api/desk/mark-lost")
+                .session(librarianSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(markLostJson)
+                .exchange();
+
+        assertThat(markLostResult)
+                .hasStatus(HttpStatus.OK);
+        assertThat(markLostResult)
+                .bodyJson()
+                .extractingPath("id")
+                .asNumber()
+                .isEqualTo(1);
+        assertThat(markLostResult)
+                .bodyJson()
+                .extractingPath("status")
+                .isEqualTo("LOST");
+    }
 }
