@@ -1,6 +1,6 @@
 package librarymanagement.model;
 
-import librarymanagement.testdata.BookTestData;
+import librarymanagement.utils.BookTestData;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashSet;

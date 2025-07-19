@@ -1,7 +1,10 @@
-package librarymanagement.testdata;
+package librarymanagement.utils;
 
-public class BookTestData {
-    public static class TestBook1 {
+public final class BookTestData {
+    private BookTestData() {
+    }
+
+    public static final class TestBook1 {
         public static final String ISBN = "9781234567891";
         public static final String TITLE = "1984 2";
         public static final int PUBLICATION_YEAR = 2077;
@@ -16,6 +19,8 @@ public class BookTestData {
                     ]
                 }
                 """.formatted(ISBN, TITLE, PUBLICATION_YEAR, AUTHOR_NAME);
+        private TestBook1() {
+        }
     }
 
     public static class TestBook2 {
@@ -33,5 +38,7 @@ public class BookTestData {
                     ]
                 }
                 """.formatted(ISBN, TITLE, PUBLICATION_YEAR, AUTHOR_NAME);
+        private TestBook2() {
+        }
     }
 }

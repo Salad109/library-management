@@ -1,9 +1,8 @@
 package librarymanagement.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
+import librarymanagement.utils.ControllerTestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,52 +26,12 @@ public class ReservationControllerTest {
     @Autowired
     private MockMvcTester mockMvcTester;
 
-    private MvcTestResult registerCustomer(String username, String firstName, String lastName) {
-        String customerJson = """
-                {
-                    "username": "%s",
-                    "password": "password123",
-                    "role": "ROLE_CUSTOMER",
-                    "firstName": "%s",
-                    "lastName": "%s"
-                }
-                """.formatted(username, firstName, lastName);
-
-        return mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
-    }
-
-    private MvcTestResult loginAsCustomer(String username) {
-        return mockMvcTester.post()
-                .uri("/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("username=" + username + "&password=password123")
-                .exchange();
-    }
-
-    private Long extractIdFromResponse(MvcTestResult result) throws Exception {
-        String responseBody = result.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("id").asLong();
-    }
-
-    private Long extractCustomerIdFromRegistration(MvcTestResult result) throws Exception {
-        String responseBody = result.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("customer").get("id").asLong();
-    }
-
     @Test
     void testMyReservations() {
-        MvcTestResult registrationResult = registerCustomer("jane", "Jane", "Mama");
+        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = loginAsCustomer("jane");
+        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "jane");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -89,10 +48,10 @@ public class ReservationControllerTest {
 
     @Test
     void testCreateReservation() {
-        MvcTestResult registrationResult = registerCustomer("joe", "Joe", "Mama");
+        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = loginAsCustomer("joe");
+        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -116,10 +75,10 @@ public class ReservationControllerTest {
 
     @Test
     void testCreateInvalidReservations() {
-        MvcTestResult registrationResult = registerCustomer("joe", "Joe", "Mama");
+        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = loginAsCustomer("joe");
+        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -164,12 +123,12 @@ public class ReservationControllerTest {
     @Test
     void testCancelOtherCustomersReservation() throws Exception {
         // Customer A reserves a book
-        MvcTestResult registrationResultA = registerCustomer("customerA", "Joe", "Mama");
+        MvcTestResult registrationResultA = ControllerTestUtils.registerCustomer(mockMvcTester, "customerA", "Joe", "Mama");
         assertThat(registrationResultA).hasStatus(HttpStatus.CREATED);
 
-        Long customerAId = extractCustomerIdFromRegistration(registrationResultA);
+        Long customerAId = ControllerTestUtils.extractCustomerIdFromRegistration(registrationResultA);
 
-        MvcTestResult loginResultA = loginAsCustomer("customerA");
+        MvcTestResult loginResultA = ControllerTestUtils.loginAsCustomer(mockMvcTester, "customerA");
         assertThat(loginResultA).hasStatus(HttpStatus.OK);
 
         MockHttpSession sessionA = (MockHttpSession) loginResultA.getRequest().getSession();
@@ -189,13 +148,13 @@ public class ReservationControllerTest {
                 .exchange();
 
         assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
-        Long reservationId = extractIdFromResponse(reservationResult);
+        Long reservationId = ControllerTestUtils.extractIdFromResponse(reservationResult);
 
         // Customer B tries to delete Customer A's reservation
-        MvcTestResult registrationResultB = registerCustomer("customerB", "Evil Joe", "Mama");
+        MvcTestResult registrationResultB = ControllerTestUtils.registerCustomer(mockMvcTester, "customerB", "Evil Joe", "Mama");
         assertThat(registrationResultB).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResultB = loginAsCustomer("customerB");
+        MvcTestResult loginResultB = ControllerTestUtils.loginAsCustomer(mockMvcTester, "customerB");
         assertThat(loginResultB).hasStatus(HttpStatus.OK);
 
         MockHttpSession sessionB = (MockHttpSession) loginResultB.getRequest().getSession();
@@ -235,10 +194,10 @@ public class ReservationControllerTest {
 
     @Test
     void testCancelReservation() throws Exception {
-        MvcTestResult registrationResult = registerCustomer("joe jr", "Joe", "Mama Jr");
+        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = loginAsCustomer("joe jr");
+        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe jr");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -259,7 +218,7 @@ public class ReservationControllerTest {
 
         assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
 
-        Long reservationId = extractIdFromResponse(reservationResult);
+        Long reservationId = ControllerTestUtils.extractIdFromResponse(reservationResult);
 
         MvcTestResult cancelResult = mockMvcTester.delete()
                 .uri("/api/reservations/" + reservationId)
@@ -272,10 +231,10 @@ public class ReservationControllerTest {
 
     @Test
     void testCancelInvalidReservations() {
-        MvcTestResult registrationResult = registerCustomer("joe jr", "Joe", "Mama Jr");
+        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = loginAsCustomer("joe jr");
+        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe jr");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
