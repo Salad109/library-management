@@ -28,7 +28,23 @@ public final class ControllerTestUtils {
                 .exchange();
     }
 
-    public static MvcTestResult loginAsCustomer(MockMvcTester mockMvcTester, String username) {
+    public static MvcTestResult registerLibrarian(MockMvcTester mockMvcTester, String username) {
+        String librarianJson = """
+                {
+                    "username": "%s",
+                    "password": "password123",
+                    "role": "ROLE_LIBRARIAN"
+                }
+                """.formatted(username);
+
+        return mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(librarianJson)
+                .exchange();
+    }
+
+    public static MvcTestResult login(MockMvcTester mockMvcTester, String username) {
         return mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -36,17 +52,17 @@ public final class ControllerTestUtils {
                 .exchange();
     }
 
-    public static Long extractIdFromResponse(MvcTestResult result) throws Exception {
+    public static int extractIdFromResponse(MvcTestResult result) throws Exception {
         String responseBody = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("id").asLong();
+        return jsonNode.get("id").asInt();
     }
 
-    public static Long extractCustomerIdFromRegistration(MvcTestResult result) throws Exception {
+    public static int extractCustomerIdFromRegistration(MvcTestResult result) throws Exception {
         String responseBody = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("customer").get("id").asLong();
+        return jsonNode.get("customer").get("id").asInt();
     }
 }

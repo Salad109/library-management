@@ -31,7 +31,7 @@ public class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "jane");
+        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "jane");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -51,7 +51,7 @@ public class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe");
+        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -78,7 +78,7 @@ public class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe");
+        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -126,9 +126,9 @@ public class ReservationControllerTest {
         MvcTestResult registrationResultA = ControllerTestUtils.registerCustomer(mockMvcTester, "customerA", "Joe", "Mama");
         assertThat(registrationResultA).hasStatus(HttpStatus.CREATED);
 
-        Long customerAId = ControllerTestUtils.extractCustomerIdFromRegistration(registrationResultA);
+        int customerAId = ControllerTestUtils.extractCustomerIdFromRegistration(registrationResultA);
 
-        MvcTestResult loginResultA = ControllerTestUtils.loginAsCustomer(mockMvcTester, "customerA");
+        MvcTestResult loginResultA = ControllerTestUtils.login(mockMvcTester, "customerA");
         assertThat(loginResultA).hasStatus(HttpStatus.OK);
 
         MockHttpSession sessionA = (MockHttpSession) loginResultA.getRequest().getSession();
@@ -148,13 +148,13 @@ public class ReservationControllerTest {
                 .exchange();
 
         assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
-        Long reservationId = ControllerTestUtils.extractIdFromResponse(reservationResult);
+        int reservationId = ControllerTestUtils.extractIdFromResponse(reservationResult);
 
         // Customer B tries to delete Customer A's reservation
         MvcTestResult registrationResultB = ControllerTestUtils.registerCustomer(mockMvcTester, "customerB", "Evil Joe", "Mama");
         assertThat(registrationResultB).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResultB = ControllerTestUtils.loginAsCustomer(mockMvcTester, "customerB");
+        MvcTestResult loginResultB = ControllerTestUtils.login(mockMvcTester, "customerB");
         assertThat(loginResultB).hasStatus(HttpStatus.OK);
 
         MockHttpSession sessionB = (MockHttpSession) loginResultB.getRequest().getSession();
@@ -197,7 +197,7 @@ public class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe jr");
+        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe jr");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -218,7 +218,7 @@ public class ReservationControllerTest {
 
         assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
 
-        Long reservationId = ControllerTestUtils.extractIdFromResponse(reservationResult);
+        int reservationId = ControllerTestUtils.extractIdFromResponse(reservationResult);
 
         MvcTestResult cancelResult = mockMvcTester.delete()
                 .uri("/api/reservations/" + reservationId)
@@ -234,14 +234,14 @@ public class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.loginAsCustomer(mockMvcTester, "joe jr");
+        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe jr");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
         assertThat(session).isNotNull();
 
-        long nonExistentReservationId = 999L;
-        long nonReservedReservationId = 1L;
+        int nonExistentReservationId = 999;
+        int nonReservedReservationId = 1;
 
         MvcTestResult nonExistentReservationCancelResult = mockMvcTester.delete()
                 .uri("/api/reservations/" + nonExistentReservationId)
