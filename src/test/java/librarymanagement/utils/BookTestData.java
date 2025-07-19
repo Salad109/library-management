@@ -19,6 +19,7 @@ public final class BookTestData {
                     ]
                 }
                 """.formatted(ISBN, TITLE, PUBLICATION_YEAR, AUTHOR_NAME);
+
         private TestBook1() {
         }
     }
@@ -38,6 +39,7 @@ public final class BookTestData {
                     ]
                 }
                 """.formatted(ISBN, TITLE, PUBLICATION_YEAR, AUTHOR_NAME);
+
         private TestBook2() {
         }
     }

@@ -34,7 +34,7 @@ public class BookService {
     }
 
     public Page<Book> searchBooks(String title, String authorName, Integer publicationYear, String isbn, Pageable pageable) {
-            return bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
+        return bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
     }
 
     public Book addBook(Book book) {
