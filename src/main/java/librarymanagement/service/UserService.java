@@ -8,6 +8,8 @@ import librarymanagement.model.Customer;
 import librarymanagement.model.User;
 import librarymanagement.repository.CustomerRepository;
 import librarymanagement.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,8 +31,10 @@ public class UserService {
 
     @Transactional
     public User addUser(UserRegistrationRequest request) {
+        log.info("Adding new user with username: {}", request.username());
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
+            log.debug("Duplicate user found with username: {}", request.username());
             throw new DuplicateResourceException(Messages.USER_DUPLICATE + request.username());
         }
 
@@ -40,6 +45,7 @@ public class UserService {
 
         if (request.isCustomer()) {
             if (!request.hasRequiredFieldsForCustomer()) {
+                log.debug("User registration request missing required customer fields");
                 throw new IllegalArgumentException(Messages.USER_MISSING_CUSTOMER_FIELDS);
             }
             Customer customer = new Customer();
@@ -50,6 +56,8 @@ public class UserService {
             user.setCustomer(customer);
         }
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        log.info("User added with username: {}", savedUser.getUsername());
+        return savedUser;
     }
 }

@@ -2,6 +2,8 @@ package librarymanagement.service;
 
 import librarymanagement.model.User;
 import librarymanagement.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import java.util.Optional;
 public class SecurityService {
 
     private final UserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(SecurityService.class);
 
     public SecurityService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -18,14 +21,20 @@ public class SecurityService {
 
     public Long getCurrentCustomerId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.debug("Getting customer ID for authenticated user: {}", username);
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
+            log.debug("User not found in security context: {}", username);
             throw new IllegalStateException("User not found in the security context");
         }
         if (optionalUser.get().getCustomer() == null) {
+            log.debug("User {} does not have an associated customer", username);
             throw new IllegalStateException("User does not have an associated customer");
         }
-        return optionalUser.get().getCustomer().getId();
+
+        Long customerId = optionalUser.get().getCustomer().getId();
+        log.debug("Found customer ID: {} for user: {}", customerId, username);
+        return customerId;
     }
 }

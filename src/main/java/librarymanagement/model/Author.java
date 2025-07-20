@@ -32,6 +32,11 @@ public class Author {
     }
 
     @Override
+    public String toString() {
+        return "Author(name=%s)".formatted(name);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Author) || getName() == null || ((Author) o).getName() == null) return false;
         return (getName().equals(((Author) o).getName()));
