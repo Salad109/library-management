@@ -1,0 +1,10 @@
+# Monitoring
+# Login as librarian first
+
+###
+GET http://localhost:8080/actuator
+
+###
+
+###
+GET http://localhost:8080/actuator/metrics
