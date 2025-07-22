@@ -35,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/authors/**").permitAll()
 
+                        .requestMatchers("/actuator/**").permitAll()
+
                         // Authentication required for everything else
                         .anyRequest().authenticated()
                 )

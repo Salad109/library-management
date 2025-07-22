@@ -12,25 +12,37 @@ A Spring Boot REST API for managing books and their copies in a library.
 - Authentication and authorization with Spring Security
 - Password hashing and secure user management
 - Search functionality across books, copies and authors
-- Robust integration and unit tests with >80% coverage
+- Application monitoring with Prometheus and Grafana
+- 94% test coverage with comprehensive integration and unit testing
 
 ## Tech Stack
 
 - Java 21 + Spring Boot 3.5.0
-- Spring Data JPA with H2 (planning PostgreSQL migration)
+- Spring Data JPA with PostgreSQL
 - Spring Security for authentication and role-based authorization
-- Undertow web server (replaced default Tomcat for better performance)
+- Slf4j for logging
+- Prometheus for metrics collection
+- Grafana for monitoring dashboards
+- Docker Compose for containerization
+- Undertow web server
 - JUnit 5 + MockMvc for testing
 - Maven
 
-## Startup Guide
+## Quick Start
 
 ```bash
-./mvnw spring-boot:run
+# Clone and setup environment
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Start all services
+docker-compose up
 ```
 
-The API runs on `http://localhost:8080`. H2 console is available at `/h2-console` (JDBC URL: `jdbc:h2:mem:testdb`,
-username: `sa`, no password)
+The application runs on `http://localhost:8080` with monitoring available at:
+
+- **Grafana:** `http://localhost:3000` (admin/admin)
+- **Prometheus:** `http://localhost:9090`
 
 ## API Endpoints
 
@@ -126,6 +138,10 @@ DELETE /api/reservations/{copyId}           # Cancel reservation
 - `RESERVED` - On hold for a customer
 - `LOST` - Missing from inventory
 
+## Monitoring
+
+WIP
+
 ## Example HTTP Requests
 
 The `exampleRequests` directory contains ready-to-use HTTP requests:
@@ -164,7 +180,9 @@ exampleRequests/
 - [x] Proper separation of admin, desk, and customer endpoints
 - [x] PostgreSQL migration from H2
 - [x] Docker support
-- [ ] Logging and monitoring
+- [x] Application monitoring with Prometheus and Grafana
+- [ ] Custom dashboards for Grafana
+- [ ] Integration with external book databases
 - [ ] Deployment
 - [ ] Proper API documentation
 - [ ] Microcontroller-based book scanner

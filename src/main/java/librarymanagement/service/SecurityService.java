@@ -12,8 +12,8 @@ import java.util.Optional;
 @Service
 public class SecurityService {
 
-    private final UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(SecurityService.class);
+    private final UserRepository userRepository;
 
     public SecurityService(UserRepository userRepository) {
         this.userRepository = userRepository;
