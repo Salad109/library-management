@@ -31,18 +31,30 @@ A Spring Boot REST API for managing books and their copies in a library.
 ## Quick Start
 
 ```bash
-# Clone and setup environment
+# Clone environment
 cp .env.example .env
-# Edit .env with your database credentials
+# Edit .env with your database credentials. For example:
+# POSTGRES_USER=library_admin
+# POSTGRES_PASSWORD=secret123
+# POSTGRES_DB=library_db
 
 # Start all services
 docker-compose up
 ```
 
-The application runs on `http://localhost:8080` with monitoring available at:
+The application runs on `http://localhost:8080`. Monitoring dashboard is available via Grafana and Prometheus.
 
-- **Grafana:** `http://localhost:3000` (admin/admin)
-- **Prometheus:** `http://localhost:9090`
+## Monitoring Setup Guide
+
+1. Visit Grafana at `http://localhost:3000` (admin/admin)
+2. Create a new data source:
+    - Type: Prometheus
+    - URL: `http://prometheus:9090`
+    - Use default settings for everything else
+3. Click "Save & Test"
+4. Import dashboard from `grafana/dashboard.json`
+5. Select the created Prometheus data source
+6. Generate sample data by running `exampleRequests/complete-workflow.http`
 
 ## API Endpoints
 
