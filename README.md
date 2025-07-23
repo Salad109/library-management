@@ -138,10 +138,6 @@ DELETE /api/reservations/{copyId}           # Cancel reservation
 - `RESERVED` - On hold for a customer
 - `LOST` - Missing from inventory
 
-## Monitoring
-
-WIP
-
 ## Example HTTP Requests
 
 The `exampleRequests` directory contains ready-to-use HTTP requests:
@@ -181,7 +177,7 @@ exampleRequests/
 - [x] PostgreSQL migration from H2
 - [x] Docker support
 - [x] Application monitoring with Prometheus and Grafana
-- [ ] Custom dashboards for Grafana
+- [x] Custom dashboards in Grafana
 - [ ] Integration with external book databases
 - [ ] Deployment
 - [ ] Proper API documentation
