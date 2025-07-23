@@ -1,6 +1,8 @@
 # Library Management System
 
-A Spring Boot REST API for managing books and their copies in a library.
+A library management system built with Spring Boot, featuring public book catalog
+browsing, customer self-service reservations, librarian workflow management, 
+role-based authentication, and real-time operational monitoring.
 
 ## Features
 
@@ -28,7 +30,7 @@ A Spring Boot REST API for managing books and their copies in a library.
 - JUnit 5 + MockMvc for testing
 - Maven
 
-## Quick Start
+## Starting Guide
 
 ```bash
 # Clone environment
@@ -42,7 +44,8 @@ cp .env.example .env
 docker-compose up
 ```
 
-The application runs on `http://localhost:8080`. Monitoring dashboard is available via Grafana and Prometheus.
+The application runs on `http://localhost:8080`. Monitoring dashboard is available 
+via Grafana and Prometheus.
 
 ## Monitoring Setup Guide
 
@@ -55,6 +58,10 @@ The application runs on `http://localhost:8080`. Monitoring dashboard is availab
 4. Import dashboard from `grafana/dashboard.json`
 5. Select the created Prometheus data source
 6. Generate sample data by running `exampleRequests/complete-workflow.http`
+
+<img src="https://github.com/user-attachments/assets/41e175c4-f124-4dc9-a132-f77a5e108fe1"
+    alt="dashboard screenshot" width="100%"/>
+Dashboard screenshot during ~100 RPS load simulation using the config in `grafana/dashboard.json`.
 
 ## API Endpoints
 
