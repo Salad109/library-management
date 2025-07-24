@@ -34,7 +34,7 @@ public class UserService {
         log.info("Adding new user with username: {}", request.username());
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
-            log.debug("Duplicate user found with username: {}", request.username());
+            log.warn("Duplicate user found with username: {}", request.username());
             throw new DuplicateResourceException(Messages.USER_DUPLICATE + request.username());
         }
 
@@ -45,7 +45,7 @@ public class UserService {
 
         if (request.isCustomer()) {
             if (!request.hasRequiredFieldsForCustomer()) {
-                log.debug("User registration request missing required customer fields");
+                log.warn("User registration request missing required customer fields");
                 throw new IllegalArgumentException(Messages.USER_MISSING_CUSTOMER_FIELDS);
             }
             Customer customer = new Customer();

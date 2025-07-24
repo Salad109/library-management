@@ -37,7 +37,7 @@ public class BookService {
         log.debug("Looking up book by ISBN: {}", isbn);
         Optional<Book> book = bookRepository.findByIsbn(isbn);
         if (book.isEmpty()) {
-            log.debug("Book not found with ISBN: {}", isbn);
+            log.warn("Book not found with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
         log.debug("Found book: '{}'", book.get().getTitle());
@@ -45,12 +45,12 @@ public class BookService {
     }
 
     public Page<Book> searchBooks(String title, String authorName, Integer publicationYear, String isbn, Pageable pageable) {
-        log.info("Searching books - title: '{}', author: '{}', year: {}, isbn: '{}', page: {}",
+        log.debug("Searching books - title: '{}', author: '{}', year: {}, isbn: '{}', page: {}",
                 title, authorName, publicationYear, isbn, pageable.getPageNumber());
 
         Page<Book> results = bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
 
-        log.info("Search returned {} results out of {} total matches",
+        log.debug("Search returned {} results out of {} total matches",
                 results.getNumberOfElements(), results.getTotalElements());
 
         return results;
@@ -62,7 +62,7 @@ public class BookService {
                 book.getTitle(), authorNames, book.getIsbn());
 
         if (bookRepository.findByIsbn(book.getIsbn()).isPresent()) {
-            log.debug("Attempted to add duplicate book with ISBN: {}", book.getIsbn());
+            log.warn("Attempted to add duplicate book with ISBN: {}", book.getIsbn());
             throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + book.getIsbn());
         }
 
@@ -79,7 +79,7 @@ public class BookService {
 
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty()) {
-            log.debug("Attempted to update non-existent book with ISBN: {}", isbn);
+            log.warn("Attempted to update non-existent book with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
 
@@ -106,7 +106,7 @@ public class BookService {
 
         Optional<Book> book = bookRepository.findById(isbn);
         if (book.isEmpty()) {
-            log.debug("Attempted to delete non-existent book with ISBN: {}", isbn);
+            log.warn("Attempted to delete non-existent book with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
 

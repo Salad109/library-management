@@ -33,7 +33,7 @@ public class AuthorService {
         log.debug("Looking up author by name: {}", name);
         Optional<Author> author = authorRepository.findById(name);
         if (author.isEmpty()) {
-            log.debug("Author not found with name: {}", name);
+            log.warn("Author not found with name: {}", name);
             throw new ResourceNotFoundException(Messages.AUTHOR_NOT_FOUND + name);
         }
         log.debug("Found author: '{}'", author.get().getName());

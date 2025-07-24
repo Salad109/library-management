@@ -71,7 +71,7 @@ public class CopyService {
         log.info("Adding {} copies for book with ISBN: {}", quantity, isbn);
         Optional<Book> book = bookRepository.findByIsbn(isbn);
         if (book.isEmpty()) {
-            log.debug("Book not found with ISBN: {}", isbn);
+            log.warn("Book not found with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
         }
         Book existingBook = book.get();
@@ -93,13 +93,13 @@ public class CopyService {
         log.info("Returning copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.BORROWED) {
-            log.debug("Copy with ID: {} is not borrowed, current status: {}", copyId, existingCopy.getStatus());
+            log.warn("Copy with ID: {} is not borrowed, current status: {}", copyId, existingCopy.getStatus());
             throw new IllegalStateException(Messages.COPY_NOT_BORROWED + existingCopy.getStatus());
         }
 
         Customer customer = getCustomerOrThrow(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
-            log.debug("Copy with ID: {} is reserved for another customer, current customer ID: {}", copyId, existingCopy.getCustomer().getId());
+            log.warn("Copy with ID: {} is reserved for another customer, current customer ID: {}", copyId, existingCopy.getCustomer().getId());
             throw new IllegalStateException(Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
         }
 
@@ -126,7 +126,7 @@ public class CopyService {
         log.info("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
         Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
         if (availableCopies.isEmpty()) {
-            log.debug("No available copies found for book with ISBN: {}", isbn);
+            log.warn("No available copies found for book with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.COPY_NO_AVAILABLE + isbn);
         }
 
@@ -152,13 +152,13 @@ public class CopyService {
         log.info("Cancelling reservation for copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.RESERVED) {
-            log.debug("Copy with ID: {} is not reserved, current status: {}", copyId, existingCopy.getStatus());
+            log.warn("Copy with ID: {} is not reserved, current status: {}", copyId, existingCopy.getStatus());
             throw new IllegalStateException(Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
         }
 
         Customer customer = getCustomerOrThrow(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
-            log.debug("Copy with ID: {} is reserved for customer ID: {}, not for customer ID: {}", copyId, existingCopy.getCustomer().getId(), customerId);
+            log.warn("Copy with ID: {} is reserved for customer ID: {}, not for customer ID: {}", copyId, existingCopy.getCustomer().getId(), customerId);
             throw new IllegalStateException(Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
         }
 
@@ -185,14 +185,14 @@ public class CopyService {
             return checkoutAvailableCopy(copy, customer);
         }
 
-        log.debug("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
+        log.warn("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
         throw new IllegalStateException(Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
     }
 
     private Copy checkoutReservedCopy(Copy copy, Customer customer) {
         log.info("Checking out reserved copy with ID: {} for customer ID: {}", copy.getId(), customer.getId());
         if (!copy.getCustomer().getId().equals(customer.getId())) {
-            log.debug("Copy with ID: {} is reserved for another customer ID: {}, cannot checkout", copy.getId(), copy.getCustomer().getId());
+            log.warn("Copy with ID: {} is reserved for another customer ID: {}, cannot checkout", copy.getId(), copy.getCustomer().getId());
             throw new IllegalStateException(Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
         }
         copy.setStatus(CopyStatus.BORROWED);
@@ -216,7 +216,7 @@ public class CopyService {
         log.debug("Looking up copy by ID: {}", id);
         Optional<Copy> optionalCopy = copyRepository.findById(id);
         if (optionalCopy.isEmpty()) {
-            log.debug("Copy not found with ID: {}", id);
+            log.warn("Copy not found with ID: {}", id);
             throw new ResourceNotFoundException(Messages.COPY_NOT_FOUND + id);
         }
         Copy savedCopy = optionalCopy.get();
@@ -228,7 +228,7 @@ public class CopyService {
         log.debug("Looking up customer by ID: {}", customerId);
         Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
         if (optionalCustomer.isEmpty()) {
-            log.debug("Customer not found with ID: {}", customerId);
+            log.warn("Customer not found with ID: {}", customerId);
             throw new ResourceNotFoundException(Messages.CUSTOMER_NOT_FOUND + customerId);
         }
         Customer customer = optionalCustomer.get();

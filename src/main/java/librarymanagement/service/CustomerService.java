@@ -35,7 +35,7 @@ public class CustomerService {
         log.debug("Looking up customer by ID: {}", id);
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) {
-            log.debug("Customer not found with ID: {}", id);
+            log.warn("Customer not found with ID: {}", id);
             throw new ResourceNotFoundException(Messages.CUSTOMER_NOT_FOUND + id);
         }
         Customer existingCustomer = customer.get();
@@ -49,7 +49,7 @@ public class CustomerService {
         if (email != null && !email.isBlank()) {
             Optional<Customer> duplicateCustomer = customerRepository.findByEmail(email);
             if (duplicateCustomer.isPresent()) {
-                log.debug("Duplicate customer found with email: {}", email);
+                log.warn("Duplicate customer found with email: {}", email);
                 throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + email);
             }
         }
@@ -69,7 +69,7 @@ public class CustomerService {
         if (newEmail != null && !newEmail.isBlank()) {
             Optional<Customer> duplicateCustomer = customerRepository.findByEmail(newEmail);
             if (duplicateCustomer.isPresent() && !duplicateCustomer.get().getId().equals(id)) {
-                log.debug("Attempted to update customer with duplicate email: {}", newEmail);
+                log.warn("Attempted to update customer with duplicate email: {}", newEmail);
                 throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + newEmail);
             }
         }

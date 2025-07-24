@@ -25,11 +25,11 @@ public class SecurityService {
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            log.debug("User not found in security context: {}", username);
+            log.warn("User not found in security context: {}", username);
             throw new IllegalStateException("User not found in the security context");
         }
         if (optionalUser.get().getCustomer() == null) {
-            log.debug("User {} does not have an associated customer", username);
+            log.warn("User {} does not have an associated customer", username);
             throw new IllegalStateException("User does not have an associated customer");
         }
 
