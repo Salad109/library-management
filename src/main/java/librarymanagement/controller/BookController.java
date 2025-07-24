@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import librarymanagement.model.Book;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.service.BookService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+@Tag(name = "Public Browsing")
 public class BookController {
 
     private final BookService bookService;

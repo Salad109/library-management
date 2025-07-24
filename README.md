@@ -1,7 +1,7 @@
 # Library Management System
 
 A library management system built with Spring Boot, featuring public book catalog
-browsing, customer self-service reservations, librarian workflow management, 
+browsing, customer self-service reservations, librarian workflow management,
 role-based authentication, and real-time operational monitoring.
 
 ## Features
@@ -26,6 +26,7 @@ role-based authentication, and real-time operational monitoring.
 - Prometheus for metrics collection
 - Grafana for monitoring dashboards
 - Docker Compose for containerization
+- Swagger for API documentation
 - Undertow web server
 - JUnit 5 + MockMvc for testing
 - Maven
@@ -44,7 +45,9 @@ cp .env.example .env
 docker-compose up
 ```
 
-The application runs on `http://localhost:8080`. Monitoring dashboard is available 
+The application runs on `http://localhost:8080`. API documentation is available
+at http://localhost:8080/swagger-ui.html.
+Monitoring dashboard is available
 via Grafana and Prometheus.
 
 ## Monitoring Setup Guide
@@ -60,7 +63,7 @@ via Grafana and Prometheus.
 6. Generate sample data by running `exampleRequests/complete-workflow.http`
 
 <img src="https://github.com/user-attachments/assets/41e175c4-f124-4dc9-a132-f77a5e108fe1"
-    alt="dashboard screenshot" width="100%"/>
+alt="dashboard screenshot" width="100%"/>
 Dashboard screenshot during ~100 RPS load simulation using the config in `grafana/dashboard.json`.
 
 ## API Endpoints

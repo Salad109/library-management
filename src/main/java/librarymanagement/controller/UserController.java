@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import librarymanagement.dto.UserRegistrationRequest;
 import librarymanagement.model.User;
@@ -10,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "Authentication")
 public class UserController {
 
     private final UserService userService;

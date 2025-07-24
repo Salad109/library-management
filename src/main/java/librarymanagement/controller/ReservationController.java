@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import librarymanagement.dto.CopyReservationRequest;
 import librarymanagement.model.Copy;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @PreAuthorize("hasRole('CUSTOMER')")
+@Tag(name = "Custom Reservations", description = "Customers can manage their reservations. Requires CUSTOMER role")
 public class ReservationController {
 
     private final CopyService copyService;

@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import librarymanagement.dto.CopyCheckoutRequest;
 import librarymanagement.dto.CopyMarkLostRequest;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @PreAuthorize("hasRole('LIBRARIAN')")
+@Tag(name = "Desk Operations", description = "Librarians can manage copy checkouts, returns, and lost copies. Requires LIBRARIAN role")
 public class DeskController {
 
     private final CopyService copyService;

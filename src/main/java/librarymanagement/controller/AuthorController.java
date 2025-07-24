@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import librarymanagement.model.Author;
 import librarymanagement.service.AuthorService;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Public Browsing", description = "No auth required")
 public class AuthorController {
 
     private final AuthorService authorService;

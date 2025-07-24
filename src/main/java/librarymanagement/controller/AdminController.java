@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import librarymanagement.dto.BookCreateRequest;
 import librarymanagement.dto.BookUpdateRequest;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasRole('LIBRARIAN')")
+@Tag(name = "Admin Operations", description = "Librarians can manage books, copies, and customers. Requires LIBRARIAN role")
 public class AdminController {
 
     private final BookService bookService;

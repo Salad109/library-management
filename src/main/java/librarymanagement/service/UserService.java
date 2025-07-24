@@ -51,6 +51,13 @@ public class UserService {
             Customer customer = new Customer();
             customer.setFirstName(request.firstName());
             customer.setLastName(request.lastName());
+            if (request.email() != null && !request.email().isBlank()) {
+                Optional<Customer> duplicateCustomer = customerRepository.findByEmail(request.email());
+                if (duplicateCustomer.isPresent()) {
+                    log.warn("Attempted to create user with duplicate email: {}", request.email());
+                    throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + request.email());
+                }
+            }
             customer.setEmail(request.email());
             customer = customerRepository.save(customer);
             user.setCustomer(customer);
