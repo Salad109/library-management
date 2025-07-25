@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @PreAuthorize("hasRole('LIBRARIAN')")
-@Tag(name = "Desk Operations", description = "Librarians can manage copy checkouts, returns, and lost copies. Requires LIBRARIAN role")
+@Tag(name = "Desk Operations", description = "Librarians can manage copy checkouts, returns, and lost copies. " +
+        "Requires LIBRARIAN role")
 public class DeskController {
 
     private final CopyService copyService;
@@ -32,21 +33,47 @@ public class DeskController {
         this.customerService = customerService;
     }
 
+    @Operation(summary = "Checkout a copy to a customer",
+            description = "Desk operation. Librarians can checkout a copy to a customer. The copy must be either " +
+                    "available or reserved by the specific customer. Requires LIBRARIAN role")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Copy checked out successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or copy not available for checkout"),
+            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
+            @ApiResponse(responseCode = "404", description = "Copy or customer not found")
+    })
     @PostMapping("/api/desk/checkout")
     public Copy checkout(@Valid @RequestBody CopyCheckoutRequest request) {
         return copyService.checkout(request.copyId(), request.customerId());
     }
 
+    @Operation(summary = "Return a copy from a customer",
+            description = "Desk operation. Librarians can return a copy from a customer. The copy must be checked out " +
+                    "to the specific customer. Requires LIBRARIAN role")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Copy returned successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or copy not checked out to this customer"),
+            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
+            @ApiResponse(responseCode = "404", description = "Copy or customer not found")
+    })
     @PostMapping("/api/desk/return")
     public Copy returnCopy(@Valid @RequestBody CopyReturnRequest request) {
         return copyService.returnCopy(request.copyId(), request.customerId());
     }
 
+    @Operation(summary = "Mark a copy as lost",
+            description = "Desk operation. Librarians mark a copy as lost instead of deleting it from the database. " +
+                    "Requires LIBRARIAN role")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Copy marked as lost successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or copy not found"),
+            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
+            @ApiResponse(responseCode = "404", description = "Copy not found")
+    })
     @PostMapping("/api/desk/mark-lost")
     public Copy markLost(@Valid @RequestBody CopyMarkLostRequest request) {
         return copyService.markLost(request.copyId());
     }
-
 
     @Operation(summary = "Create a new customer")
     @ApiResponses(value = {
