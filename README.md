@@ -2,7 +2,7 @@
 
 A library management system built with Spring Boot, featuring public book catalog
 browsing, customer self-service reservations, librarian workflow management,
-role-based authentication, and real-time operational monitoring.
+role-based authentication, and real-time monitoring.
 
 ## Features
 
@@ -66,99 +66,26 @@ via Grafana and Prometheus.
 alt="dashboard screenshot" width="100%"/>
 Dashboard screenshot during ~100 RPS load simulation using the config in `grafana/dashboard.json`.
 
-## API Endpoints
+## API Overview
 
-### Response Codes
+Full API Documentation and details are available at http://localhost:8080/swagger-ui.html. The API is organized into
+four main areas:
 
-- `200 OK` - Successful GET, PUT
-- `201 Created` - Successful POST
-- `204 No Content` - Successful DELETE
-- `400 Bad Request` - Invalid request data
-- `401 Unauthorized` - Authentication required
-- `403 Forbidden` - Insufficient permissions
-- `404 Not Found` - Resource doesn't exist
-- `409 Conflict` - Duplicate resource (e.g., ISBN already exists)
+### Public Browsing (No Authentication Required)
 
-### Authentication
+Browse books and authors, search the catalog, check what's available
 
-```http
-POST /api/register                          # Register a new user
-POST /api/login                             # Login with username/password (form data)
-POST /api/logout                            # Logout current user
-GET  /api/whoami                            # Check current authentication status
-```
+### Customer Self-Service (CUSTOMER role)
 
-#### User Roles
+Create, view and cancel your reservations
 
-- `ROLE_LIBRARIAN` - Full access to manage everything
-- `ROLE_CUSTOMER` - Limited access for browsing and reservations
+### Desk Operations (LIBRARIAN role)
 
-### Public Endpoints (No Authentication Required)
+Handle checkouts, returns, and mark items as lost
 
-```http
-GET  /api/books                             # List all books (paginated)
-GET  /api/books/{isbn}                      # Get book by ISBN
-GET  /api/books/search                      # Search books (paginated)
-GET  /api/authors                           # List all authors (paginated)
-GET  /api/authors/{name}                    # Get author by name
-GET  /api/books/{isbn}/count                # Count available copies
-```
+### Admin Operations (LIBRARIAN role)
 
-### Admin Endpoints (Librarian Only)
-
-#### Book Management
-
-```http
-POST   /api/admin/books                     # Create book
-PUT    /api/admin/books/{isbn}              # Update book
-DELETE /api/admin/books/{isbn}              # Delete book
-```
-
-#### Copy Management
-
-```http
-GET    /api/admin/copies                    # List all copies (paginated)
-GET    /api/admin/copies/{id}               # Get copy by ID
-GET    /api/admin/copies/book/{isbn}        # Get copies of a book (paginated)
-POST   /api/admin/copies                    # Create copies (batch)
-```
-
-#### Customer Management
-
-```http
-GET    /api/admin/customers                 # List all customers (paginated)
-POST   /api/admin/customers                 # Create customer (walk-in)
-GET    /api/admin/customers/{id}            # Get customer by ID
-PUT    /api/admin/customers/{id}            # Update customer
-```
-
-### Desk Operations (Librarian Only)
-
-```http
-POST /api/desk/checkout                     # Check out copy to customer
-POST /api/desk/return                       # Return a copy
-POST /api/desk/mark-lost                    # Mark copy as lost
-```
-
-### Customer Self-Service (Customer Only)
-
-```http
-GET    /api/reservations/mine               # Get my reservations (paginated)
-POST   /api/reservations                    # Reserve a book
-DELETE /api/reservations/{copyId}           # Cancel reservation
-```
-
-### Search Parameters
-
-- Books: `?title=...&authorName=...&publicationYear=...&isbn=...&page=...&size=...`
-- Pagination: `?page=0&size=20` (default size: 20, max: 100)
-
-### Copy Status Values
-
-- `AVAILABLE` - Can be borrowed or reserved
-- `BORROWED` - Currently checked out
-- `RESERVED` - On hold for a customer
-- `LOST` - Missing from inventory
+Manage books, copies, and customer accounts
 
 ## Example HTTP Requests
 
