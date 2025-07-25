@@ -81,7 +81,7 @@ Create, view and cancel your reservations
 
 ### Desk Operations (LIBRARIAN role)
 
-Handle checkouts, returns, and mark items as lost
+Handle checkouts, returns, and mark items as lost. Create "offline" customer accounts for walk-in users.
 
 ### Admin Operations (LIBRARIAN role)
 

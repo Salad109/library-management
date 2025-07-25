@@ -145,19 +145,6 @@ public class AdminController {
         return customerService.getCustomerById(id);
     }
 
-    @Operation(summary = "Create a new customer")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Customer created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data or validation errors"),
-            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
-            @ApiResponse(responseCode = "409", description = "Customer with this email already exists")
-    })
-    @PostMapping("/api/admin/customers")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Customer createCustomer(@Valid @RequestBody Customer customer) {
-        return customerService.addCustomer(customer);
-    }
-
     @Operation(summary = "Update an existing customer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Customer updated successfully"),
