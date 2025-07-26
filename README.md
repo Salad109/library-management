@@ -127,7 +127,5 @@ exampleRequests/
 - [x] Docker support
 - [x] Application monitoring with Prometheus and Grafana
 - [x] Custom dashboards in Grafana
-- [ ] Integration with external book databases
+- [x] Proper API documentation
 - [ ] Deployment
-- [ ] Proper API documentation
-- [ ] Microcontroller-based book scanner
