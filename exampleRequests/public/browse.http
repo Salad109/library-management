@@ -10,28 +10,8 @@ GET http://localhost:8080/api/books/9781234567890
 
 ###
 
-### Search books by title
-GET http://localhost:8080/api/books/search?title=Gatsby
-
-###
-
-### Search books by author
-GET http://localhost:8080/api/books/search?authorName=Orwell
-
-###
-
-### Search books with pagination
-GET http://localhost:8080/api/books/search?authorName=Joe&size=2&page=0
-
-###
-
-### Search books by publication year
-GET http://localhost:8080/api/books/search?publicationYear=1984
-
-###
-
-### Search books by ISBN
-GET http://localhost:8080/api/books/search?isbn=9781234567890
+### Search books
+GET http://localhost:8080/api/books/search?q=Gatsby
 
 ###
 

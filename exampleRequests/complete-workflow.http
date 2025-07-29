@@ -73,7 +73,7 @@ password = customer123
 ###
 
 ### 7. Customer browses books (public endpoint)
-GET http://localhost:8080/api/books/search?title=1984
+GET http://localhost:8080/api/books/search?q=1984
 
 ###
 
