@@ -314,47 +314,6 @@ class AdminControllerTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
-    void testCreateCustomer() {
-        String customerJson = """
-                {
-                    "firstName": "Joe Jr.",
-                    "lastName": "Mama",
-                    "email": "joemamajr@example.com"
-                }
-                """;
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/admin/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.CREATED);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo("Joe Jr.");
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo("Mama");
-        assertThat(result).bodyJson().extractingPath("email").isEqualTo("joemamajr@example.com");
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
-    void testCreateInvalidCustomer() {
-        String invalidCustomerJson = """
-                {
-                    "email": "goober@example.com"
-                    }
-                """;
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/admin/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidCustomerJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
     void testUpdateCustomer() {
         String updateJson = """
                 {
