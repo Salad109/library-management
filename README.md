@@ -62,9 +62,8 @@ via Grafana and Prometheus.
 5. Select the created Prometheus data source
 6. Generate sample data by running `exampleRequests/complete-workflow.http`
 
-<img src="https://github.com/user-attachments/assets/41e175c4-f124-4dc9-a132-f77a5e108fe1"
-alt="dashboard screenshot" width="100%"/>
-Dashboard screenshot during ~100 RPS load simulation using the config in `grafana/dashboard.json`.
+![Grafana dashboard screenshot](images/dashboard-screenshot.webp)
+Grafana dashboard screenshot during ~280 RPS mixed load simulation using the config in `grafana/dashboard.json`.
 
 ## API Overview
 
