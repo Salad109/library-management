@@ -52,26 +52,11 @@ public class BookController {
         return copyService.countCopiesByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
     }
 
-    @Operation(summary = "Search books by various criteria",
-            description = "Search by title, author name, publication year, or ISBN. " +
-                    "Any parameter can be null or blank to ignore that criterion.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Books found matching the search criteria"),
-            @ApiResponse(responseCode = "400", description = "Invalid search parameters")
-    })
+    @Operation(summary = "Search books by title or author name",
+            description = "Simple search that looks for the term in both book titles and author names")
+    @ApiResponse(responseCode = "200", description = "Books found matching the search term")
     @GetMapping("/api/books/search")
-    public Page<Book> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String authorName, @RequestParam(required = false) Integer publicationYear, @RequestParam(required = false) String isbn, Pageable pageable) {
-        title = nullBlankString(title);
-        authorName = nullBlankString(authorName);
-        isbn = nullBlankString(isbn);
-
-        return bookService.searchBooks(title, authorName, publicationYear, isbn, pageable);
-    }
-
-    private String nullBlankString(String str) {
-        if (str != null && str.isBlank())
-            return null;
-        else
-            return str;
+    public Page<Book> searchBooks(@RequestParam(required = false) String q, Pageable pageable) {
+        return bookService.searchBooks(q, pageable);
     }
 }

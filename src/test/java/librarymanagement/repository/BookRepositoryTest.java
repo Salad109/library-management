@@ -37,9 +37,9 @@ class BookRepositoryTest {
 
         testEntityManager.persistAndFlush(book);
 
-        Page<Book> results = bookRepository.searchBooks("Goober", null, null, null, PageRequest.of(0, 10));
+        Page<Book> results = bookRepository.findByAuthorContaining("Goober", PageRequest.of(0, 10));
 
         assertThat(results).hasSize(1);
-        assertThat(results.getContent().get(0).getTitle()).isEqualTo("The Goober Lore");
+        assertThat(results.getContent().getFirst().getTitle()).isEqualTo("The Goober Lore");
     }
 }

@@ -12,20 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
-    // If no parameters provided, return all books
-    @Query(value = "SELECT DISTINCT b.* FROM books b " +
-            "LEFT JOIN books_authors ba ON b.isbn = ba.books_isbn " +
-            "LEFT JOIN authors a ON ba.authors_name = a.name " +
-            "WHERE (:title IS NULL OR b.title ILIKE CONCAT('%', :title, '%')) " +
-            "AND (:authorName IS NULL OR a.name ILIKE CONCAT('%', :authorName, '%')) " +
-            "AND (:year IS NULL OR b.publication_year = :year) " +
-            "AND (:isbn IS NULL OR b.isbn = :isbn)",
-            nativeQuery = true)
-    Page<Book> searchBooks(@Param("title") String title,
-                           @Param("authorName") String authorName,
-                           @Param("year") Integer year,
-                           @Param("isbn") String isbn,
-                           Pageable pageable);
 
     Optional<Book> findByIsbn(String isbn);
+
+    @Query("SELECT b FROM Book b WHERE b.title ILIKE CONCAT('%', :term, '%')")
+    Page<Book> findByTitleContaining(@Param("term") String term, Pageable pageable);
+
+    @Query("SELECT DISTINCT b FROM Book b JOIN b.authors a WHERE a.name ILIKE CONCAT('%', :term, '%')")
+    Page<Book> findByAuthorContaining(@Param("term") String term, Pageable pageable);
 }

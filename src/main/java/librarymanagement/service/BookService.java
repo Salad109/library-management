@@ -44,16 +44,26 @@ public class BookService {
         return book.get();
     }
 
-    public Page<Book> searchBooks(String title, String authorName, Integer publicationYear, String isbn, Pageable pageable) {
-        log.debug("Searching books - title: '{}', author: '{}', year: {}, isbn: '{}', page: {}",
-                title, authorName, publicationYear, isbn, pageable.getPageNumber());
+    public Page<Book> searchBooks(String searchTerm, Pageable pageable) {
+        log.debug("Searching books with term: '{}', page: {}, size: {}", searchTerm, pageable.getPageNumber(), pageable.getPageSize());
+        if (searchTerm == null || searchTerm.isBlank()) {
+            log.debug("Search term is empty or null, returning all books");
+            return bookRepository.findAll(pageable);
+        }
 
-        Page<Book> results = bookRepository.searchBooks(title, authorName, publicationYear, isbn, pageable);
+        String cleanTerm = searchTerm.trim();
 
-        log.debug("Search returned {} results out of {} total matches",
-                results.getNumberOfElements(), results.getTotalElements());
+        Page<Book> titleResults = bookRepository.findByTitleContaining(cleanTerm, pageable);
+        Page<Book> authorResults = bookRepository.findByAuthorContaining(cleanTerm, pageable);
 
-        return results;
+        if (!(titleResults.getNumberOfElements() == 0)) {
+            log.debug("Found {} books matching title search for term: '{}'", titleResults.getNumberOfElements(), cleanTerm);
+            return titleResults;
+        } else {
+            log.debug("No books found matching title search for term: '{}'. Returning {} books by authors",
+                    cleanTerm, authorResults.getNumberOfElements());
+            return authorResults;
+        }
     }
 
     public Book addBook(Book book) {

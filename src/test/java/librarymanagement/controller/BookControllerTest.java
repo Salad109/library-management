@@ -66,7 +66,7 @@ class BookControllerTest {
 
     @Test
     void searchBook() {
-        MvcTestResult result = mockMvcTester.get().uri("/api/books/search?title=1984&authorName=").exchange();
+        MvcTestResult result = mockMvcTester.get().uri("/api/books/search?q=1984").exchange();
 
         assertThat(result)
                 .hasStatus(HttpStatus.OK)
