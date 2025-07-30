@@ -126,11 +126,11 @@ public class CopyService {
         log.info("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
         Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
         if (availableCopies.isEmpty()) {
-            log.warn("No available copies found for book with ISBN: {}", isbn);
+            log.info("No available copies found for book with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.COPY_NO_AVAILABLE + isbn);
         }
 
-        Copy copyToReserve = availableCopies.getContent().get(0); // Reserve the first available copy
+        Copy copyToReserve = availableCopies.getContent().getFirst(); // Reserve the first available copy
         log.info("Reserving copy with ID: {} for customer ID: {}", copyToReserve.getId(), customerId);
         return reserveCopy(copyToReserve.getId(), customerId);
     }
@@ -185,14 +185,14 @@ public class CopyService {
             return checkoutAvailableCopy(copy, customer);
         }
 
-        log.warn("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
+        log.info("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
         throw new IllegalStateException(Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
     }
 
     private Copy checkoutReservedCopy(Copy copy, Customer customer) {
         log.info("Checking out reserved copy with ID: {} for customer ID: {}", copy.getId(), customer.getId());
         if (!copy.getCustomer().getId().equals(customer.getId())) {
-            log.warn("Copy with ID: {} is reserved for another customer ID: {}, cannot checkout", copy.getId(), copy.getCustomer().getId());
+            log.info("Copy with ID: {} is reserved for another customer ID: {}, cannot checkout", copy.getId(), copy.getCustomer().getId());
             throw new IllegalStateException(Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
         }
         copy.setStatus(CopyStatus.BORROWED);

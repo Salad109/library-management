@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.0.2"
+      "version": "12.1.0"
     },
     {
       "type": "panel",
@@ -125,7 +125,7 @@
           "unit": "s"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -198,7 +198,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -238,7 +239,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -309,7 +310,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -349,7 +351,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -445,7 +447,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -473,7 +476,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -556,7 +559,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -584,7 +588,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -592,7 +596,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_count{uri=~\"/api/.*\",status=~\"4..|5..\"}[1m])) / sum(rate(http_server_requests_seconds_count{uri=~\"/api/.*\"}[1m]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{uri=~\"/api/.*\",status=~\"5..\"}[1m])) / sum(rate(http_server_requests_seconds_count{uri=~\"/api/.*\"}[1m]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "Error Rate"
@@ -655,7 +659,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -695,7 +700,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -731,6 +736,6 @@
   "timezone": "browser",
   "title": "Library Dashboard",
   "uid": "0d88cbcd-7961-4387-80f4-d71269fd170b",
-  "version": 4,
+  "version": 2,
   "weekStart": ""
 }

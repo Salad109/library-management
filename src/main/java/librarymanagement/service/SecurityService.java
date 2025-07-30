@@ -25,7 +25,7 @@ public class SecurityService {
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            log.warn("User not found in security context: {}", username);
+            log.error("User not found in security context: {}", username);
             throw new IllegalStateException("User not found in the security context");
         }
         if (optionalUser.get().getCustomer() == null) {

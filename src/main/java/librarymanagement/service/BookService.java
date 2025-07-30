@@ -54,12 +54,12 @@ public class BookService {
         String cleanTerm = searchTerm.trim();
 
         Page<Book> titleResults = bookRepository.findByTitleContaining(cleanTerm, pageable);
-        Page<Book> authorResults = bookRepository.findByAuthorContaining(cleanTerm, pageable);
 
-        if (!(titleResults.getNumberOfElements() == 0)) {
+        if (titleResults.getTotalElements() != 0) {
             log.debug("Found {} books matching title search for term: '{}'", titleResults.getNumberOfElements(), cleanTerm);
             return titleResults;
         } else {
+            Page<Book> authorResults = bookRepository.findByAuthorContaining(cleanTerm, pageable);
             log.debug("No books found matching title search for term: '{}'. Returning {} books by authors",
                     cleanTerm, authorResults.getNumberOfElements());
             return authorResults;
