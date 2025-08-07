@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-public class ReservationControllerTest {
+class ReservationControllerTest {
 
     @Autowired
     private MockMvcTester mockMvcTester;

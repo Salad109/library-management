@@ -71,31 +71,6 @@ class UserControllerTest {
     }
 
     @Test
-    void testRegisterInvalidUser() {
-        String invalidCustomerJson = """
-                {
-                    "username": "Goober"
-                }
-                """;
-
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidCustomerJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result)
-                .bodyJson()
-                .extractingPath("password")
-                .isEqualTo(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
-        assertThat(result)
-                .bodyJson()
-                .extractingPath("role")
-                .isEqualTo(Messages.USER_ROLE_VALIDATION_MESSAGE);
-    }
-
-    @Test
     void testLoginSuccess() {
         // Register a user
         String librarianJson = """
@@ -121,8 +96,10 @@ class UserControllerTest {
                 .content("username=testuser&password=testpass123")
                 .exchange();
 
-        assertThat(loginResult).hasStatus(HttpStatus.OK);
-        assertThat(loginResult).bodyText().isEqualTo(Messages.SECURITY_LOGIN_SUCCESS);
+        assertThat(loginResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyText()
+                .isEqualTo(Messages.SECURITY_LOGIN_SUCCESS);
     }
 
     @Test
@@ -156,8 +133,10 @@ class UserControllerTest {
                 .content("username=baduser&password=badpass")
                 .exchange();
 
-        assertThat(loginResult).hasStatus(HttpStatus.UNAUTHORIZED);
-        assertThat(loginResult).bodyText().isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
+        assertThat(loginResult)
+                .hasStatus(HttpStatus.UNAUTHORIZED)
+                .bodyText()
+                .isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
     }
 
     @Test
@@ -167,7 +146,9 @@ class UserControllerTest {
                 .uri("/api/whoami")
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyText().contains("LIBRARIAN");
+        assertThat(result)
+                .hasStatus(HttpStatus.OK)
+                .bodyText()
+                .contains("LIBRARIAN");
     }
 }

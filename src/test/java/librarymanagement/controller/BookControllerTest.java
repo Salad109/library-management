@@ -21,17 +21,6 @@ class BookControllerTest {
     private MockMvcTester mockMvcTester;
 
     @Test
-    void getAllBooks() {
-        MvcTestResult result = mockMvcTester.get().uri("/api/books").exchange();
-
-        assertThat(result)
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("totalElements")
-                .isEqualTo(3);
-    }
-
-    @Test
     void getBook() {
         MvcTestResult result = mockMvcTester.get().uri("/api/books/123456789X").exchange();
 

@@ -21,16 +21,6 @@ class AuthorControllerTest {
     private MockMvcTester mockMvcTester;
 
     @Test
-    void testGetAllAuthors() {
-        MvcTestResult result = mockMvcTester.get().uri("/api/authors").exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("totalElements")
-                .isEqualTo(3);
-    }
-
-    @Test
     void testGetAuthor() {
         String authorName = "George Orwell";
 

@@ -15,7 +15,7 @@ role-based authentication, and real-time monitoring.
 - Password hashing and secure user management
 - Search functionality across books, copies and authors
 - Application monitoring with Prometheus and Grafana
-- 94% test coverage with comprehensive integration and unit testing
+- 89% test coverage with comprehensive integration and unit testing
 
 ## Tech Stack
 
@@ -63,7 +63,7 @@ via Grafana and Prometheus.
 6. Generate sample data by running `exampleRequests/complete-workflow.http`
 
 ![Grafana dashboard screenshot](images/dashboard-screenshot.webp)
-Grafana dashboard screenshot during ~280 RPS mixed load simulation using the config in `grafana/dashboard.json`.
+Grafana dashboard screenshot during high load simulation using the config in `grafana/dashboard.json`.
 
 ## API Overview
 

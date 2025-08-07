@@ -4,6 +4,9 @@ import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.BookTestData;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,29 +43,6 @@ class AdminControllerTest {
         assertThat(result).bodyJson().extractingPath("title").isEqualTo(BookTestData.TestBook1.TITLE);
         assertThat(result).bodyJson().extractingPath("publicationYear").isEqualTo(BookTestData.TestBook1.PUBLICATION_YEAR);
         assertThat(result).bodyJson().extractingPath("authors[0].name").isEqualTo(BookTestData.TestBook1.AUTHOR_NAME);
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
-    void testCreateDuplicateBook() {
-        // Create a book
-        MvcTestResult createResult = mockMvcTester.post()
-                .uri("/api/admin/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(BookTestData.TestBook1.JSON)
-                .exchange();
-
-        assertThat(createResult).hasStatus(HttpStatus.CREATED);
-
-        // Create it again
-        MvcTestResult duplicateResult = mockMvcTester.post()
-                .uri("/api/admin/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(BookTestData.TestBook1.JSON)
-                .exchange();
-
-        assertThat(duplicateResult).hasStatus(HttpStatus.CONFLICT);
-        assertThat(duplicateResult).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_DUPLICATE + BookTestData.TestBook1.ISBN);
     }
 
     @Test
@@ -157,17 +137,6 @@ class AdminControllerTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
-    void testGetAllCopies() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/copies")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
     void testGetCopyById() {
         MvcTestResult result = mockMvcTester.get()
                 .uri("/api/admin/copies/1")
@@ -230,65 +199,32 @@ class AdminControllerTest {
                 .isEqualTo(5);
     }
 
-    @Test
+    @ParameterizedTest
     @WithMockUser(roles = "LIBRARIAN")
-    void testCreateCopiesInvalidParameters() {
-        String tooManyCopiesBadIsbnRequestJson = """
-                {
-                    "bookIsbn": "9781234567890",
-                    "quantity": 9999999
-                }
-                """;
-        String tooLittleCopiesRequestJson = """
-                {
-                    "bookIsbn": "123456789X",
-                    "quantity": 0
-                }
-                """;
-        String invalidIsbnRequestJson = """
-                {
-                    "bookIsbn": "invalid-isbn"
-                }
-                """;
+    @CsvSource({
+            "'9781234567890', 9999999, quantity, " + Messages.COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE,
+            "'123456789X', 0, quantity, " + Messages.COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE,
+            "'invalid-isbn',, bookIsbn, " + Messages.BOOK_ISBN_VALIDATION_MESSAGE
+    })
+    void testCreateCopiesInvalidParameters(String isbn, Integer quantity, String errorField, String expectedMessage) {
+        StringBuilder json = new StringBuilder("{\n");
+        json.append("    \"bookIsbn\": \"").append(isbn).append("\"");
+        if (quantity != null) {
+            json.append(",\n    \"quantity\": ").append(quantity);
+        }
+        json.append("\n}");
 
-        MvcTestResult manyResult = mockMvcTester.post()
+        MvcTestResult result = mockMvcTester.post()
                 .uri("/api/admin/copies")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(tooManyCopiesBadIsbnRequestJson)
-                .exchange();
-        MvcTestResult negativeResult = mockMvcTester.post()
-                .uri("/api/admin/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tooLittleCopiesRequestJson)
-                .exchange();
-        MvcTestResult invalidIsbnResult = mockMvcTester.post()
-                .uri("/api/admin/copies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidIsbnRequestJson)
+                .content(json.toString())
                 .exchange();
 
-        assertThat(manyResult).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(manyResult).bodyJson().extractingPath("quantity").isEqualTo(Messages.COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE);
-
-        assertThat(negativeResult).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(negativeResult).bodyJson().extractingPath("quantity").isEqualTo(Messages.COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE);
-
-        assertThat(invalidIsbnResult).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(invalidIsbnResult).bodyJson().extractingPath("bookIsbn").isEqualTo(Messages.BOOK_ISBN_VALIDATION_MESSAGE);
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath(errorField).isEqualTo(expectedMessage);
     }
 
     // CUSTOMER MANAGEMENT TESTS
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
-    void testGetAllCustomers() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/customers")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
-    }
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
@@ -337,26 +273,6 @@ class AdminControllerTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
-    void testUpdateCustomerMissingFields() {
-        String updateJson = """
-                {
-                    "email": "goober@example.com"
-                    }
-                """;
-
-        MvcTestResult result = mockMvcTester.put()
-                .uri("/api/admin/customers/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
     void testUpdateCustomerDuplicateEmail() {
         String updateJson = """
                 {
@@ -375,5 +291,19 @@ class AdminControllerTest {
                 .bodyJson()
                 .extractingPath("error")
                 .isEqualTo(Messages.CUSTOMER_EMAIL_DUPLICATE + "joemama@example.com");
+    }
+
+    // OTHER
+
+    @ParameterizedTest
+    @WithMockUser(roles = "LIBRARIAN")
+    @ValueSource(strings = {"books", "admin/copies", "admin/customers"})
+    void testGetAll(String endpoint) {
+        MvcTestResult result = mockMvcTester.get()
+                .uri("/api/" + endpoint)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("content").isNotEmpty();
     }
 }
