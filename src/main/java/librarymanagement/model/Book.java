@@ -8,6 +8,7 @@ import librarymanagement.constants.Messages;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "books")
@@ -40,6 +41,13 @@ public class Book {
         this.title = title;
         this.authors = (authors != null) ? new LinkedHashSet<>(authors) : new LinkedHashSet<>();
         this.publicationYear = publicationYear;
+    }
+
+    @Transient
+    public String getFormattedAuthors() {
+        return authors.stream()
+                .map(Author::getName)
+                .collect(Collectors.joining(", "));
     }
 
     @Override

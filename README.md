@@ -127,4 +127,7 @@ exampleRequests/
 - [x] Application monitoring with Prometheus and Grafana
 - [x] Custom dashboards in Grafana
 - [x] Proper API documentation
+- [ ] Admin panel in Thymeleaf
+- [ ] Forms for full CRUD operations on resources
+- [ ] Enhance admin panel with HTMX
 - [ ] Deployment
