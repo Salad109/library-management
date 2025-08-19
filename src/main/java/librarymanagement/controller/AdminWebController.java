@@ -24,4 +24,9 @@ public class AdminWebController {
         model.addAttribute("bookCount", books.getTotalElements());
         return "admin";
     }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
 }

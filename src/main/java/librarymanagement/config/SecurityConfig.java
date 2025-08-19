@@ -3,9 +3,10 @@ package librarymanagement.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import librarymanagement.constants.Messages;
+import librarymanagement.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +16,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.savedrequest.SavedRequest;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -30,48 +34,48 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints like browsing
-                        .requestMatchers("/api/register", "/api/login", "/api/logout", "/api/whoami").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/authors/**").permitAll()
+                        .requestMatchers("/actuator/**", "/login", "/api/login",
+                                "/api/register", "/api/books/**", "/api/authors/**").permitAll()
 
-                        .requestMatchers("/actuator/**").permitAll()
-
-                        // Authentication required for everything else
+                        .requestMatchers("/admin/**", "/api/admin/**", "/api/desk/**").hasRole("LIBRARIAN")
+                        .requestMatchers("/customer/**", "/api/reservations/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
+                        .loginPage("/login")
                         .loginProcessingUrl("/api/login")
-                        .successHandler(this::loginSuccess)
+                        .successHandler(this::roleBasedRedirect)
                         .failureHandler(this::loginFailure)
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/api/logout")
-                        .logoutSuccessHandler(this::logoutSuccess)
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 
-    private void loginSuccess(HttpServletRequest request,
-                              HttpServletResponse response,
-                              Authentication authentication) throws java.io.IOException {
-        response.setContentType("text/plain");
-        response.getWriter().write(Messages.SECURITY_LOGIN_SUCCESS);
+    private void roleBasedRedirect(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   Authentication authentication) throws IOException {
+
+        boolean isLibrarian = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals(Role.ROLE_LIBRARIAN.toString()));
+
+        if (isLibrarian) {
+            SavedRequest savedRequest = (SavedRequest) request.getSession()
+                    .getAttribute("SPRING_SECURITY_SAVED_REQUEST");
+
+            String targetUrl = savedRequest != null ?
+                    savedRequest.getRedirectUrl() : "/admin";
+
+            response.sendRedirect(targetUrl);
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType("text/html");
+            response.getWriter().write(Messages.USER_FORBIDDEN_ACCESS);
+        }
     }
 
     private void loginFailure(HttpServletRequest request,
                               HttpServletResponse response,
-                              AuthenticationException exception) throws java.io.IOException {
-        response.setStatus(401);
-        response.setContentType("text/plain");
-        response.getWriter().write(Messages.SECURITY_LOGIN_FAILURE);
-    }
-
-    private void logoutSuccess(HttpServletRequest request,
-                               HttpServletResponse response,
-                               Authentication authentication) throws java.io.IOException {
-        response.setContentType("text/plain");
-        response.getWriter().write(Messages.SECURITY_LOGOUT_SUCCESS);
+                              AuthenticationException exception) throws IOException {
+        response.sendRedirect("/login?error=true");
     }
 }
