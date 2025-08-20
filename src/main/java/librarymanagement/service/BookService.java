@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
-import librarymanagement.model.Author;
 import librarymanagement.model.Book;
 import librarymanagement.repository.BookRepository;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.Optional;
 
 @Service
@@ -67,7 +65,7 @@ public class BookService {
     }
 
     public Book addBook(Book book) {
-        String authorNames = getAuthorNames(book);
+        String authorNames = book.getFormattedAuthors();
         log.info("Adding book: '{}' by [{}] (ISBN: {})",
                 book.getTitle(), authorNames, book.getIsbn());
 
@@ -95,7 +93,7 @@ public class BookService {
 
         Book existingBook = optionalBook.get();
         String oldTitle = existingBook.getTitle();
-        String oldAuthors = getAuthorNames(existingBook);
+        String oldAuthors = existingBook.getFormattedAuthors();
 
         existingBook.setAuthors(book.getAuthors());
         existingBook.setTitle(book.getTitle());
@@ -105,7 +103,7 @@ public class BookService {
 
         log.info("Updated book (ISBN: {}): '{}' by [{}] to '{}' by [{}]",
                 isbn, oldTitle, oldAuthors,
-                savedBook.getTitle(), getAuthorNames(savedBook));
+                savedBook.getTitle(), savedBook.getFormattedAuthors());
 
         return savedBook;
     }
@@ -124,21 +122,5 @@ public class BookService {
 
         bookRepository.deleteById(isbn);
         log.info("Successfully deleted book: '{}' (ISBN: {})", title, isbn);
-    }
-
-    private String getAuthorNames(Book book) {
-        StringBuilder names = new StringBuilder();
-        Iterator<Author> iterator = book.getAuthors().iterator();
-
-        while (iterator.hasNext()) {
-            Author author = iterator.next();
-            names.append(author.getName());
-
-            if (book.getAuthors().size() > 1 && iterator.hasNext()) {
-                names.append(", ");
-            }
-        }
-
-        return names.toString();
     }
 }

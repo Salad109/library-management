@@ -42,6 +42,7 @@ public class Messages {
     public static final String USER_USERNAME_VALIDATION_MESSAGE = "Username cannot be blank";
     public static final String USER_PASSWORD_VALIDATION_MESSAGE = "Password cannot be blank";
     public static final String USER_ROLE_VALIDATION_MESSAGE = "Role cannot be null";
+
     private Messages() {
     }
 }

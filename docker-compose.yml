@@ -34,6 +34,8 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+    environment:
+      - GF_LOG_LEVEL=warn
     depends_on:
       - prometheus
 
