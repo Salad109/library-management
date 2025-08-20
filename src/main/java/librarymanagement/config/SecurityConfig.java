@@ -2,11 +2,9 @@ package librarymanagement.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import librarymanagement.constants.Messages;
 import librarymanagement.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -47,6 +45,12 @@ public class SecurityConfig {
                         .successHandler(this::roleBasedRedirect)
                         .failureHandler(this::loginFailure)
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessUrl("/login")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
@@ -67,9 +71,7 @@ public class SecurityConfig {
 
             response.sendRedirect(targetUrl);
         } else {
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.setContentType("text/html");
-            response.getWriter().write(Messages.USER_FORBIDDEN_ACCESS);
+            response.sendRedirect("/login?error=true");
         }
     }
 

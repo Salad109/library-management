@@ -130,4 +130,5 @@ exampleRequests/
 - [ ] Admin panel in Thymeleaf
 - [ ] Forms for full CRUD operations on resources
 - [ ] Enhance admin panel with HTMX
+- [ ] Caching
 - [ ] Deployment
