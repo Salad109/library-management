@@ -35,7 +35,7 @@ public class BookService {
 
     public Book getBookByIsbn(String isbn) {
         log.debug("Looking up book by ISBN: {}", isbn);
-        Optional<Book> book = bookRepository.findByIsbn(isbn);
+        Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
         if (book.isEmpty()) {
             log.warn("Book not found with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
@@ -71,7 +71,7 @@ public class BookService {
         log.info("Adding book: '{}' by [{}] (ISBN: {})",
                 book.getTitle(), authorNames, book.getIsbn());
 
-        if (bookRepository.findByIsbn(book.getIsbn()).isPresent()) {
+        if (bookRepository.findByIsbnWithAuthors(book.getIsbn()).isPresent()) {
             log.warn("Attempted to add duplicate book with ISBN: {}", book.getIsbn());
             throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + book.getIsbn());
         }

@@ -69,7 +69,7 @@ public class CopyService {
     @Transactional
     public List<Copy> addCopies(String isbn, int quantity) {
         log.info("Adding {} copies for book with ISBN: {}", quantity, isbn);
-        Optional<Book> book = bookRepository.findByIsbn(isbn);
+        Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
         if (book.isEmpty()) {
             log.warn("Book not found with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
@@ -124,13 +124,13 @@ public class CopyService {
     @Transactional
     public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.info("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
-        Page<Copy> availableCopies = copyRepository.findByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE, Pageable.unpaged());
-        if (availableCopies.isEmpty()) {
+        Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
+        if (availableCopy.isEmpty()) {
             log.info("No available copies found for book with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.COPY_NO_AVAILABLE + isbn);
         }
 
-        Copy copyToReserve = availableCopies.getContent().getFirst(); // Reserve the first available copy
+        Copy copyToReserve = availableCopy.get();
         log.info("Reserving copy with ID: {} for customer ID: {}", copyToReserve.getId(), customerId);
         return reserveCopy(copyToReserve.getId(), customerId);
     }

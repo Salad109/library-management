@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import librarymanagement.constants.Messages;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -25,6 +26,7 @@ public class Book {
     @NotBlank(message = Messages.BOOK_TITLE_VALIDATION_MESSAGE)
     private String title;
 
+    @BatchSize(size = 20)
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Author> authors;
 

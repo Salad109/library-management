@@ -13,7 +13,8 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
 
-    Optional<Book> findByIsbn(String isbn);
+    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.isbn = :isbn")
+    Optional<Book> findByIsbnWithAuthors(String isbn);
 
     @Query("SELECT b FROM Book b WHERE b.title ILIKE CONCAT('%', :term, '%')")
     Page<Book> findByTitleContaining(@Param("term") String term, Pageable pageable);
