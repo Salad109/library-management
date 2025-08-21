@@ -7,9 +7,11 @@ import librarymanagement.repository.AuthorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,9 +26,19 @@ public class AuthorService {
 
     public Page<Author> getAllAuthors(Pageable pageable) {
         log.debug("Fetching all authors, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<Author> authors = authorRepository.findAll(pageable);
-        log.debug("Retrieved {} authors out of {} total", authors.getNumberOfElements(), authors.getTotalElements());
-        return authors;
+
+        Page<String> namePage = authorRepository.findAllNames(pageable);
+
+        if (namePage.getContent().isEmpty()) {
+            log.debug("No authors found, returning empty page");
+            return Page.empty(pageable);
+        }
+
+        List<Author> authors = authorRepository.findByNamesWithBooks(namePage.getContent());
+
+        log.debug("Retrieved {} authors out of {} total", authors.size(), namePage.getTotalElements());
+
+        return new PageImpl<>(authors, pageable, namePage.getTotalElements());
     }
 
     public Author getAuthorByName(String name) {

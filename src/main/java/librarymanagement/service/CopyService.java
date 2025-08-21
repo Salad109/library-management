@@ -13,6 +13,7 @@ import librarymanagement.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +37,19 @@ public class CopyService {
 
     public Page<Copy> getAllCopies(Pageable pageable) {
         log.debug("Fetching all copies, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<Copy> copies = copyRepository.findAll(pageable);
-        log.debug("Retrieved {} copies out of {} total", copies.getNumberOfElements(), copies.getTotalElements());
-        return copies;
+
+        Page<Long> idPage = copyRepository.findAllIds(pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No copies found, returning empty page");
+            return Page.empty(pageable);
+        }
+
+        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+
+        log.debug("Retrieved {} copies out of {} total", copies.size(), idPage.getTotalElements());
+
+        return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
     public Copy getCopyById(Long id) {
@@ -47,16 +58,36 @@ public class CopyService {
 
     public Page<Copy> getCopiesByBookIsbn(String isbn, Pageable pageable) {
         log.debug("Fetching copies for book ISBN: {}, page: {}, size: {}", isbn, pageable.getPageNumber(), pageable.getPageSize());
-        Page<Copy> copies = copyRepository.findByBookIsbn(isbn, pageable);
-        log.debug("Retrieved {} copies for ISBN: {} out of {} total", copies.getNumberOfElements(), isbn, copies.getTotalElements());
-        return copies;
+
+        Page<Long> idPage = copyRepository.findIdsByBookIsbn(isbn, pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No copies found for ISBN: {}", isbn);
+            return Page.empty(pageable);
+        }
+
+        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+
+        log.debug("Retrieved {} copies for ISBN: {} out of {} total", copies.size(), isbn, idPage.getTotalElements());
+
+        return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
     public Page<Copy> getCopiesByCustomerId(Long customerId, Pageable pageable) {
         log.debug("Fetching copies for customer ID: {}, page: {}, size: {}", customerId, pageable.getPageNumber(), pageable.getPageSize());
-        Page<Copy> copies = copyRepository.findByCustomerId(customerId, pageable);
-        log.debug("Retrieved {} copies for customer ID: {} out of {} total", copies.getNumberOfElements(), customerId, copies.getTotalElements());
-        return copies;
+
+        Page<Long> idPage = copyRepository.findIdsByCustomerId(customerId, pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No copies found for customer ID: {}", customerId);
+            return Page.empty(pageable);
+        }
+
+        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+
+        log.debug("Retrieved {} copies for customer ID: {} out of {} total", copies.size(), customerId, idPage.getTotalElements());
+
+        return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
     public long countCopiesByBookIsbnAndStatus(String isbn, CopyStatus status) {

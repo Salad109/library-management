@@ -9,9 +9,11 @@ import librarymanagement.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,9 +28,19 @@ public class CustomerService {
 
     public Page<Customer> getAllCustomers(Pageable pageable) {
         log.debug("Fetching all customers, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<Customer> customers = customerRepository.findAll(pageable);
-        log.debug("Retrieved {} customers out of {} total", customers.getNumberOfElements(), customers.getTotalElements());
-        return customers;
+
+        Page<Long> idPage = customerRepository.findAllIds(pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No customers found, returning empty page");
+            return Page.empty(pageable);
+        }
+
+        List<Customer> customers = customerRepository.findByIds(idPage.getContent());
+
+        log.debug("Retrieved {} customers out of {} total", customers.size(), idPage.getTotalElements());
+
+        return new PageImpl<>(customers, pageable, idPage.getTotalElements());
     }
 
     public Customer getCustomerById(Long id) {

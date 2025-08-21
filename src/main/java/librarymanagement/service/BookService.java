@@ -9,9 +9,11 @@ import librarymanagement.repository.BookRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,9 +28,19 @@ public class BookService {
 
     public Page<Book> getAllBooks(Pageable pageable) {
         log.debug("Fetching all books, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<Book> books = bookRepository.findAll(pageable);
-        log.debug("Retrieved {} books out of {} total", books.getNumberOfElements(), books.getTotalElements());
-        return books;
+
+        Page<String> isbnPage = bookRepository.findAllIsbns(pageable);
+
+        if (isbnPage.getContent().isEmpty()) {
+            log.debug("No books found, returning empty page");
+            return Page.empty(pageable);
+        }
+
+        List<Book> books = bookRepository.findByIsbnsWithAuthors(isbnPage.getContent());
+
+        log.debug("Retrieved {} books out of {} total", books.size(), isbnPage.getTotalElements());
+
+        return new PageImpl<>(books, pageable, isbnPage.getTotalElements());
     }
 
     public Book getBookByIsbn(String isbn) {
@@ -44,24 +56,32 @@ public class BookService {
 
     public Page<Book> searchBooks(String searchTerm, Pageable pageable) {
         log.debug("Searching books with term: '{}', page: {}, size: {}", searchTerm, pageable.getPageNumber(), pageable.getPageSize());
+
         if (searchTerm == null || searchTerm.isBlank()) {
-            log.debug("Search term is empty or null, returning all books");
-            return bookRepository.findAll(pageable);
+            return getAllBooks(pageable);
         }
 
         String cleanTerm = searchTerm.trim();
 
-        Page<Book> titleResults = bookRepository.findByTitleContaining(cleanTerm, pageable);
+        Page<String> titleIsbns = bookRepository.findIsbnsByTitleContaining(cleanTerm, pageable);
 
-        if (titleResults.getTotalElements() != 0) {
-            log.debug("Found {} books matching title search for term: '{}'", titleResults.getNumberOfElements(), cleanTerm);
-            return titleResults;
-        } else {
-            Page<Book> authorResults = bookRepository.findByAuthorContaining(cleanTerm, pageable);
-            log.debug("No books found matching title search for term: '{}'. Returning {} books by authors",
-                    cleanTerm, authorResults.getNumberOfElements());
-            return authorResults;
+        if (titleIsbns.getTotalElements() > 0) {
+            log.debug("Found {} books matching title search for term: '{}'", titleIsbns.getTotalElements(), cleanTerm);
+
+            List<Book> books = bookRepository.findByIsbnsWithAuthors(titleIsbns.getContent());
+            return new PageImpl<>(books, pageable, titleIsbns.getTotalElements());
         }
+
+        Page<String> authorIsbns = bookRepository.findIsbnsByAuthorContaining(cleanTerm, pageable);
+        log.debug("No books found matching title search for term: '{}'. Returning {} books by authors",
+                cleanTerm, authorIsbns.getTotalElements());
+
+        if (authorIsbns.getContent().isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        List<Book> books = bookRepository.findByIsbnsWithAuthors(authorIsbns.getContent());
+        return new PageImpl<>(books, pageable, authorIsbns.getTotalElements());
     }
 
     public Book addBook(Book book) {
