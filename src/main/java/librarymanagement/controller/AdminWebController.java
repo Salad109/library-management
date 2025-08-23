@@ -17,16 +17,21 @@ public class AdminWebController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/admin")
-    public String adminPage(Model model) {
-        Page<Book> books = bookService.getAllBooks(Pageable.ofSize(20));
-        model.addAttribute("books", books);
-        model.addAttribute("bookCount", books.getTotalElements());
-        return "admin";
-    }
-
     @GetMapping("/login")
     public String loginPage() {
         return "login";
+    }
+
+    @GetMapping("/admin")
+    public String adminPage(Model model) {
+        return "admin";
+    }
+
+    @GetMapping("/admin/books/browse")
+    public String bookBrowsePage(Model model) {
+        Page<Book> books = bookService.getAllBooks(Pageable.ofSize(20));
+        model.addAttribute("books", books);
+        model.addAttribute("bookCount", books.getTotalElements());
+        return "books-browse";
     }
 }

@@ -1,68 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Admin Panel</title>
+    <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container">
-    <h1>Admin Panel</h1>
-
-    <h4>Total Books: <span th:text="${bookCount}">0</span></h4>
-
-    <h2>Recent Books</h2>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Year</th>
-            <th>Authors</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="book : ${books}">
-            <td th:text="${book.isbn}">-</td>
-            <td th:text="${book.title}">-</td>
-            <td th:text="${book.publicationYear}">-</td>
-            <td th:text="${book.getFormattedAuthors()}">-</td>
-            <td>
-                <button class="btn btn-sm btn-primary" onclick="viewBook(this)" th:data-isbn="${book.isbn}">View
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteBook(this)"
-                        th:data-isbn="${book.isbn}" th:data-title="${book.title}">Delete
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <script>
-        function viewBook(button) {
-            const isbn = button.dataset.isbn;
-            window.open('/api/books/' + isbn);
-        }
-
-        function deleteBook(button) {
-            const isbn = button.dataset.isbn;
-            const title = button.dataset.title;
-
-            if (!confirm(`Are you sure you want to delete "${title}"?`)) {
-                return;
-            }
-
-            fetch(`/api/admin/books/${isbn}`, {method: 'DELETE'})
-                .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Error deleting book');
-                    }
-                });
-        }
-    </script>
+    <h1>Homepage</h1>
 </div>
 </body>
 </html>

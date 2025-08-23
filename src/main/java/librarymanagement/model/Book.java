@@ -1,5 +1,6 @@
 package librarymanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -45,6 +46,7 @@ public class Book {
         this.publicationYear = publicationYear;
     }
 
+    @JsonIgnore
     @Transient
     public String getFormattedAuthors() {
         return authors.stream()
