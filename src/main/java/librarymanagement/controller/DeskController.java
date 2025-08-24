@@ -9,14 +9,10 @@ import librarymanagement.dto.CopyCheckoutRequest;
 import librarymanagement.dto.CopyMarkLostRequest;
 import librarymanagement.dto.CopyReturnRequest;
 import librarymanagement.model.Copy;
-import librarymanagement.model.Customer;
 import librarymanagement.service.CopyService;
-import librarymanagement.service.CustomerService;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,11 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeskController {
 
     private final CopyService copyService;
-    private final CustomerService customerService;
 
-    public DeskController(CopyService copyService, CustomerService customerService) {
+    public DeskController(CopyService copyService) {
         this.copyService = copyService;
-        this.customerService = customerService;
     }
 
     @Operation(summary = "Checkout a copy to a customer",
@@ -73,18 +67,5 @@ public class DeskController {
     @PostMapping("/api/desk/mark-lost")
     public Copy markLost(@Valid @RequestBody CopyMarkLostRequest request) {
         return copyService.markLost(request.copyId());
-    }
-
-    @Operation(summary = "Create a new customer")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Customer created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data or validation errors"),
-            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
-            @ApiResponse(responseCode = "409", description = "Customer with this email already exists")
-    })
-    @PostMapping("/api/desk/customers")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Customer createCustomer(@Valid @RequestBody Customer customer) {
-        return customerService.addCustomer(customer);
     }
 }

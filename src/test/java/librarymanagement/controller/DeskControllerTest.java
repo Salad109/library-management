@@ -1,7 +1,6 @@
 package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
-import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -249,46 +247,5 @@ class DeskControllerTest {
                 .bodyJson()
                 .extractingPath("status")
                 .isEqualTo("LOST");
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
-    void testCreateCustomer() {
-        String customerJson = """
-                {
-                    "firstName": "Joe Jr.",
-                    "lastName": "Mama",
-                    "email": "joemamajr@example.com"
-                }
-                """;
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/desk/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.CREATED);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo("Joe Jr.");
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo("Mama");
-        assertThat(result).bodyJson().extractingPath("email").isEqualTo("joemamajr@example.com");
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
-    void testCreateInvalidCustomer() {
-        String invalidCustomerJson = """
-                {
-                    "email": "goober@example.com"
-                    }
-                """;
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/desk/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidCustomerJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
     }
 }

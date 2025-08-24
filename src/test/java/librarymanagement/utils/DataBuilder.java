@@ -42,4 +42,23 @@ public class DataBuilder {
                 .content(copyJson)
                 .exchange();
     }
+
+    public static MvcTestResult createTestCustomer(MockMvcTester mockMvcTester,
+                                                   String firstName,
+                                                   String lastName,
+                                                   String email) {
+        String customerJson = """
+                {
+                    "firstName": "%s",
+                    "lastName": "%s",
+                    "email": "%s"
+                }
+                """.formatted(firstName, lastName, email);
+
+        return mockMvcTester.post()
+                .uri("/api/admin/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange();
+    }
 }

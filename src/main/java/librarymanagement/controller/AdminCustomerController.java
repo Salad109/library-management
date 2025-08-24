@@ -9,6 +9,7 @@ import librarymanagement.model.Customer;
 import librarymanagement.service.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,20 @@ public class AdminCustomerController {
     @GetMapping("/api/admin/customers/{id}")
     public Customer getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
+    }
+
+    @Operation(summary = "Create a new customer",
+            description = "Creates a new \"offline\" customer without a user account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Customer created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data or validation errors"),
+            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
+            @ApiResponse(responseCode = "409", description = "Customer with this email already exists")
+    })
+    @PostMapping("/api/admin/customers")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Customer createCustomer(@Valid @RequestBody Customer customer) {
+        return customerService.addCustomer(customer);
     }
 
     @Operation(summary = "Update an existing customer")
