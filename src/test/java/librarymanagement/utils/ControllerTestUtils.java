@@ -59,6 +59,13 @@ public final class ControllerTestUtils {
         return jsonNode.get("id").asInt();
     }
 
+    public static int extractIdFromResponseArray(MvcTestResult result) throws Exception {
+        String responseBody = result.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return jsonNode.get(0).get("id").asInt();
+    }
+
     public static int extractCustomerIdFromRegistration(MvcTestResult result) throws Exception {
         String responseBody = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();

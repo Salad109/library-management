@@ -21,7 +21,7 @@ class BookControllerTest {
     private MockMvcTester mockMvcTester;
 
     @Test
-    void getBook() {
+    void testGetBook() {
         MvcTestResult result = mockMvcTester.get().uri("/api/books/123456789X").exchange();
 
         assertThat(result)
@@ -32,7 +32,7 @@ class BookControllerTest {
     }
 
     @Test
-    void getNonExistentBook() {
+    void testGetNonExistentBook() {
         String nonExistentIsbn = "987654321X";
         MvcTestResult result = mockMvcTester.get().uri("/api/books/" + nonExistentIsbn).exchange();
 
@@ -62,5 +62,12 @@ class BookControllerTest {
                 .bodyJson()
                 .extractingPath("totalElements")
                 .isEqualTo(1);
+    }
+
+    @Test
+    void testGetAllBooks() {
+        MvcTestResult result = mockMvcTester.get().uri("/api/books").exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
     }
 }
