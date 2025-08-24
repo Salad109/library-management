@@ -23,9 +23,6 @@ public interface BookRepository extends JpaRepository<Book, String> {
     @Query("SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.isbn IN :isbns ORDER BY b.title")
     List<Book> findByIsbnsWithAuthors(@Param("isbns") List<String> isbns);
 
-    @Query("SELECT DISTINCT b FROM Book b JOIN b.authors a WHERE a.name ILIKE CONCAT('%', :term, '%')")
-    Page<Book> findByAuthorContaining(@Param("term") String term, Pageable pageable);
-
     @Query("SELECT b.isbn FROM Book b WHERE b.title ILIKE CONCAT('%', :term, '%') ORDER BY b.title")
     Page<String> findIsbnsByTitleContaining(@Param("term") String term, Pageable pageable);
 
