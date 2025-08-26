@@ -47,8 +47,8 @@ class AdminBookControllerTest {
         assertThat(DataBuilder.createTestBook(mockMvcTester,
                 BookTestData.TestBook1.ISBN,
                 BookTestData.TestBook1.TITLE,
-                BookTestData.TestBook1.AUTHOR_NAME))
-                .hasStatus(HttpStatus.CREATED);
+                BookTestData.TestBook1.AUTHOR_NAME)
+        ).hasStatus(HttpStatus.CREATED);
 
         // Verify initial state
         assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
@@ -80,8 +80,11 @@ class AdminBookControllerTest {
                 .content(BookTestData.TestBook2.JSON)
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 
     @Test
@@ -90,8 +93,8 @@ class AdminBookControllerTest {
         assertThat(DataBuilder.createTestBook(mockMvcTester,
                 BookTestData.TestBook1.ISBN,
                 BookTestData.TestBook1.TITLE,
-                BookTestData.TestBook1.AUTHOR_NAME))
-                .hasStatus(HttpStatus.CREATED);
+                BookTestData.TestBook1.AUTHOR_NAME)
+        ).hasStatus(HttpStatus.CREATED);
 
         // Verify the book exists
         assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
@@ -101,28 +104,22 @@ class AdminBookControllerTest {
                 .isEqualTo(BookTestData.TestBook1.TITLE);
 
         // Delete the book
-        MvcTestResult deleteResult = mockMvcTester.delete()
-                .uri("/api/admin/books/" + BookTestData.TestBook1.ISBN)
-                .exchange();
-
-        assertThat(deleteResult).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(mockMvcTester.delete().uri("/api/admin/books/" + BookTestData.TestBook1.ISBN))
+                .hasStatus(HttpStatus.NO_CONTENT);
 
         // Verify the book no longer exists
-        MvcTestResult afterDeleteResult = mockMvcTester.get()
-                .uri("/api/books/" + BookTestData.TestBook1.ISBN)
-                .exchange();
-
-        assertThat(afterDeleteResult).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
+                .hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void testDeleteNonExistentBook() {
         String isbn = "9784567891230"; // Nonexistent ISBN
-        MvcTestResult result = mockMvcTester.delete()
-                .uri("/api/admin/books/" + isbn)
-                .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
+        assertThat(mockMvcTester.delete().uri("/api/admin/books/" + isbn))
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 }

@@ -1,5 +1,6 @@
 package librarymanagement.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
@@ -17,6 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -32,6 +36,7 @@ class AdminCopyControllerTest {
     @Test
     void testCreateCopies() {
         String isbn = "123456789X";
+        // Create the book first
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
                 .hasStatus(HttpStatus.CREATED);
 
@@ -42,13 +47,11 @@ class AdminCopyControllerTest {
                 }
                 """.formatted(isbn);
 
-        MvcTestResult createResult = mockMvcTester.post()
+        assertThat(mockMvcTester.post()
                 .uri("/api/admin/copies")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson)
-                .exchange();
-
-        assertThat(createResult).hasStatus(HttpStatus.CREATED);
+        ).hasStatus(HttpStatus.CREATED);
     }
 
     @ParameterizedTest
@@ -57,61 +60,68 @@ class AdminCopyControllerTest {
             "'123456789X', 0, quantity, " + Messages.COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE,
             "'invalid-isbn',, bookIsbn, " + Messages.BOOK_ISBN_VALIDATION_MESSAGE
     })
-    void testCreateCopiesInvalidParameters(String isbn, Integer quantity, String errorField, String expectedMessage) {
-        StringBuilder json = new StringBuilder("{\n");
-        json.append("    \"bookIsbn\": \"").append(isbn).append("\"");
+    void testCreateCopiesInvalidParameters(String isbn, Integer quantity, String errorField, String expectedMessage)
+            throws Exception {
+        Map<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("bookIsbn", isbn);
         if (quantity != null) {
-            json.append(",\n    \"quantity\": ").append(quantity);
+            jsonMap.put("quantity", quantity);
         }
-        json.append("\n}");
+        String jsonString = new ObjectMapper().writeValueAsString(jsonMap);
 
         MvcTestResult result = mockMvcTester.post()
                 .uri("/api/admin/copies")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(json.toString())
+                .content(jsonString)
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath(errorField).isEqualTo(expectedMessage);
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath(errorField)
+                .isEqualTo(expectedMessage);
     }
+
 
     @Test
     void testGetCopyById() throws Exception {
         String isbn = "9781234567890";
+        // Create the book and a copy first
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
                 .hasStatus(HttpStatus.CREATED);
+
         MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, isbn, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
-        assertThat(mockMvcTester.get()
-                .uri("/api/admin/copies/" + copyId))
-                .hasStatus(HttpStatus.OK);
+        assertThat(mockMvcTester.get().uri("/api/admin/copies/" + copyId))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("id")
+                .isEqualTo(copyId);
     }
 
     @Test
     void testGetNonexistentCopyById() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/copies/9999")
-                .exchange();
+        int copyId = 9999; // Nonexistent copy ID
 
-        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.COPY_NOT_FOUND + "9999");
+        assertThat(mockMvcTester.get().uri("/api/admin/copies/" + copyId))
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.COPY_NOT_FOUND + copyId);
     }
 
     @Test
     void testGetCopiesByBookIsbn() {
         String isbn = "9781234567890";
+        // Create the book and some copies first
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
                 .hasStatus(HttpStatus.CREATED);
         assertThat(DataBuilder.createTestCopy(mockMvcTester, isbn, 3))
                 .hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/copies/book/" + isbn)
-                .exchange();
-
-        assertThat(result)
+        assertThat(mockMvcTester.get().uri("/api/admin/copies/book/" + isbn))
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("page.totalElements").isEqualTo(3);
@@ -119,10 +129,9 @@ class AdminCopyControllerTest {
 
     @Test
     void testGetAllCopies() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/copies")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(mockMvcTester.get().uri("/api/admin/copies"))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("page").isNotNull();
     }
 }

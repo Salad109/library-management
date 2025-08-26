@@ -77,30 +77,26 @@ class AdminCustomerControllerTest {
 
         int customerId = ControllerTestUtils.extractIdFromResponse(customerCreationResult);
 
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/customers/" + customerId)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(mockMvcTester.get().uri("/api/admin/customers/" + customerId))
+                .hasStatus(HttpStatus.OK);
     }
 
     @Test
     void testGetNonExistentCustomerById() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/customers/9999")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.CUSTOMER_NOT_FOUND + "9999");
+        assertThat(mockMvcTester.get().uri("/api/admin/customers/9999"))
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.CUSTOMER_NOT_FOUND + "9999");
     }
 
     @Test
     void testGetAllCustomers() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/admin/customers")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK).bodyJson().extractingPath("content").isNotNull();
+        assertThat(mockMvcTester.get().uri("/api/admin/customers"))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("content")
+                .isNotNull();
     }
 
     @Test
@@ -154,7 +150,7 @@ class AdminCustomerControllerTest {
 
         String updateJson = """
                 {
-                    "firstName": "Joe Jr.",
+                    "firstName": "Joe",
                     "lastName": "Mama",
                     "email": "goober@example.com"
                     }
