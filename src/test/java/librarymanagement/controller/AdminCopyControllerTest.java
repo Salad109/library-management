@@ -35,7 +35,7 @@ class AdminCopyControllerTest {
 
     @Test
     void testCreateCopies() {
-        String isbn = "123456789X";
+        String isbn = "123456777X";
         // Create the book first
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
                 .hasStatus(HttpStatus.CREATED);

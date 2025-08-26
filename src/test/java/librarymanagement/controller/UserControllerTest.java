@@ -71,12 +71,12 @@ class UserControllerTest {
     }
 
     @Test
-    void testLoginSuccess() {
-        // Register a user
+    void testLoginLibrarian() {
+        // Register a librarian
         String librarianJson = """
                 {
-                    "username": "testuser",
-                    "password": "testpass123",
+                    "username": "librarian1",
+                    "password": "password123",
                     "role": "ROLE_LIBRARIAN"
                 }
                 """;
@@ -91,15 +91,48 @@ class UserControllerTest {
 
         // Try to log in
         MvcTestResult loginResult = mockMvcTester.post()
+                .uri("/admin/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("username=librarian1&password=password123")
+                .exchange();
+
+        assertThat(loginResult)
+                .hasStatus(HttpStatus.FOUND)
+                .hasRedirectedUrl("/admin");
+    }
+
+    @Test
+    void testLoginCustomer() {
+        // Register a customer
+        String customerJson = """
+                {
+                    "username": "goober",
+                    "password": "password123",
+                    "role": "ROLE_CUSTOMER",
+                    "firstName": "Test",
+                    "lastName": "User"
+                }
+                """;
+
+        mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson)
+                .exchange()
+                .assertThat()
+                .hasStatus(HttpStatus.CREATED);
+
+        // Try to log in
+        MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("username=testuser&password=testpass123")
+                .content("username=goober&password=password123")
                 .exchange();
 
         assertThat(loginResult)
                 .hasStatus(HttpStatus.OK)
                 .bodyText()
-                .isEqualTo(Messages.SECURITY_LOGIN_SUCCESS);
+                .contains(Messages.SECURITY_LOGIN_SUCCESS);
     }
 
     @Test
@@ -126,7 +159,20 @@ class UserControllerTest {
     }
 
     @Test
-    void testLoginFailure() {
+    void testAdminLoginFailure() {
+        MvcTestResult loginResult = mockMvcTester.post()
+                .uri("/admin/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("username=baduser&password=badpass")
+                .exchange();
+
+        assertThat(loginResult)
+                .hasStatus(HttpStatus.FOUND)
+                .hasRedirectedUrl("/login?error=true");
+    }
+
+    @Test
+    void testCustomerLoginFailure() {
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -136,7 +182,7 @@ class UserControllerTest {
         assertThat(loginResult)
                 .hasStatus(HttpStatus.UNAUTHORIZED)
                 .bodyText()
-                .isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
+                .contains(Messages.SECURITY_LOGIN_FAILURE);
     }
 
     @Test
