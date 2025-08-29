@@ -15,7 +15,7 @@ role-based authentication, and real-time monitoring.
 - Password hashing and secure user management
 - Search functionality across books, copies and authors
 - Application monitoring with Prometheus and Grafana
-- 89% test coverage with comprehensive integration and unit testing
+- 83% test coverage with comprehensive integration and unit testing
 
 ## Tech Stack
 
