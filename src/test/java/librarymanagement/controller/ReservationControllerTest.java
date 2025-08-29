@@ -31,7 +31,7 @@ class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "jane");
+        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "jane");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -51,7 +51,7 @@ class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe");
+        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -78,7 +78,7 @@ class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe");
+        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -128,7 +128,7 @@ class ReservationControllerTest {
 
         int customerAId = ControllerTestUtils.extractCustomerIdFromRegistration(registrationResultA);
 
-        MvcTestResult loginResultA = ControllerTestUtils.login(mockMvcTester, "customerA");
+        MvcTestResult loginResultA = ControllerTestUtils.loginCustomer(mockMvcTester, "customerA");
         assertThat(loginResultA).hasStatus(HttpStatus.OK);
 
         MockHttpSession sessionA = (MockHttpSession) loginResultA.getRequest().getSession();
@@ -154,7 +154,7 @@ class ReservationControllerTest {
         MvcTestResult registrationResultB = ControllerTestUtils.registerCustomer(mockMvcTester, "customerB", "Evil Joe", "Mama");
         assertThat(registrationResultB).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResultB = ControllerTestUtils.login(mockMvcTester, "customerB");
+        MvcTestResult loginResultB = ControllerTestUtils.loginCustomer(mockMvcTester, "customerB");
         assertThat(loginResultB).hasStatus(HttpStatus.OK);
 
         MockHttpSession sessionB = (MockHttpSession) loginResultB.getRequest().getSession();
@@ -197,7 +197,7 @@ class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe jr");
+        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe jr");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
@@ -234,7 +234,7 @@ class ReservationControllerTest {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult loginResult = ControllerTestUtils.login(mockMvcTester, "joe jr");
+        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe jr");
         assertThat(loginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();

@@ -1,6 +1,7 @@
 package librarymanagement.utils;
 
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -26,6 +27,28 @@ public final class DataBuilder {
                 .exchange();
     }
 
+    public static MvcTestResult createTestBook(MockMvcTester mockMvcTester,
+                                               MockHttpSession librarianSession,
+                                               String isbn,
+                                               String title,
+                                               String authorName) {
+        String bookJson = """
+                {
+                    "isbn": "%s",
+                    "title": "%s",
+                    "publicationYear": 2024,
+                    "authorNames": ["%s"]
+                }
+                """.formatted(isbn, title, authorName);
+
+        return mockMvcTester.post()
+                .uri("/api/admin/books")
+                .session(librarianSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(bookJson)
+                .exchange();
+    }
+
     public static MvcTestResult createTestCopy(MockMvcTester mockMvcTester,
                                                String isbn,
                                                int quantity) {
@@ -42,6 +65,26 @@ public final class DataBuilder {
                 .content(copyJson)
                 .exchange();
     }
+
+    public static MvcTestResult createTestCopy(MockMvcTester mockMvcTester,
+                                               MockHttpSession librarianSession,
+                                               String isbn,
+                                               int quantity) {
+        String copyJson = """
+                {
+                    "bookIsbn": "%s",
+                    "quantity": %d
+                }
+                """.formatted(isbn, quantity);
+
+        return mockMvcTester.post()
+                .uri("/api/admin/copies")
+                .session(librarianSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(copyJson)
+                .exchange();
+    }
+
 
     public static MvcTestResult createTestCustomer(MockMvcTester mockMvcTester,
                                                    String firstName,

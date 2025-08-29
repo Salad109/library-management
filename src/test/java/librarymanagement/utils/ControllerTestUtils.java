@@ -44,9 +44,17 @@ public final class ControllerTestUtils {
                 .exchange();
     }
 
-    public static MvcTestResult login(MockMvcTester mockMvcTester, String username) {
+    public static MvcTestResult loginCustomer(MockMvcTester mockMvcTester, String username) {
         return mockMvcTester.post()
                 .uri("/api/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("username=" + username + "&password=password123")
+                .exchange();
+    }
+
+    public static MvcTestResult loginLibrarian(MockMvcTester mockMvcTester, String username) {
+        return mockMvcTester.post()
+                .uri("/admin/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("username=" + username + "&password=password123")
                 .exchange();

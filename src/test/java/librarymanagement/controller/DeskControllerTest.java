@@ -2,6 +2,7 @@ package librarymanagement.controller;
 
 import jakarta.transaction.Transactional;
 import librarymanagement.utils.ControllerTestUtils;
+import librarymanagement.utils.DataBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,30 +25,55 @@ class DeskControllerTest {
     @Autowired
     MockMvcTester mockMvcTester;
 
+    /**
+     * 1. Register and login the librarian.
+     * 2. Create a book and two copies of it.
+     * 3. Register and login the customer.
+     * 4. Customer reserves one copy.
+     * 5. Librarian checks out the reserved copy to the customer.
+     * 6. Librarian checks out the unreserved copy to the customer.
+     */
     @Test
     void testCheckout() throws Exception {
-        // Register a customer
-        // Extract customerId
-        // Login
-        // Reserve 1 copy
-        // Extract copyId
-        // Logout
-        // Register a librarian and login
-        // Checkout the reserved copy
-        // Checkout an unreserved copy
-        // Verify the checkout response
+        // Register and login the librarian
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1");
+        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
 
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian1");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
+
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        assertThat(librarianSession).isNotNull();
+
+        // Create book
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9781234567890", "Test Book", "Test Author");
+        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
+
+        // Create a copy to be reserved and checked out
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
+
+        int reservedCopyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
+
+        // Create another copy for unreserved checkout
+        MvcTestResult secondCopyResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        assertThat(secondCopyResult).hasStatus(HttpStatus.CREATED);
+
+        int unreservedCopyId = ControllerTestUtils.extractIdFromResponseArray(secondCopyResult);
+
+        // Register and login the customer
         MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
 
         int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
 
-        MvcTestResult customerLoginResult = ControllerTestUtils.login(mockMvcTester, "joe");
+        MvcTestResult customerLoginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
         assertThat(customerLoginResult).hasStatus(HttpStatus.OK);
 
         MockHttpSession customerSession = (MockHttpSession) customerLoginResult.getRequest().getSession();
         assertThat(customerSession).isNotNull();
 
+        // Customer reserves a copy
         String reservationJson = """
                 {
                     "bookIsbn": "9781234567890"
@@ -63,34 +89,19 @@ class DeskControllerTest {
 
         assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
 
-        int reservedCopyId = ControllerTestUtils.extractIdFromResponse(reservationResult);
-
+        // Customer logs out
         MvcTestResult customerLogoutResult = mockMvcTester.post().uri("/api/logout")
                 .session(customerSession)
                 .exchange();
         assertThat(customerLogoutResult).hasStatus(HttpStatus.OK);
 
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.login(mockMvcTester, "librarian1");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
-
+        // Librarian checks out the reserved copy
         String reservedCheckoutJson = """
                 {
                     "copyId": %d,
                     "customerId": %d
                 }
                 """.formatted(reservedCopyId, customerId);
-        String unreservedCheckoutJson = """
-                {
-                    "copyId": 2,
-                    "customerId": %d
-                }
-                """.formatted(customerId);
 
         MvcTestResult reservedCheckoutResult = mockMvcTester.post()
                 .uri("/api/desk/checkout")
@@ -106,6 +117,14 @@ class DeskControllerTest {
                 .asNumber()
                 .isEqualTo(reservedCopyId);
 
+        // Librarian checks out an unreserved copy
+        String unreservedCheckoutJson = """
+                {
+                    "copyId": %d,
+                    "customerId": %d
+                }
+                """.formatted(unreservedCopyId, customerId);
+
         MvcTestResult unreservedCheckoutResult = mockMvcTester.post()
                 .uri("/api/desk/checkout")
                 .session(librarianSession)
@@ -118,38 +137,50 @@ class DeskControllerTest {
                 .bodyJson()
                 .extractingPath("id")
                 .asNumber()
-                .isEqualTo(2);
+                .isEqualTo(unreservedCopyId);
     }
 
+    /**
+     * 1. Register and login the librarian.
+     * 2. Create a book and a copy of it.
+     * 3. Register and login the customer.
+     * 4. Librarian checks out the copy to the customer.
+     * 5. Customer returns the copy.
+     */
     @Test
     void testReturnCopy() throws Exception {
-        // Register a customer
-        // Extract customerId
-        // Register a librarian and login
-        // Checkout a  copy
-        // Return the checked out copy
-        // Verify the return response
+        // Register and login the librarian
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian2");
+        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
 
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian2");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
+
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        assertThat(librarianSession).isNotNull();
+
+        // Create book and copy
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9787654321098", "Return Test Book", "Return Author");
+        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9787654321098", 1);
+        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
+
+        int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
+
+        // Create customer
         MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
         assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
 
         int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
 
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian2");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.login(mockMvcTester, "librarian2");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
-
+        // Checkout the copy first
         String checkoutJson = """
                 {
-                    "copyId": 1,
+                    "copyId": %d,
                     "customerId": %d
                 }
-                """.formatted(customerId);
+                """.formatted(copyId, customerId);
 
         MvcTestResult checkoutResult = mockMvcTester.post()
                 .uri("/api/desk/checkout")
@@ -160,8 +191,7 @@ class DeskControllerTest {
 
         assertThat(checkoutResult).hasStatus(HttpStatus.OK);
 
-        int copyId = ControllerTestUtils.extractIdFromResponse(checkoutResult);
-
+        // Return the copy
         String returnJson = """
                 {
                     "copyId": %d,
@@ -184,23 +214,46 @@ class DeskControllerTest {
                 .isEqualTo(copyId);
     }
 
+    /**
+     * 1. Register and login the librarian.
+     * 2. Create a book and a copy of it.
+     * 3. Register the customer.
+     * 4. Try to return the copy that was never borrowed.
+     */
     @Test
-    void returnNotBorrowedCopy() {
+    void testReturnNotBorrowedCopy() throws Exception {
+        // Register and login the librarian
         MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian3");
         assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult librarianLoginResult = ControllerTestUtils.login(mockMvcTester, "librarian3");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.OK);
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian3");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
 
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
         assertThat(librarianSession).isNotNull();
 
+        // Create book and copy
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9785555555555", "Not Borrowed Book", "Some Author");
+        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9785555555555", 1);
+        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
+
+        int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
+
+        // Register customer
+        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "bob", "Bob", "Smith");
+        assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
+
+        int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
+
+        // Try to return copy that was never borrowed
         String returnJson = """
                 {
-                    "copyId": 1,
-                    "customerId": 1
+                    "copyId": %d,
+                    "customerId": %d
                 }
-                """;
+                """.formatted(copyId, customerId);
 
         MvcTestResult returnResult = mockMvcTester.post()
                 .uri("/api/desk/return")
@@ -213,21 +266,32 @@ class DeskControllerTest {
     }
 
     @Test
-    void testMarkLost() {
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian3");
+    void testMarkLost() throws Exception {
+        // Register and login the librarian
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian4");
         assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult librarianLoginResult = ControllerTestUtils.login(mockMvcTester, "librarian3");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.OK);
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian4");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
 
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
         assertThat(librarianSession).isNotNull();
 
+        // Create book and copy
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9783333333333", "Lost Book", "Lost Author");
+        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9783333333333", 1);
+        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
+
+        int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
+
+        // Mark copy as lost
         String markLostJson = """
                 {
-                    "copyId": 1
+                    "copyId": %d
                 }
-                """;
+                """.formatted(copyId);
 
         MvcTestResult markLostResult = mockMvcTester.post()
                 .uri("/api/desk/mark-lost")
@@ -242,7 +306,7 @@ class DeskControllerTest {
                 .bodyJson()
                 .extractingPath("id")
                 .asNumber()
-                .isEqualTo(1);
+                .isEqualTo(copyId);
         assertThat(markLostResult)
                 .bodyJson()
                 .extractingPath("status")
