@@ -1,10 +1,7 @@
 package librarymanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import librarymanagement.constants.Messages;
 
@@ -16,6 +13,7 @@ import java.util.Set;
 public class Author {
     @Id
     @NotBlank(message = Messages.AUTHOR_NAME_VALIDATION_MESSAGE)
+    @Column(length = 100)
     private String name;
 
     @ManyToMany(mappedBy = "authors")

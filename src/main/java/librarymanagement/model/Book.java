@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 @Table(name = "books")
 public class Book {
     @Id
-    @Column(unique = true)
+    @Column(unique = true, length = 13)
     @Pattern(
             regexp = Messages.BOOK_ISBN_REGEX,
             message = Messages.BOOK_ISBN_VALIDATION_MESSAGE
     )
     private String isbn;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 150)
     @NotBlank(message = Messages.BOOK_TITLE_VALIDATION_MESSAGE)
     private String title;
 

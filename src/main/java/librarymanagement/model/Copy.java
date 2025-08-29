@@ -19,6 +19,7 @@ public class Copy {
     @ManyToOne
     private Customer customer;
 
+    @Column(length = 9)
     @NotNull(message = Messages.COPY_STATUS_VALIDATION_MESSAGE)
     @Enumerated(EnumType.STRING)
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
