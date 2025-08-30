@@ -14,7 +14,7 @@ Content-Type: application/json
 ###
 
 ### 2. Login as librarian
-POST http://localhost:8080/api/login
+POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
 username = librarian1 &
@@ -98,7 +98,7 @@ GET http://localhost:8080/api/reservations/mine
 ###
 
 ### 11. Login back as librarian for checkout
-POST http://localhost:8080/api/login
+POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
 username = librarian1 &

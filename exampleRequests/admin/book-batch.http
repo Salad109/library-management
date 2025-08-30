@@ -1,0 +1,1955 @@
+# Large data set of books for testing
+# No, I did not type it by hand
+# Login as librarian first
+
+### 1. The Great Gatsby
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780743273565",
+  "title": "The Great Gatsby",
+  "publicationYear": 1925,
+  "authorNames": [
+    "F. Scott Fitzgerald"
+  ]
+}
+
+### 2. To Kill a Mockingbird
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780061120084",
+  "title": "To Kill a Mockingbird",
+  "publicationYear": 1960,
+  "authorNames": [
+    "Harper Lee"
+  ]
+}
+
+### 3. Pride and Prejudice
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780141439518",
+  "title": "Pride and Prejudice",
+  "publicationYear": 1813,
+  "authorNames": [
+    "Jane Austen"
+  ]
+}
+
+### 4. The Catcher in the Rye
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780316769174",
+  "title": "The Catcher in the Rye",
+  "publicationYear": 1951,
+  "authorNames": [
+    "J.D. Salinger"
+  ]
+}
+
+### 5. Lord of the Flies
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780571056866",
+  "title": "Lord of the Flies",
+  "publicationYear": 1954,
+  "authorNames": [
+    "William Golding"
+  ]
+}
+
+### 6. Jane Eyre
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780141441146",
+  "title": "Jane Eyre",
+  "publicationYear": 1847,
+  "authorNames": [
+    "Charlotte Brontë"
+  ]
+}
+
+### 7. Wuthering Heights
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780141439556",
+  "title": "Wuthering Heights",
+  "publicationYear": 1847,
+  "authorNames": [
+    "Emily Brontë"
+  ]
+}
+
+### 8. Sense and Sensibility
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780141439662",
+  "title": "Sense and Sensibility",
+  "publicationYear": 1811,
+  "authorNames": [
+    "Jane Austen"
+  ]
+}
+
+### 9. Emma
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780141439587",
+  "title": "Emma",
+  "publicationYear": 1815,
+  "authorNames": [
+    "Jane Austen"
+  ]
+}
+
+### 10. Of Mice and Men
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140177398",
+  "title": "Of Mice and Men",
+  "publicationYear": 1937,
+  "authorNames": [
+    "John Steinbeck"
+  ]
+}
+
+### 11. The Grapes of Wrath
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780143039433",
+  "title": "The Grapes of Wrath",
+  "publicationYear": 1939,
+  "authorNames": [
+    "John Steinbeck"
+  ]
+}
+
+### 12. Brave New World
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780060850524",
+  "title": "Brave New World",
+  "publicationYear": 1932,
+  "authorNames": [
+    "Aldous Huxley"
+  ]
+}
+
+### 13. Animal Farm
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780451526342",
+  "title": "Animal Farm",
+  "publicationYear": 1945,
+  "authorNames": [
+    "George Orwell"
+  ]
+}
+
+### 14. Fahrenheit 451
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781451673319",
+  "title": "Fahrenheit 451",
+  "publicationYear": 1953,
+  "authorNames": [
+    "Ray Bradbury"
+  ]
+}
+
+### 15. The Hobbit
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780547928227",
+  "title": "The Hobbit",
+  "publicationYear": 1937,
+  "authorNames": [
+    "J.R.R. Tolkien"
+  ]
+}
+
+### 16. The Fellowship of the Ring
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780547928210",
+  "title": "The Fellowship of the Ring",
+  "publicationYear": 1954,
+  "authorNames": [
+    "J.R.R. Tolkien"
+  ]
+}
+
+### 17. The Two Towers
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780547928203",
+  "title": "The Two Towers",
+  "publicationYear": 1954,
+  "authorNames": [
+    "J.R.R. Tolkien"
+  ]
+}
+
+### 18. The Return of the King
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780547928197",
+  "title": "The Return of the King",
+  "publicationYear": 1955,
+  "authorNames": [
+    "J.R.R. Tolkien"
+  ]
+}
+
+### 19. Dune
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780441172719",
+  "title": "Dune",
+  "publicationYear": 1965,
+  "authorNames": [
+    "Frank Herbert"
+  ]
+}
+
+### 20. Foundation
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553293357",
+  "title": "Foundation",
+  "publicationYear": 1951,
+  "authorNames": [
+    "Isaac Asimov"
+  ]
+}
+
+### 21. I, Robot
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553294385",
+  "title": "I, Robot",
+  "publicationYear": 1950,
+  "authorNames": [
+    "Isaac Asimov"
+  ]
+}
+
+### 22. The Martian Chronicles
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780385030533",
+  "title": "The Martian Chronicles",
+  "publicationYear": 1950,
+  "authorNames": [
+    "Ray Bradbury"
+  ]
+}
+
+### 23. Slaughterhouse-Five
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780385333849",
+  "title": "Slaughterhouse-Five",
+  "publicationYear": 1969,
+  "authorNames": [
+    "Kurt Vonnegut"
+  ]
+}
+
+### 24. Catch-22
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781451626650",
+  "title": "Catch-22",
+  "publicationYear": 1961,
+  "authorNames": [
+    "Joseph Heller"
+  ]
+}
+
+### 25. The Bell Jar
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780061148514",
+  "title": "The Bell Jar",
+  "publicationYear": 1963,
+  "authorNames": [
+    "Sylvia Plath"
+  ]
+}
+
+### 26. One Flew Over the Cuckoo's Nest
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780143105022",
+  "title": "One Flew Over the Cuckoo's Nest",
+  "publicationYear": 1962,
+  "authorNames": [
+    "Ken Kesey"
+  ]
+}
+
+### 27. The Color Purple
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780156028356",
+  "title": "The Color Purple",
+  "publicationYear": 1982,
+  "authorNames": [
+    "Alice Walker"
+  ]
+}
+
+### 28. Beloved
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781400033416",
+  "title": "Beloved",
+  "publicationYear": 1987,
+  "authorNames": [
+    "Toni Morrison"
+  ]
+}
+
+### 29. The Handmaid's Tale
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780385490818",
+  "title": "The Handmaid's Tale",
+  "publicationYear": 1985,
+  "authorNames": [
+    "Margaret Atwood"
+  ]
+}
+
+### 30. The Kite Runner
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781594631931",
+  "title": "The Kite Runner",
+  "publicationYear": 2003,
+  "authorNames": [
+    "Khaled Hosseini"
+  ]
+}
+
+### 31. A Thousand Splendid Suns
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781594489501",
+  "title": "A Thousand Splendid Suns",
+  "publicationYear": 2007,
+  "authorNames": [
+    "Khaled Hosseini"
+  ]
+}
+
+### 32. Life of Pi
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780156027328",
+  "title": "Life of Pi",
+  "publicationYear": 2001,
+  "authorNames": [
+    "Yann Martel"
+  ]
+}
+
+### 33. The Road
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307387899",
+  "title": "The Road",
+  "publicationYear": 2006,
+  "authorNames": [
+    "Cormac McCarthy"
+  ]
+}
+
+### 34. No Country for Old Men
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780375706677",
+  "title": "No Country for Old Men",
+  "publicationYear": 2005,
+  "authorNames": [
+    "Cormac McCarthy"
+  ]
+}
+
+### 35. The Book Thief
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780375842207",
+  "title": "The Book Thief",
+  "publicationYear": 2005,
+  "authorNames": [
+    "Markus Zusak"
+  ]
+}
+
+### 36. The Curious Incident of the Dog in the Night-Time
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781400032716",
+  "title": "The Curious Incident of the Dog in the Night-Time",
+  "publicationYear": 2003,
+  "authorNames": [
+    "Mark Haddon"
+  ]
+}
+
+### 37. Never Let Me Go
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781400078776",
+  "title": "Never Let Me Go",
+  "publicationYear": 2005,
+  "authorNames": [
+    "Kazuo Ishiguro"
+  ]
+}
+
+### 38. The Remains of the Day
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780679731726",
+  "title": "The Remains of the Day",
+  "publicationYear": 1989,
+  "authorNames": [
+    "Kazuo Ishiguro"
+  ]
+}
+
+### 39. Atonement
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780385721790",
+  "title": "Atonement",
+  "publicationYear": 2001,
+  "authorNames": [
+    "Ian McEwan"
+  ]
+}
+
+### 40. The Da Vinci Code
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307474278",
+  "title": "The Da Vinci Code",
+  "publicationYear": 2003,
+  "authorNames": [
+    "Dan Brown"
+  ]
+}
+
+### 41. Angels & Demons
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780671027360",
+  "title": "Angels & Demons",
+  "publicationYear": 2000,
+  "authorNames": [
+    "Dan Brown"
+  ]
+}
+
+### 42. The Girl with the Dragon Tattoo
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307454546",
+  "title": "The Girl with the Dragon Tattoo",
+  "publicationYear": 2005,
+  "authorNames": [
+    "Stieg Larsson"
+  ]
+}
+
+### 43. Gone Girl
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307588364",
+  "title": "Gone Girl",
+  "publicationYear": 2012,
+  "authorNames": [
+    "Gillian Flynn"
+  ]
+}
+
+### 44. The Girl on the Train
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781594634024",
+  "title": "The Girl on the Train",
+  "publicationYear": 2015,
+  "authorNames": [
+    "Paula Hawkins"
+  ]
+}
+
+### 45. Big Little Lies
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780399167065",
+  "title": "Big Little Lies",
+  "publicationYear": 2014,
+  "authorNames": [
+    "Liane Moriarty"
+  ]
+}
+
+### 46. Good Omens (Multiple Authors Example)
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780060853983",
+  "title": "Good Omens",
+  "publicationYear": 1990,
+  "authorNames": [
+    "Terry Pratchett",
+    "Neil Gaiman"
+  ]
+}
+
+### 47. The Talisman (Multiple Authors Example)
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780345444882",
+  "title": "The Talisman",
+  "publicationYear": 1984,
+  "authorNames": [
+    "Stephen King",
+    "Peter Straub"
+  ]
+}
+
+### 48. The Expanse: Leviathan Wakes (Multiple Authors Example)
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780316129084",
+  "title": "Leviathan Wakes",
+  "publicationYear": 2011,
+  "authorNames": [
+    "James S.A. Corey"
+  ]
+}
+
+### 49. The Name of the Wind
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780756404079",
+  "title": "The Name of the Wind",
+  "publicationYear": 2007,
+  "authorNames": [
+    "Patrick Rothfuss"
+  ]
+}
+
+### 50. The Way of Kings
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780765326355",
+  "title": "The Way of Kings",
+  "publicationYear": 2010,
+  "authorNames": [
+    "Brandon Sanderson"
+  ]
+}
+
+### 51. Words of Radiance
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780765326362",
+  "title": "Words of Radiance",
+  "publicationYear": 2014,
+  "authorNames": [
+    "Brandon Sanderson"
+  ]
+}
+
+### 52. Oathbringer
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780765326379",
+  "title": "Oathbringer",
+  "publicationYear": 2017,
+  "authorNames": [
+    "Brandon Sanderson"
+  ]
+}
+
+### 53. The Final Empire
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780765311788",
+  "title": "The Final Empire",
+  "publicationYear": 2006,
+  "authorNames": [
+    "Brandon Sanderson"
+  ]
+}
+
+### 54. The Well of Ascension
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780765316882",
+  "title": "The Well of Ascension",
+  "publicationYear": 2007,
+  "authorNames": [
+    "Brandon Sanderson"
+  ]
+}
+
+### 55. The Hero of Ages
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780765316899",
+  "title": "The Hero of Ages",
+  "publicationYear": 2008,
+  "authorNames": [
+    "Brandon Sanderson"
+  ]
+}
+
+### 56. The Wise Man's Fear
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780756407919",
+  "title": "The Wise Man's Fear",
+  "publicationYear": 2011,
+  "authorNames": [
+    "Patrick Rothfuss"
+  ]
+}
+
+### 57. A Game of Thrones
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553103540",
+  "title": "A Game of Thrones",
+  "publicationYear": 1996,
+  "authorNames": [
+    "George R.R. Martin"
+  ]
+}
+
+### 58. A Clash of Kings
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553108033",
+  "title": "A Clash of Kings",
+  "publicationYear": 1998,
+  "authorNames": [
+    "George R.R. Martin"
+  ]
+}
+
+### 59. A Storm of Swords
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553106633",
+  "title": "A Storm of Swords",
+  "publicationYear": 2000,
+  "authorNames": [
+    "George R.R. Martin"
+  ]
+}
+
+### 60. A Feast for Crows
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553801507",
+  "title": "A Feast for Crows",
+  "publicationYear": 2005,
+  "authorNames": [
+    "George R.R. Martin"
+  ]
+}
+
+### 61. A Dance with Dragons
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553801477",
+  "title": "A Dance with Dragons",
+  "publicationYear": 2011,
+  "authorNames": [
+    "George R.R. Martin"
+  ]
+}
+
+### 62. Harry Potter and the Philosopher's Stone
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747532699",
+  "title": "Harry Potter and the Philosopher's Stone",
+  "publicationYear": 1997,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 63. Harry Potter and the Chamber of Secrets
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747538493",
+  "title": "Harry Potter and the Chamber of Secrets",
+  "publicationYear": 1998,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 64. Harry Potter and the Prisoner of Azkaban
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747542155",
+  "title": "Harry Potter and the Prisoner of Azkaban",
+  "publicationYear": 1999,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 65. Harry Potter and the Goblet of Fire
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747546245",
+  "title": "Harry Potter and the Goblet of Fire",
+  "publicationYear": 2000,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 66. Harry Potter and the Order of the Phoenix
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747551003",
+  "title": "Harry Potter and the Order of the Phoenix",
+  "publicationYear": 2003,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 67. Harry Potter and the Half-Blood Prince
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747581086",
+  "title": "Harry Potter and the Half-Blood Prince",
+  "publicationYear": 2005,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 68. Harry Potter and the Deathly Hallows
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780747591054",
+  "title": "Harry Potter and the Deathly Hallows",
+  "publicationYear": 2007,
+  "authorNames": [
+    "J.K. Rowling"
+  ]
+}
+
+### 69. The Chronicles of Narnia: The Lion, the Witch and the Wardrobe
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471046",
+  "title": "The Lion, the Witch and the Wardrobe",
+  "publicationYear": 1950,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 70. Prince Caspian
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471053",
+  "title": "Prince Caspian",
+  "publicationYear": 1951,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 71. The Voyage of the Dawn Treader
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471077",
+  "title": "The Voyage of the Dawn Treader",
+  "publicationYear": 1952,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 72. The Silver Chair
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471084",
+  "title": "The Silver Chair",
+  "publicationYear": 1953,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 73. The Horse and His Boy
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471060",
+  "title": "The Horse and His Boy",
+  "publicationYear": 1954,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 74. The Magician's Nephew
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471107",
+  "title": "The Magician's Nephew",
+  "publicationYear": 1955,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 75. The Last Battle
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780064471091",
+  "title": "The Last Battle",
+  "publicationYear": 1956,
+  "authorNames": [
+    "C.S. Lewis"
+  ]
+}
+
+### 76. The Stand
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307743688",
+  "title": "The Stand",
+  "publicationYear": 1978,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 77. It
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781501142970",
+  "title": "It",
+  "publicationYear": 1986,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 78. The Shining
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307743657",
+  "title": "The Shining",
+  "publicationYear": 1977,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 79. Carrie
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307743664",
+  "title": "Carrie",
+  "publicationYear": 1974,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 80. Pet Sematary
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307743671",
+  "title": "Pet Sematary",
+  "publicationYear": 1983,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 81. Misery
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781501143106",
+  "title": "Misery",
+  "publicationYear": 1987,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 82. The Green Mile
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781501143434",
+  "title": "The Green Mile",
+  "publicationYear": 1996,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 83. Salem's Lot
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307743695",
+  "title": "Salem's Lot",
+  "publicationYear": 1975,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 84. Doctor Sleep
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781476727653",
+  "title": "Doctor Sleep",
+  "publicationYear": 2013,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 85. The Dark Tower: The Gunslinger
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781501143519",
+  "title": "The Gunslinger",
+  "publicationYear": 1982,
+  "authorNames": [
+    "Stephen King"
+  ]
+}
+
+### 86. American Gods
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780380973651",
+  "title": "American Gods",
+  "publicationYear": 2001,
+  "authorNames": [
+    "Neil Gaiman"
+  ]
+}
+
+### 87. The Sandman: Preludes & Nocturnes
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9781401284774",
+  "title": "The Sandman: Preludes & Nocturnes",
+  "publicationYear": 1991,
+  "authorNames": [
+    "Neil Gaiman"
+  ]
+}
+
+### 88. Coraline
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780380807345",
+  "title": "Coraline",
+  "publicationYear": 2002,
+  "authorNames": [
+    "Neil Gaiman"
+  ]
+}
+
+### 89. The Graveyard Book
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780060530945",
+  "title": "The Graveyard Book",
+  "publicationYear": 2008,
+  "authorNames": [
+    "Neil Gaiman"
+  ]
+}
+
+### 90. Neverwhere
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780380789016",
+  "title": "Neverwhere",
+  "publicationYear": 1996,
+  "authorNames": [
+    "Neil Gaiman"
+  ]
+}
+
+### 91. The Ocean at the End of the Lane
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780062255655",
+  "title": "The Ocean at the End of the Lane",
+  "publicationYear": 2013,
+  "authorNames": [
+    "Neil Gaiman"
+  ]
+}
+
+### 92. The Colour of Magic
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780552124751",
+  "title": "The Colour of Magic",
+  "publicationYear": 1983,
+  "authorNames": [
+    "Terry Pratchett"
+  ]
+}
+
+### 93. The Light Fantastic
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780552128483",
+  "title": "The Light Fantastic",
+  "publicationYear": 1986,
+  "authorNames": [
+    "Terry Pratchett"
+  ]
+}
+
+### 94. Mort
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780552131063",
+  "title": "Mort",
+  "publicationYear": 1987,
+  "authorNames": [
+    "Terry Pratchett"
+  ]
+}
+
+### 95. Guards! Guards!
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780552134620",
+  "title": "Guards! Guards!",
+  "publicationYear": 1989,
+  "authorNames": [
+    "Terry Pratchett"
+  ]
+}
+
+### 96. Small Gods
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780552138901",
+  "title": "Small Gods",
+  "publicationYear": 1992,
+  "authorNames": [
+    "Terry Pratchett"
+  ]
+}
+
+### 97. The Hitchhiker's Guide to the Galaxy
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780345391803",
+  "title": "The Hitchhiker's Guide to the Galaxy",
+  "publicationYear": 1979,
+  "authorNames": [
+    "Douglas Adams"
+  ]
+}
+
+### 98. The Restaurant at the End of the Universe
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780345391810",
+  "title": "The Restaurant at the End of the Universe",
+  "publicationYear": 1980,
+  "authorNames": [
+    "Douglas Adams"
+  ]
+}
+
+### 99. Life, the Universe and Everything
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780345391827",
+  "title": "Life, the Universe and Everything",
+  "publicationYear": 1982,
+  "authorNames": [
+    "Douglas Adams"
+  ]
+}
+
+### 100. So Long, and Thanks for All the Fish
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780345391834",
+  "title": "So Long, and Thanks for All the Fish",
+  "publicationYear": 1984,
+  "authorNames": [
+    "Douglas Adams"
+  ]
+}
+
+### 101. Mostly Harmless
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780345418777",
+  "title": "Mostly Harmless",
+  "publicationYear": 1992,
+  "authorNames": [
+    "Douglas Adams"
+  ]
+}
+
+### 102. Ender's Game
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780812550702",
+  "title": "Ender's Game",
+  "publicationYear": 1985,
+  "authorNames": [
+    "Orson Scott Card"
+  ]
+}
+
+### 103. Speaker for the Dead
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780812550757",
+  "title": "Speaker for the Dead",
+  "publicationYear": 1986,
+  "authorNames": [
+    "Orson Scott Card"
+  ]
+}
+
+### 104. Xenocide
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780812509250",
+  "title": "Xenocide",
+  "publicationYear": 1991,
+  "authorNames": [
+    "Orson Scott Card"
+  ]
+}
+
+### 105. Children of the Mind
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780812522396",
+  "title": "Children of the Mind",
+  "publicationYear": 1996,
+  "authorNames": [
+    "Orson Scott Card"
+  ]
+}
+
+### 106. Neuromancer
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780441569595",
+  "title": "Neuromancer",
+  "publicationYear": 1984,
+  "authorNames": [
+    "William Gibson"
+  ]
+}
+
+### 107. Count Zero
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780441117734",
+  "title": "Count Zero",
+  "publicationYear": 1986,
+  "authorNames": [
+    "William Gibson"
+  ]
+}
+
+### 108. Mona Lisa Overdrive
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553281743",
+  "title": "Mona Lisa Overdrive",
+  "publicationYear": 1988,
+  "authorNames": [
+    "William Gibson"
+  ]
+}
+
+### 109. Snow Crash
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553380958",
+  "title": "Snow Crash",
+  "publicationYear": 1992,
+  "authorNames": [
+    "Neal Stephenson"
+  ]
+}
+
+### 110. The Diamond Age
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780553380965",
+  "title": "The Diamond Age",
+  "publicationYear": 1995,
+  "authorNames": [
+    "Neal Stephenson"
+  ]
+}
+
+### 111. Cryptonomicon
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780380973464",
+  "title": "Cryptonomicon",
+  "publicationYear": 1999,
+  "authorNames": [
+    "Neal Stephenson"
+  ]
+}
+
+### 112. The Time Machine
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486284729",
+  "title": "The Time Machine",
+  "publicationYear": 1895,
+  "authorNames": [
+    "H.G. Wells"
+  ]
+}
+
+### 113. The War of the Worlds
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486295060",
+  "title": "The War of the Worlds",
+  "publicationYear": 1898,
+  "authorNames": [
+    "H.G. Wells"
+  ]
+}
+
+### 114. The Invisible Man
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486270715",
+  "title": "The Invisible Man",
+  "publicationYear": 1897,
+  "authorNames": [
+    "H.G. Wells"
+  ]
+}
+
+### 115. Frankenstein
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486282114",
+  "title": "Frankenstein",
+  "publicationYear": 1818,
+  "authorNames": [
+    "Mary Shelley"
+  ]
+}
+
+### 116. Dracula
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486411095",
+  "title": "Dracula",
+  "publicationYear": 1897,
+  "authorNames": [
+    "Bram Stoker"
+  ]
+}
+
+### 117. The Strange Case of Dr. Jekyll and Mr. Hyde
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486266886",
+  "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
+  "publicationYear": 1886,
+  "authorNames": [
+    "Robert Louis Stevenson"
+  ]
+}
+
+### 118. Treasure Island
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486275598",
+  "title": "Treasure Island",
+  "publicationYear": 1883,
+  "authorNames": [
+    "Robert Louis Stevenson"
+  ]
+}
+
+### 119. Robinson Crusoe
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486404271",
+  "title": "Robinson Crusoe",
+  "publicationYear": 1719,
+  "authorNames": [
+    "Daniel Defoe"
+  ]
+}
+
+### 120. Gulliver's Travels
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486292731",
+  "title": "Gulliver's Travels",
+  "publicationYear": 1726,
+  "authorNames": [
+    "Jonathan Swift"
+  ]
+}
+
+### 121. Don Quixote
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780060934347",
+  "title": "Don Quixote",
+  "publicationYear": 1605,
+  "authorNames": [
+    "Miguel de Cervantes"
+  ]
+}
+
+### 122. The Count of Monte Cristo
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140449266",
+  "title": "The Count of Monte Cristo",
+  "publicationYear": 1844,
+  "authorNames": [
+    "Alexandre Dumas"
+  ]
+}
+
+### 123. The Three Musketeers
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140390025",
+  "title": "The Three Musketeers",
+  "publicationYear": 1844,
+  "authorNames": [
+    "Alexandre Dumas"
+  ]
+}
+
+### 124. Les Misérables
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140444308",
+  "title": "Les Misérables",
+  "publicationYear": 1862,
+  "authorNames": [
+    "Victor Hugo"
+  ]
+}
+
+### 125. The Hunchback of Notre-Dame
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140443530",
+  "title": "The Hunchback of Notre-Dame",
+  "publicationYear": 1831,
+  "authorNames": [
+    "Victor Hugo"
+  ]
+}
+
+### 126. Crime and Punishment
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486415871",
+  "title": "Crime and Punishment",
+  "publicationYear": 1866,
+  "authorNames": [
+    "Fyodor Dostoevsky"
+  ]
+}
+
+### 127. The Brothers Karamazov
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486437910",
+  "title": "The Brothers Karamazov",
+  "publicationYear": 1880,
+  "authorNames": [
+    "Fyodor Dostoevsky"
+  ]
+}
+
+### 128. War and Peace
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140447934",
+  "title": "War and Peace",
+  "publicationYear": 1869,
+  "authorNames": [
+    "Leo Tolstoy"
+  ]
+}
+
+### 129. Anna Karenina
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780140449174",
+  "title": "Anna Karenina",
+  "publicationYear": 1877,
+  "authorNames": [
+    "Leo Tolstoy"
+  ]
+}
+
+### 130. The Death of Ivan Ilyich
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486406022",
+  "title": "The Death of Ivan Ilyich",
+  "publicationYear": 1886,
+  "authorNames": [
+    "Leo Tolstoy"
+  ]
+}
+
+### 131. One Hundred Years of Solitude
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780060883287",
+  "title": "One Hundred Years of Solitude",
+  "publicationYear": 1967,
+  "authorNames": [
+    "Gabriel García Márquez"
+  ]
+}
+
+### 132. Love in the Time of Cholera
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780307389732",
+  "title": "Love in the Time of Cholera",
+  "publicationYear": 1985,
+  "authorNames": [
+    "Gabriel García Márquez"
+  ]
+}
+
+### 133. The Metamorphosis
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486290300",
+  "title": "The Metamorphosis",
+  "publicationYear": 1915,
+  "authorNames": [
+    "Franz Kafka"
+  ]
+}
+
+### 134. The Trial
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780805209990",
+  "title": "The Trial",
+  "publicationYear": 1925,
+  "authorNames": [
+    "Franz Kafka"
+  ]
+}
+
+### 135. The Stranger
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780679720201",
+  "title": "The Stranger",
+  "publicationYear": 1942,
+  "authorNames": [
+    "Albert Camus"
+  ]
+}
+
+### 136. The Plague
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780679720218",
+  "title": "The Plague",
+  "publicationYear": 1947,
+  "authorNames": [
+    "Albert Camus"
+  ]
+}
+
+### 137. Moby-Dick
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486432151",
+  "title": "Moby-Dick",
+  "publicationYear": 1851,
+  "authorNames": [
+    "Herman Melville"
+  ]
+}
+
+### 138. The Adventures of Huckleberry Finn
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486280615",
+  "title": "The Adventures of Huckleberry Finn",
+  "publicationYear": 1884,
+  "authorNames": [
+    "Mark Twain"
+  ]
+}
+
+### 139. The Adventures of Tom Sawyer
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486400778",
+  "title": "The Adventures of Tom Sawyer",
+  "publicationYear": 1876,
+  "authorNames": [
+    "Mark Twain"
+  ]
+}
+
+### 140. A Connecticut Yankee in King Arthur's Court
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486415918",
+  "title": "A Connecticut Yankee in King Arthur's Court",
+  "publicationYear": 1889,
+  "authorNames": [
+    "Mark Twain"
+  ]
+}
+
+### 141. The Scarlet Letter
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486280486",
+  "title": "The Scarlet Letter",
+  "publicationYear": 1850,
+  "authorNames": [
+    "Nathaniel Hawthorne"
+  ]
+}
+
+### 142. The House of the Seven Gables
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486408828",
+  "title": "The House of the Seven Gables",
+  "publicationYear": 1851,
+  "authorNames": [
+    "Nathaniel Hawthorne"
+  ]
+}
+
+### 143. The Call of the Wild
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486264721",
+  "title": "The Call of the Wild",
+  "publicationYear": 1903,
+  "authorNames": [
+    "Jack London"
+  ]
+}
+
+### 144. White Fang
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486266267",
+  "title": "White Fang",
+  "publicationYear": 1906,
+  "authorNames": [
+    "Jack London"
+  ]
+}
+
+### 145. The Sea-Wolf
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486411088",
+  "title": "The Sea-Wolf",
+  "publicationYear": 1904,
+  "authorNames": [
+    "Jack London"
+  ]
+}
+
+### 146. Martin Eden
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486466705",
+  "title": "Martin Eden",
+  "publicationYear": 1909,
+  "authorNames": [
+    "Jack London"
+  ]
+}
+
+### 147. The Iron Heel
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486419732",
+  "title": "The Iron Heel",
+  "publicationYear": 1908,
+  "authorNames": [
+    "Jack London"
+  ]
+}
+
+### 148. The Jungle
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486419237",
+  "title": "The Jungle",
+  "publicationYear": 1906,
+  "authorNames": [
+    "Upton Sinclair"
+  ]
+}
+
+### 149. Sister Carrie
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780486417944",
+  "title": "Sister Carrie",
+  "publicationYear": 1900,
+  "authorNames": [
+    "Theodore Dreiser"
+  ]
+}
+
+### 150. An American Tragedy
+POST http://localhost:8080/api/admin/books
+Content-Type: application/json
+
+{
+  "isbn": "9780451532091",
+  "title": "An American Tragedy",
+  "publicationYear": 1925,
+  "authorNames": [
+    "Theodore Dreiser"
+  ]
+}

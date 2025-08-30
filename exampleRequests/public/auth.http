@@ -28,7 +28,7 @@ Content-Type: application/json
 ###
 
 ### Login as librarian
-POST http://localhost:8080/api/login
+POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
 username = librarian1 &

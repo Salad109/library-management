@@ -58,7 +58,8 @@ public class SecurityConfig {
                                 "/api/register",
                                 "/api/login",
                                 "/api/books/**",
-                                "/api/authors/**").permitAll()
+                                "/api/authors/**",
+                                "/api/whoami").permitAll()
                         .requestMatchers("/api/reservations/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/admin/**", "/api/desk/**").hasRole("LIBRARIAN")
                         .anyRequest().hasRole("LIBRARIAN")
