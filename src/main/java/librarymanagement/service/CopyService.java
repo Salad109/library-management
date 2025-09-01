@@ -7,7 +7,6 @@ import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.model.Customer;
-import librarymanagement.repository.BookRepository;
 import librarymanagement.repository.CopyRepository;
 import librarymanagement.repository.CustomerRepository;
 import org.slf4j.Logger;
@@ -26,12 +25,12 @@ public class CopyService {
 
     private static final Logger log = LoggerFactory.getLogger(CopyService.class);
     private final CopyRepository copyRepository;
-    private final BookRepository bookRepository;
+    private final BookService bookService;
     private final CustomerRepository customerRepository;
 
-    public CopyService(CopyRepository copyRepository, BookRepository bookRepository, CustomerRepository customerRepository) {
+    public CopyService(CopyRepository copyRepository, BookService bookService, CustomerRepository customerRepository) {
         this.copyRepository = copyRepository;
-        this.bookRepository = bookRepository;
+        this.bookService = bookService;
         this.customerRepository = customerRepository;
     }
 
@@ -100,17 +99,12 @@ public class CopyService {
     @Transactional
     public List<Copy> addCopies(String isbn, int quantity) {
         log.info("Adding {} copies for book with ISBN: {}", quantity, isbn);
-        Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
-        if (book.isEmpty()) {
-            log.warn("Book not found with ISBN: {}", isbn);
-            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
-        }
-        Book existingBook = book.get();
+        Book book = bookService.getBookByIsbn(isbn);
 
         List<Copy> copies = new ArrayList<>(quantity);
         for (int i = 0; i < quantity; i++) {
             Copy copy = new Copy();
-            copy.setBook(existingBook);
+            copy.setBook(book);
             copy.setStatus(CopyStatus.AVAILABLE);
             copies.add(copy);
         }

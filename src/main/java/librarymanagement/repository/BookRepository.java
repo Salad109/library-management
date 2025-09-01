@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
 
+    boolean existsByIsbn(String isbn);
+
     @Query("SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.isbn = :isbn")
     Optional<Book> findByIsbnWithAuthors(String isbn);
 

@@ -8,6 +8,10 @@ import librarymanagement.model.Book;
 import librarymanagement.repository.BookRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +30,7 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
+    @Cacheable(value = "book-pages", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
     public Page<Book> getAllBooks(Pageable pageable) {
         log.debug("Fetching all books, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
@@ -43,6 +48,7 @@ public class BookService {
         return new PageImpl<>(books, pageable, isbnPage.getTotalElements());
     }
 
+    @Cacheable(value = "books", key = "#isbn")
     public Book getBookByIsbn(String isbn) {
         log.debug("Looking up book by ISBN: {}", isbn);
         Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
@@ -58,7 +64,7 @@ public class BookService {
         log.debug("Searching books with term: '{}', page: {}, size: {}", searchTerm, pageable.getPageNumber(), pageable.getPageSize());
 
         if (searchTerm == null || searchTerm.isBlank()) {
-            return getAllBooks(pageable);
+            return Page.empty(pageable);
         }
 
         String cleanTerm = searchTerm.trim();
@@ -84,23 +90,25 @@ public class BookService {
         return new PageImpl<>(books, pageable, authorIsbns.getTotalElements());
     }
 
+    @CachePut(value = "books", key = "#result.isbn")
+    @CacheEvict(value = "book-pages", allEntries = true)
     public Book addBook(Book book) {
         String authorNames = book.getFormattedAuthors();
-        log.info("Adding book: '{}' by [{}] (ISBN: {})",
-                book.getTitle(), authorNames, book.getIsbn());
+        log.info("Adding book: '{}' by [{}] (ISBN: {})", book.getTitle(), authorNames, book.getIsbn());
 
-        if (bookRepository.findByIsbnWithAuthors(book.getIsbn()).isPresent()) {
+        if (bookRepository.existsByIsbn(book.getIsbn())) {
             log.warn("Attempted to add duplicate book with ISBN: {}", book.getIsbn());
             throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + book.getIsbn());
         }
 
         Book savedBook = bookRepository.save(book);
-        log.info("Successfully added book: '{}' (ISBN: {})",
-                savedBook.getTitle(), savedBook.getIsbn());
+        log.info("Successfully added book: '{}' (ISBN: {})", savedBook.getTitle(), savedBook.getIsbn());
 
         return savedBook;
     }
 
+    @CachePut(value = "books", key = "#isbn")
+    @CacheEvict(value = "book-pages", allEntries = true)
     @Transactional
     public Book updateBook(String isbn, Book book) {
         log.info("Updating book with ISBN: {}", isbn);
@@ -128,6 +136,7 @@ public class BookService {
         return savedBook;
     }
 
+    @Caching(evict = {@CacheEvict(value = "books", key = "#isbn"), @CacheEvict(value = "book-pages", allEntries = true)})
     @Transactional
     public void deleteBook(String isbn) {
         log.info("Deleting book with ISBN: {}", isbn);
