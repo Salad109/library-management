@@ -56,7 +56,7 @@ public class CustomerService {
     }
 
     public Customer addCustomer(Customer customer) {
-        log.info("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());
+        log.debug("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());
         String email = customer.getEmail();
         if (email != null && !email.isBlank()) {
             Optional<Customer> duplicateCustomer = customerRepository.findByEmail(email);
@@ -73,7 +73,7 @@ public class CustomerService {
 
     @Transactional
     public Customer updateCustomer(Long id, Customer customer) {
-        log.info("Updating customer with ID: {}", id);
+        log.debug("Updating customer with ID: {}", id);
         Customer existingCustomer = getCustomerById(id);
 
         String newEmail = customer.getEmail();
