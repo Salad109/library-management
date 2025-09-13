@@ -91,7 +91,9 @@ public class BookService {
     }
 
     @CachePut(value = "books", key = "#result.isbn")
-    @CacheEvict(value = "book-pages", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "book-pages", allEntries = true),
+            @CacheEvict(value = "authors", allEntries = true)})
     public Book addBook(Book book) {
         String authorNames = book.getFormattedAuthors();
         log.info("Adding book: '{}' by [{}] (ISBN: {})", book.getTitle(), authorNames, book.getIsbn());
@@ -108,7 +110,9 @@ public class BookService {
     }
 
     @CachePut(value = "books", key = "#isbn")
-    @CacheEvict(value = "book-pages", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "book-pages", allEntries = true),
+            @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public Book updateBook(String isbn, Book book) {
         log.info("Updating book with ISBN: {}", isbn);
@@ -136,7 +140,10 @@ public class BookService {
         return savedBook;
     }
 
-    @Caching(evict = {@CacheEvict(value = "books", key = "#isbn"), @CacheEvict(value = "book-pages", allEntries = true)})
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#isbn"),
+            @CacheEvict(value = "book-pages", allEntries = true),
+            @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public void deleteBook(String isbn) {
         log.info("Deleting book with ISBN: {}", isbn);

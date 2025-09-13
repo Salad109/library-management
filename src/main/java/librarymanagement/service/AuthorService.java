@@ -6,6 +6,7 @@ import librarymanagement.model.Author;
 import librarymanagement.repository.AuthorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
+    @Cacheable(value = "authors", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
     public Page<Author> getAllAuthors(Pageable pageable) {
         log.debug("Fetching all authors, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
@@ -32,6 +34,7 @@ public class AuthorService {
         return authors;
     }
 
+    @Cacheable(value = "authors", key = "#name")
     public Author getAuthorByName(String name) {
         log.debug("Looking up author by name: {}", name);
         Optional<Author> author = authorRepository.findById(name);
