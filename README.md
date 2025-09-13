@@ -15,12 +15,12 @@ role-based authentication, and real-time monitoring.
 - Password hashing and secure user management
 - Search functionality across books, copies and authors
 - Application monitoring with Prometheus and Grafana
-- 83% test coverage with comprehensive integration and unit testing
+- +80% test coverage with comprehensive integration and unit testing
 
 ## Tech Stack
 
 - Java 21 + Spring Boot 3.5.0
-- Spring Data JPA with PostgreSQL
+- JPA/Hibernate with PostgreSQL
 - Spring Security for authentication and role-based authorization
 - Slf4j for logging
 - Prometheus for metrics collection
