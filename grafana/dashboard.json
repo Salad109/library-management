@@ -12,10 +12,16 @@
   "__elements": {},
   "__requires": [
     {
+      "type": "panel",
+      "id": "gauge",
+      "name": "Gauge",
+      "version": ""
+    },
+    {
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.2.0-16979757807"
+      "version": "12.1.1"
     },
     {
       "type": "panel",
@@ -125,7 +131,7 @@
           "unit": "s"
         }
       },
-      "pluginVersion": "12.2.0-16979757807",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -208,7 +214,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
+        "h": 13,
         "w": 8,
         "x": 16,
         "y": 0
@@ -227,7 +233,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.0-16979757807",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -255,126 +261,23 @@
           "instant": false,
           "legendFormat": "Heap Memory",
           "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "System Resources Usage",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds",
-            "seriesBy": "last"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "scheme",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 0.25
-              },
-              {
-                "color": "orange",
-                "value": 0.5
-              },
-              {
-                "color": "red",
-                "value": 0.75
-              }
-            ]
-          },
-          "unit": "percentunit"
+          "refId": "Memory"
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 11,
-        "w": 8,
-        "x": 16,
-        "y": 11
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.2.0-16979757807",
-      "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "disableTextWrap": false,
           "editorMode": "code",
           "expr": "hikaricp_connections_active / hikaricp_connections_max",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "legendFormat": "__auto",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "DB Connections",
           "range": true,
-          "refId": "DB Usage",
-          "useBackend": false
+          "refId": "DB"
         }
       ],
-      "title": "DB Connection Usage",
+      "title": "Resources Usage",
       "type": "timeseries"
     },
     {
@@ -457,7 +360,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.0-16979757807",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -569,7 +472,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.0-16979757807",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -585,6 +488,92 @@
       ],
       "title": "Error Rate",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 13
+      },
+      "id": 7,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "cache_hit_rate",
+          "legendFormat": "Hit Rate",
+          "range": true,
+          "refId": "Hit rate",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          }
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "cache_size",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Size",
+          "range": true,
+          "refId": "Size"
+        }
+      ],
+      "title": "Cache",
+      "type": "gauge"
     }
   ],
   "refresh": "auto",
@@ -601,6 +590,6 @@
   "timezone": "browser",
   "title": "Library Dashboard",
   "uid": "0d88cbcd-7961-4387-80f4-d71269fd170b",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
