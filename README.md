@@ -22,7 +22,7 @@ role-based authentication, and real-time monitoring.
 - Java 21 + Spring Boot 3.5.0
 - JPA/Hibernate with PostgreSQL
 - Spring Security for authentication and role-based authorization
-- Slf4j for logging
+- Slf4j + Logback for logging
 - Prometheus for metrics collection
 - Grafana for monitoring dashboards
 - Docker Compose for containerization
@@ -126,9 +126,10 @@ exampleRequests/
 - [x] PostgreSQL migration from H2
 - [x] Docker support
 - [x] Application monitoring with Prometheus and Grafana
-- [x] Custom dashboards in Grafana
+- [x] Custom dashboard in Grafana
 - [x] Proper API documentation
 - [x] Caching
+- [x] Logs in JSON format with MDC
 - [ ] Admin panel in Thymeleaf
 - [ ] Forms for full CRUD operations on resources
 - [ ] Enhance admin panel with HTMX

@@ -1,0 +1,21 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <logLevel/>
+                <loggerName>
+                    <shortenedLoggerNameLength>0</shortenedLoggerNameLength>
+                </loggerName>
+                <mdc/>
+                <message/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <logger name="librarymanagement" level="DEBUG"/>
+</configuration>
