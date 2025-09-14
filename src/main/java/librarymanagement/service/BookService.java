@@ -96,7 +96,7 @@ public class BookService {
             @CacheEvict(value = "authors", allEntries = true)})
     public Book addBook(Book book) {
         String authorNames = book.getFormattedAuthors();
-        log.info("Adding book: '{}' by [{}] (ISBN: {})", book.getTitle(), authorNames, book.getIsbn());
+        log.debug("Adding book: '{}' by [{}] (ISBN: {})", book.getTitle(), authorNames, book.getIsbn());
 
         if (bookRepository.existsByIsbn(book.getIsbn())) {
             log.warn("Attempted to add duplicate book with ISBN: {}", book.getIsbn());
@@ -115,7 +115,7 @@ public class BookService {
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public Book updateBook(String isbn, Book book) {
-        log.info("Updating book with ISBN: {}", isbn);
+        log.debug("Updating book with ISBN: {}", isbn);
 
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty()) {
@@ -146,7 +146,7 @@ public class BookService {
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public void deleteBook(String isbn) {
-        log.info("Deleting book with ISBN: {}", isbn);
+        log.debug("Deleting book with ISBN: {}", isbn);
 
         Optional<Book> book = bookRepository.findById(isbn);
         if (book.isEmpty()) {

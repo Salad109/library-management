@@ -31,7 +31,7 @@ public class UserService {
 
     @Transactional
     public User addUser(UserRegistrationRequest request) {
-        log.info("Adding new user with username: {}", request.username());
+        log.debug("Adding new user with username: {}", request.username());
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
             log.warn("Duplicate user found with username: {}", request.username());
