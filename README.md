@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/Salad109/library-management/graph/badge.svg?token=P1LBG9BIJR)](https://codecov.io/gh/Salad109/library-management) [![CI](https://github.com/Salad109/library-management/workflows/CI/badge.svg)](https://github.com/Salad109/library-management/actions)
+
 # Library Management System
 
 A library management system built with Spring Boot, featuring public book catalog
