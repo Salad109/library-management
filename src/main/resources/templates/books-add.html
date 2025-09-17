@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add New Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="container">
+    <h1>Add New Book</h1>
+
+    <div id="message" class="alert" style="display:none"></div>
+
+    <form id="bookForm">
+        <div class="mb-3">
+            <label for="isbn">ISBN:</label>
+            <input type="text" id="isbn" name="isbn" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="authorNames" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="year">Publication Year:</label>
+            <input type="number" id="year" name="publicationYear" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Book</button>
+    </form>
+
+    <script>
+        document.getElementById('bookForm').onsubmit = async function (e) {
+            e.preventDefault();
+
+            const data = new FormData(this);
+            const json = {
+                isbn: data.get('isbn'),
+                title: data.get('title'),
+                authorNames: [data.get('authorNames')],
+                publicationYear: parseInt(data.get('publicationYear'))
+            };
+
+            const response = await fetch('/api/admin/books', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(json)
+            });
+
+            const msg = document.getElementById('message');
+            if (response.ok) {
+                msg.className = 'alert alert-success';
+                msg.innerHTML = 'Book added successfully!';
+                this.reset();
+            } else {
+                const errorData = await response.json();
+                msg.className = 'alert alert-danger';
+                msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error adding book';
+            }
+            msg.style.display = 'block';
+        };
+    </script>
+</div>
+</body>
+</html>

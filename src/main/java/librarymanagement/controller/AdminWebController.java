@@ -52,4 +52,9 @@ public class AdminWebController {
 
         return "books-browse";
     }
+
+    @GetMapping("/admin/books/add")
+    public String bookAddPage() {
+        return "books-add";
+    }
 }

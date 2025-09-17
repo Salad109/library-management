@@ -21,7 +21,7 @@ role-based authentication, and real-time monitoring.
 
 ## Tech Stack
 
-- Java 21 + Spring Boot 3.5.0
+- Java 21 + Spring Boot 3.5
 - JPA/Hibernate with PostgreSQL
 - Spring Security for authentication and role-based authorization
 - Slf4j + Logback for logging
@@ -83,7 +83,7 @@ Create, view and cancel your reservations
 
 ### Desk Operations (LIBRARIAN role)
 
-Handle checkouts, returns, and mark items as lost. Create "offline" customer accounts for walk-in users.
+Handle checkouts, returns, and mark items as lost
 
 ### Admin Operations (LIBRARIAN role)
 
@@ -132,8 +132,20 @@ exampleRequests/
 - [x] Proper API documentation
 - [x] Caching
 - [x] Logs in JSON format with MDC
-- [ ] Admin panel in Thymeleaf
-- [ ] Forms for full CRUD operations on resources
+- [x] CI
+- [ ] Login and registration pages
+- [ ] Admin panel with full operations
+  - [ ] Books
+     - [x] Create
+     - [ ] Update
+     - [x] Delete
+  - [ ] Copies
+     - [ ] Create
+     - [ ] Read
+  - [ ] Customers
+     - [ ] Create
+     - [ ] Read
+     - [ ] Update
+- [ ] Desk operations panel
 - [ ] Enhance admin panel with HTMX
-- [ ] CI
 - [ ] Deployment
