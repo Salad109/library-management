@@ -33,9 +33,9 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain staffChain(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/admin/**", "/login")
+                .securityMatcher("/admin/**", "/login", "/register")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login", "/register").permitAll()
                         .anyRequest().hasRole("LIBRARIAN")
                 )
                 .formLogin(form -> form
@@ -59,7 +59,8 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/books/**",
                                 "/api/authors/**",
-                                "/api/whoami").permitAll()
+                                "/api/whoami",
+                                "/swagger-ui/**").permitAll()
                         .requestMatchers("/api/reservations/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/admin/**", "/api/desk/**").hasRole("LIBRARIAN")
                         .anyRequest().hasRole("LIBRARIAN")

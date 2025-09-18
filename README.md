@@ -114,7 +114,7 @@ exampleRequests/
 - [x] Basic book CRUD operations
 - [x] ISBN regex validation and duplicate prevention
 - [x] Many-to-many author-book relationships with author duplicate prevention
-- [x] Book search by title, author, year, ISBN
+- [x] Book search
 - [x] Copy status tracking (available, borrowed, reserved, lost)
 - [x] State transition validation for copies
 - [x] Comprehensive test coverage written while procrastinating adding new features (ongoing)
@@ -133,19 +133,19 @@ exampleRequests/
 - [x] Caching
 - [x] Logs in JSON format with MDC
 - [x] CI
-- [ ] Login and registration pages
+- [x] Login and registration pages
 - [ ] Admin panel with full operations
-  - [ ] Books
-     - [x] Create
-     - [ ] Update
-     - [x] Delete
-  - [ ] Copies
-     - [ ] Create
-     - [ ] Read
-  - [ ] Customers
-     - [ ] Create
-     - [ ] Read
-     - [ ] Update
+    - [ ] Books
+        - [x] Create
+        - [ ] Update
+        - [x] Delete
+    - [ ] Copies
+        - [ ] Create
+        - [ ] Read
+    - [ ] Customers
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
 - [ ] Desk operations panel
 - [ ] Enhance admin panel with HTMX
 - [ ] Deployment
