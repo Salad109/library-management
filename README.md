@@ -135,9 +135,10 @@ exampleRequests/
 - [x] CI
 - [x] Login and registration pages
 - [ ] Admin panel with full operations
-    - [ ] Books
+    - [x] Books
         - [x] Create
-        - [ ] Update
+        - [x] Read
+        - [x] Update
         - [x] Delete
     - [ ] Copies
         - [ ] Create

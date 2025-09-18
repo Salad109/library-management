@@ -31,6 +31,12 @@
             <td>
                 <button class="btn btn-sm btn-primary" onclick="viewBook(this)" th:data-isbn="${book.isbn}">View
                 </button>
+                <button class="btn btn-sm btn-warning" onclick="editBook(this)"
+                        th:data-authors="${book.getFormattedAuthors()}"
+                        th:data-isbn="${book.isbn}"
+                        th:data-title="${book.title}"
+                        th:data-year="${book.publicationYear}">Edit
+                </button>
                 <button class="btn btn-sm btn-danger" onclick="deleteBook(this)"
                         th:data-isbn="${book.isbn}" th:data-title="${book.title}">Delete
                 </button>
@@ -100,11 +106,82 @@
         Page [[${currentPage + 1}]] of [[${totalPages}]]
     </div>
 
+    <!-- Edit Book Modal -->
+    <div class="modal fade" id="editBookModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Edit Book</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" id="editBookError" style="display: none;"></div>
+                    <div class="mb-3">
+                        <label for="editIsbn">ISBN</label>
+                        <input class="form-control" disabled id="editIsbn">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTitle">Title</label>
+                        <input class="form-control" id="editTitle">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPublicationYear">Publication Year</label>
+                        <input class="form-control" id="editPublicationYear" type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAuthors">Authors (comma-separated)</label>
+                        <input class="form-control" id="editAuthors">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveBookChanges()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         function viewBook(button) {
             const isbn = button.dataset.isbn;
             window.open('/api/books/' + isbn);
+        }
+
+        function editBook(button) {
+            document.getElementById('editBookError').style.display = 'none';
+            document.getElementById('editIsbn').value = button.dataset.isbn;
+            document.getElementById('editTitle').value = button.dataset.title;
+            document.getElementById('editPublicationYear').value = button.dataset.year;
+            document.getElementById('editAuthors').value = button.dataset.authors;
+
+            new bootstrap.Modal(document.getElementById('editBookModal')).show();
+        }
+
+        function saveBookChanges() {
+            const isbn = document.getElementById('editIsbn').value;
+            const title = document.getElementById('editTitle').value;
+            const publicationYear = document.getElementById('editPublicationYear').value;
+            const authors = document.getElementById('editAuthors').value.split(',').map(name => name.trim());
+
+            fetch(`/api/admin/books/${isbn}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    title: title,
+                    publicationYear: parseInt(publicationYear),
+                    authorNames: authors
+                })
+            }).then(response => {
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('editBookModal')).hide();
+                    location.reload();
+                } else {
+                    response.json().then(errorData => {
+                        document.getElementById('editBookError').innerHTML = Object.values(errorData).join('<br>');
+                        document.getElementById('editBookError').style.display = 'block';
+                    });
+                }
+            });
         }
 
         function deleteBook(button) {
