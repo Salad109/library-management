@@ -5,15 +5,20 @@
             <div class="navbar-nav me-auto">
                 <div class="nav-item dropdown">
                     <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
-                       id="booksDropdown" role="button">
-                        Books
-                    </a>
+                       id="booksDropdown" role="button">Books</a>
                     <ul aria-labelledby="booksDropdown" class="dropdown-menu">
                         <li><a class="dropdown-item" href="/admin/books/browse">Browse Books</a></li>
                         <li><a class="dropdown-item" href="/admin/books/add">Add Book</a></li>
                     </ul>
                 </div>
-                <a class="nav-link" href="/admin/copies">Copies</a>
+                <div class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                       id="copiesDropdown" role="button">Copies</a>
+                    <ul aria-labelledby="copiesDropdown" class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/copies/browse">Browse Copies</a></li>
+                        <li><a class="dropdown-item" href="/admin/copies/add">Add Copies</a></li>
+                    </ul>
+                </div>
                 <a class="nav-link" href="/admin/customers">Customers</a>
             </div>
             <div class="navbar-nav">

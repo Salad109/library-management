@@ -11,13 +11,12 @@ role-based authentication, and real-time monitoring.
 - Book management with ISBN validation and author relationships
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
-- Customer management with email validation
+- Customer management
 - Borrowing and reservation system
-- Authentication and authorization with Spring Security
-- Password hashing and secure user management
-- Search functionality across books, copies and authors
+- Authentication and authorization with Spring Security and password hashing
 - Application monitoring with Prometheus and Grafana
-- +80% test coverage with comprehensive integration and unit testing
+- Comprehensive integration and unit testing
+- Frontend for staff operations using Thymeleaf and Bootstrap
 
 ## Tech Stack
 
@@ -31,8 +30,8 @@ role-based authentication, and real-time monitoring.
 - Swagger for API documentation
 - Caffeine for caching
 - JUnit 5 + MockMvc for testing
-- Undertow web server
 - Maven
+- Thymeleaf + Bootstrap for frontend
 
 ## Starting Guide
 
@@ -49,13 +48,11 @@ docker-compose up
 ```
 
 The application runs on `http://localhost:8080`. API documentation is available
-at http://localhost:8080/swagger-ui.html.
-Monitoring dashboard is available
-via Grafana and Prometheus.
+via Swagger. Monitoring dashboard is available via Grafana and Prometheus.
 
 ## Monitoring Setup Guide
 
-1. Visit Grafana at `http://localhost:3000` (admin/admin)
+1. Visit Grafana at http://localhost:3000 (admin/admin)
 2. Create a new data source:
     - Type: Prometheus
     - URL: `http://prometheus:9090`
@@ -70,7 +67,7 @@ Grafana dashboard screenshot during high load simulation using the config in `gr
 
 ## API Overview
 
-Full API Documentation and details are available at http://localhost:8080/swagger-ui.html. The API is organized into
+Full API Documentation and details are available at http://localhost:8080/swagger-ui/index.html. The API is organized into
 four main areas:
 
 ### Public Browsing (No Authentication Required)
@@ -142,7 +139,7 @@ exampleRequests/
         - [x] Delete
     - [ ] Copies
         - [ ] Create
-        - [ ] Read
+        - [x] Read
     - [ ] Customers
         - [ ] Create
         - [ ] Read
