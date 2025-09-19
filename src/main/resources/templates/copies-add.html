@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add New Copies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="container">
+    <h1>Add New Copies</h1>
+
+    <div class="alert" id="message" style="display:none"></div>
+
+    <form id="copyForm">
+        <div class="mb-3">
+            <label for="isbn">ISBN:</label>
+            <input class="form-control" id="isbn" name="isbn" required type="text">
+        </div>
+
+        <div class="mb-3">
+            <label for="quantity">Quantity:</label>
+            <input class="form-control" id="quantity" name="quantity" type="number">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Add Copies</button>
+    </form>
+
+    <script>
+        document.getElementById('copyForm').onsubmit = async function (e) {
+            e.preventDefault();
+
+            const data = new FormData(this);
+            const json = {
+                bookIsbn: data.get('isbn'),
+                quantity: parseInt(data.get('quantity'))
+            };
+
+            const response = await fetch('/api/admin/copies', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(json)
+            });
+
+            const msg = document.getElementById('message');
+            if (response.ok) {
+                msg.className = 'alert alert-success';
+                msg.innerHTML = 'Copies added successfully!';
+                this.reset();
+            } else {
+                const errorData = await response.json();
+                msg.className = 'alert alert-danger';
+                msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error adding copies';
+            }
+            msg.style.display = 'block';
+        };
+    </script>
+</div>
+</body>
+</html>

@@ -137,8 +137,8 @@ exampleRequests/
         - [x] Read
         - [x] Update
         - [x] Delete
-    - [ ] Copies
-        - [ ] Create
+    - [x] Copies
+        - [x] Create
         - [x] Read
     - [ ] Customers
         - [ ] Create

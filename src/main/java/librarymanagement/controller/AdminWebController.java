@@ -92,4 +92,9 @@ public class AdminWebController {
 
         return "copies-browse";
     }
+
+    @GetMapping("/admin/copies/add")
+    public String copiesAddPage() {
+        return "copies-add";
+    }
 }
