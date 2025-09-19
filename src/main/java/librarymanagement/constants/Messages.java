@@ -15,6 +15,7 @@ public class Messages {
     public static final String BOOK_TITLE_VALIDATION_MESSAGE = "Title cannot be blank";
     public static final String BOOK_PUBLICATION_YEAR_VALIDATION_MESSAGE = "Publication year must be a positive integer";
     public static final String BOOK_ISBN_REGEX = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$";
+    public static final String BOOK_COPY_COUNT_VALIDATION_MESSAGE = "Available copies cannot be negative";
     // Author
     public static final String AUTHOR_NOT_FOUND = "Author not found with name: ";
     public static final String AUTHOR_NAME_VALIDATION_MESSAGE = "Name cannot be blank";

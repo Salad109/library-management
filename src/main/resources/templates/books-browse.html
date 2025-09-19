@@ -19,6 +19,7 @@
             <th>Title</th>
             <th>Year</th>
             <th>Authors</th>
+            <th>Available copies</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -28,6 +29,7 @@
             <td th:text="${book.title}">-</td>
             <td th:text="${book.publicationYear}">-</td>
             <td th:text="${book.getFormattedAuthors()}">-</td>
+            <td th:text="${book.availableCopies}">-</td>
             <td>
                 <button class="btn btn-sm btn-primary" onclick="viewBook(this)" th:data-isbn="${book.isbn}">View
                 </button>

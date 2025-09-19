@@ -55,25 +55,6 @@ class BookControllerTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
-    void testGetAvailableCopiesCount() {
-        String isbn = "9783213213210";
-        // Create the book first
-        assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
-                .hasStatus(HttpStatus.CREATED);
-
-        // Add copies
-        int quantity = 2;
-        assertThat(DataBuilder.createTestCopy(mockMvcTester, isbn, quantity))
-                .hasStatus(HttpStatus.CREATED);
-
-        assertThat(mockMvcTester.get().uri("/api/books/" + isbn + "/count"))
-                .hasStatus(HttpStatus.OK)
-                .bodyText()
-                .isEqualTo(String.valueOf(quantity));
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
     void searchBook() {
         String isbn = "777888999X";
         String title = "1984";

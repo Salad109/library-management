@@ -34,6 +34,9 @@ public class Book {
     @Min(value = 1, message = Messages.BOOK_PUBLICATION_YEAR_VALIDATION_MESSAGE)
     private Integer publicationYear;
 
+    @Column(nullable = false)
+    @Min(value = 0, message = Messages.BOOK_COPY_COUNT_VALIDATION_MESSAGE)
+    private Integer availableCopies = 0;
 
     public Book() {
         authors = new LinkedHashSet<>();
@@ -44,6 +47,7 @@ public class Book {
         this.title = title;
         this.authors = (authors != null) ? new LinkedHashSet<>(authors) : new LinkedHashSet<>();
         this.publicationYear = publicationYear;
+        this.availableCopies = 0;
     }
 
     @JsonIgnore
@@ -105,6 +109,14 @@ public class Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public Integer getAvailableCopies() {
+        return availableCopies;
+    }
+
+    public void setAvailableCopies(Integer availableCopies) {
+        this.availableCopies = availableCopies;
     }
 
 }

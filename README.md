@@ -67,8 +67,8 @@ Grafana dashboard screenshot during high load simulation using the config in `gr
 
 ## API Overview
 
-Full API Documentation and details are available at http://localhost:8080/swagger-ui/index.html. The API is organized into
-four main areas:
+Full API Documentation and details are available at http://localhost:8080/swagger-ui/index.html. The API is organized
+into four main areas:
 
 ### Public Browsing (No Authentication Required)
 
