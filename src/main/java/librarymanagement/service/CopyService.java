@@ -7,7 +7,6 @@ import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
 import librarymanagement.model.CopyStatus;
 import librarymanagement.model.Customer;
-import librarymanagement.repository.BookRepository;
 import librarymanagement.repository.CopyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +24,11 @@ public class CopyService {
 
     private static final Logger log = LoggerFactory.getLogger(CopyService.class);
     private final CopyRepository copyRepository;
-    private final BookRepository bookRepository;
     private final BookService bookService;
     private final CustomerService customerService;
 
-    public CopyService(CopyRepository copyRepository, BookRepository bookRepository, BookService bookService, CustomerService customerService) {
+    public CopyService(CopyRepository copyRepository, BookService bookService, CustomerService customerService) {
         this.copyRepository = copyRepository;
-        this.bookRepository = bookRepository;
         this.bookService = bookService;
         this.customerService = customerService;
     }
@@ -104,8 +101,7 @@ public class CopyService {
             copies.add(copy);
         }
 
-        book.setAvailableCopies(book.getAvailableCopies() + quantity);
-        bookRepository.save(book);
+        bookService.updateAvailableCopies(isbn, quantity);
 
         List<Copy> savedCopies = copyRepository.saveAll(copies);
         log.info("Added {} copies for book with ISBN: {}", savedCopies.size(), isbn);
@@ -131,8 +127,7 @@ public class CopyService {
         existingCopy.setStatus(CopyStatus.AVAILABLE);
 
         Book book = existingCopy.getBook();
-        book.setAvailableCopies(book.getAvailableCopies() + 1);
-        bookRepository.save(book);
+        bookService.updateAvailableCopies(book.getIsbn(), 1);
 
         Copy savedCopy = copyRepository.save(existingCopy);
         log.info("Copy with ID: {} returned successfully", savedCopy.getId());
@@ -146,8 +141,7 @@ public class CopyService {
 
         if (existingCopy.getStatus() == CopyStatus.AVAILABLE) {
             Book book = existingCopy.getBook();
-            book.setAvailableCopies(book.getAvailableCopies() - 1);
-            bookRepository.save(book);
+            bookService.updateAvailableCopies(book.getIsbn(), -1);
         }
 
         existingCopy.setStatus(CopyStatus.LOST);
@@ -175,8 +169,7 @@ public class CopyService {
         Customer customer = customerService.getCustomerById(customerId);
 
         Book book = existingCopy.getBook();
-        book.setAvailableCopies(book.getAvailableCopies() - 1);
-        bookRepository.save(book);
+        bookService.updateAvailableCopies(book.getIsbn(), -1);
 
         existingCopy.setCustomer(customer);
         existingCopy.setStatus(CopyStatus.RESERVED);
@@ -204,8 +197,7 @@ public class CopyService {
         existingCopy.setStatus(CopyStatus.AVAILABLE);
 
         Book book = existingCopy.getBook();
-        book.setAvailableCopies(book.getAvailableCopies() + 1);
-        bookRepository.save(book);
+        bookService.updateAvailableCopies(book.getIsbn(), 1);
 
         Copy savedCopy = copyRepository.save(existingCopy);
         log.info("Cancelled reservation for copy with ID: {}", savedCopy.getId());
@@ -250,8 +242,7 @@ public class CopyService {
         copy.setStatus(CopyStatus.BORROWED);
 
         Book book = copy.getBook();
-        book.setAvailableCopies(book.getAvailableCopies() - 1);
-        bookRepository.save(book);
+        bookService.updateAvailableCopies(book.getIsbn(), -1);
 
         Copy savedCopy = copyRepository.save(copy);
         log.info("Available copy with ID: {} checked out successfully for customer ID: {}", savedCopy.getId(), customer.getId());

@@ -140,6 +140,32 @@ public class BookService {
         return savedBook;
     }
 
+    @CachePut(value = "books", key = "#isbn")
+    @CacheEvict(value = "book-pages", allEntries = true)
+    @Transactional
+    public Book updateAvailableCopies(String isbn, int delta) {
+        log.debug("Updating available copies for ISBN: {} by delta: {}", isbn, delta);
+
+        Optional<Book> optionalBook = bookRepository.findById(isbn);
+        if (optionalBook.isEmpty()) {
+            log.warn("Attempted to update copies for non-existent book with ISBN: {}", isbn);
+            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
+        }
+
+        Book book = optionalBook.get();
+        int newCount = book.getAvailableCopies() + delta;
+        if (newCount < 0) {
+            log.warn("Available copies would become negative for ISBN: {}", isbn);
+            throw new IllegalStateException("Available copies cannot be negative");
+        }
+
+        book.setAvailableCopies(newCount);
+        Book savedBook = bookRepository.save(book);
+
+        log.debug("Updated available copies for ISBN: {} to {}", isbn, newCount);
+        return savedBook;
+    }
+
     @Caching(evict = {
             @CacheEvict(value = "books", key = "#isbn"),
             @CacheEvict(value = "book-pages", allEntries = true),
