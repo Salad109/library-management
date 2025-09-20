@@ -59,8 +59,7 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/books/**",
                                 "/api/authors/**",
-                                "/api/whoami",
-                                "/swagger-ui/**").permitAll()
+                                "/api/whoami").permitAll()
                         .requestMatchers("/api/reservations/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/admin/**", "/api/desk/**").hasRole("LIBRARIAN")
                         .anyRequest().hasRole("LIBRARIAN")

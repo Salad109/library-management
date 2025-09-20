@@ -2,8 +2,10 @@ package librarymanagement.controller;
 
 import librarymanagement.model.Book;
 import librarymanagement.model.Copy;
+import librarymanagement.model.Customer;
 import librarymanagement.service.BookService;
 import librarymanagement.service.CopyService;
+import librarymanagement.service.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -15,10 +17,12 @@ public class AdminWebController {
 
     private final BookService bookService;
     private final CopyService copyService;
+    private final CustomerService customerService;
 
-    public AdminWebController(BookService bookService, CopyService copyService) {
+    public AdminWebController(BookService bookService, CopyService copyService, CustomerService customerService) {
         this.bookService = bookService;
         this.copyService = copyService;
+        this.customerService = customerService;
     }
 
     @GetMapping("/login")
@@ -96,5 +100,36 @@ public class AdminWebController {
     @GetMapping("/admin/copies/add")
     public String copiesAddPage() {
         return "copies-add";
+    }
+
+    @GetMapping("/admin/customers/browse")
+    public String customerBrowsePage(Model model, Pageable pageable) {
+        Page<Customer> customers = customerService.getAllCustomers(pageable);
+        model.addAttribute("customers", customers);
+        model.addAttribute("customerCount", customers.getTotalElements());
+
+        int currentPage = customers.getNumber();
+        int totalPages = customers.getTotalPages();
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+
+        int windowSize = 3;
+        int startPage = Math.max(0, currentPage - windowSize);
+        int endPage = Math.min(totalPages - 1, currentPage + windowSize);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("windowSize", windowSize);
+
+        int startItem = currentPage * customers.getSize() + 1;
+        int endItem = Math.min(startItem + customers.getSize() - 1, (int) customers.getTotalElements());
+        model.addAttribute("startItem", startItem);
+        model.addAttribute("endItem", endItem);
+
+        return "customers-browse";
+    }
+
+    @GetMapping("/admin/customers/add")
+    public String customerAddPage() {
+        return "customers-add";
     }
 }

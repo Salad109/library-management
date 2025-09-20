@@ -19,7 +19,14 @@
                         <li><a class="dropdown-item" href="/admin/copies/add">Add Copies</a></li>
                     </ul>
                 </div>
-                <a class="nav-link" href="/admin/customers">Customers</a>
+                <div class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                       id="customersDropdown" role="button">Customers</a>
+                    <ul aria-labelledby="customersDropdown" class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/customers/browse">Browse Customers</a></li>
+                        <li><a class="dropdown-item" href="/admin/customers/add">Add Customer</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="navbar-nav">
                 <form action="/api/logout" class="d-inline" method="post">
