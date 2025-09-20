@@ -131,19 +131,10 @@ exampleRequests/
 - [x] Logs in JSON format with MDC
 - [x] CI
 - [x] Login and registration pages
-- [ ] Admin panel with full operations
+- [x] Admin panel with full operations:
     - [x] Books
-        - [x] Create
-        - [x] Read
-        - [x] Update
-        - [x] Delete
     - [x] Copies
-        - [x] Create
-        - [x] Read
-    - [ ] Customers
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
+    - [x] Customers
 - [ ] Desk operations panel
 - [ ] Enhance admin panel with HTMX
 - [ ] Deployment
