@@ -11,22 +11,22 @@
 
     <!-- Search Form -->
     <div class="col-4">
-        <form method="get" action="/admin/books/browse">
+        <form action="/admin/books/browse" method="get">
             <div class="input-group">
-                <input type="text" class="form-control"
-                       name="q" placeholder="Title or author..." th:value="${searchQuery}" autocomplete="off">
+                <input autocomplete="off" class="form-control"
+                       name="q" placeholder="Title or author..." th:value="${searchQuery}" type="text">
                 <button class="btn btn-primary" type="submit">Search</button>
-                <a th:href="@{/admin/books/browse}" class="btn btn-outline-secondary">Clear</a>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/books/browse}">Clear</a>
             </div>
         </form>
     </div>
 
     <!-- Results Info -->
     <div class="mb-3">
-        <span th:if="${searchQuery != null and !searchQuery.isEmpty()}" class="text-muted">
+        <span class="text-muted" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
             Showing results for: "<span th:text="${searchQuery}"></span>"
         </span>
-        <span th:if="${searchQuery == null or searchQuery.isEmpty()}" class="text-muted">
+        <span class="text-muted" th:if="${searchQuery == null or searchQuery.isEmpty()}">
             Showing all books
         </span>
     </div>

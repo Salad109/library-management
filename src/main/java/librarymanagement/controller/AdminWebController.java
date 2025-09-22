@@ -43,12 +43,12 @@ public class AdminWebController {
 
     @GetMapping("/admin/books/browse")
     public String bookBrowsePage(
-            Model model, Pageable pageable, @RequestParam(value = "q", required = false) String searchQuery) {
+            Model model, Pageable pageable, @RequestParam(required = false) String q) {
         Page<Book> books;
 
-        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            books = bookService.searchBooks(searchQuery.trim(), pageable);
-            model.addAttribute("searchQuery", searchQuery.trim());
+        if (q != null && !q.trim().isEmpty()) {
+            books = bookService.searchBooks(q.trim(), pageable);
+            model.addAttribute("searchQuery", q.trim());
         } else {
             books = bookService.getAllBooks(pageable);
             model.addAttribute("searchQuery", "");
@@ -82,8 +82,42 @@ public class AdminWebController {
     }
 
     @GetMapping("/admin/copies/browse")
-    public String copyBrowsePage(Model model, Pageable pageable) {
-        Page<Copy> copies = copyService.getAllCopies(pageable);
+    public String copyBrowsePage(
+            Model model, Pageable pageable,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String searchType) {
+
+        Page<Copy> copies;
+        String cleanQuery = (q != null) ? q.trim() : "";
+
+        if (cleanQuery.isEmpty() || searchType == null) {
+            copies = copyService.getAllCopies(pageable);
+            model.addAttribute("searchQuery", "");
+            model.addAttribute("searchType", "");
+        } else {
+            switch (searchType) {
+                case "isbn":
+                    copies = copyService.getCopiesByBookIsbn(cleanQuery, pageable);
+                    break;
+                case "customer":
+                    try {
+                        Long customerId = Long.parseLong(cleanQuery);
+                        copies = copyService.getCopiesByCustomerId(customerId, pageable);
+                    } catch (NumberFormatException e) {
+                        copies = Page.empty(pageable);
+                    }
+                    break;
+                case "title":
+                    copies = copyService.getCopiesByBookTitle(cleanQuery, pageable);
+                    break;
+                default:
+                    copies = copyService.getAllCopies(pageable);
+            }
+
+            model.addAttribute("searchQuery", cleanQuery);
+            model.addAttribute("searchType", searchType);
+        }
+
         model.addAttribute("copies", copies);
         model.addAttribute("copyCount", copies.getTotalElements());
 

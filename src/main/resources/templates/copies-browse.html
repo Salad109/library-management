@@ -9,9 +9,55 @@
 <div class="container">
     <h1>Copy Browser</h1>
 
-    <h4>Total Copies: <span th:text="${copyCount}">0</span></h4>
+    <!-- Search Form -->
+    <div class="col 8">
+        <form action="/admin/copies/browse" method="get">
+            <div class="input-group">
+                <input autocomplete="off"
+                       class="form-control me-1"
+                       name="q"
+                       placeholder="Enter search term..."
+                       th:value="${searchQuery}"
+                       type="text">
+                <button class="btn btn-primary me-1" name="searchType" th:classappend="${searchType == 'title'} ? 'active' : ''"
+                        type="submit"
+                        value="title">
+                    Search by Title
+                </button>
+                <button class="btn btn-primary me-1" name="searchType" th:classappend="${searchType == 'isbn'} ? 'active' : ''"
+                        type="submit"
+                        value="isbn">
+                    Get by ISBN
+                </button>
+                <button class="btn btn-primary me-1" name="searchType" th:classappend="${searchType == 'customer'} ? 'active' : ''"
+                        type="submit"
+                        value="customer">
+                    Get by Customer ID
+                </button>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/copies/browse}">
+                    Clear
+                </a>
+            </div>
+        </form>
+    </div>
 
-    <h2>Copies</h2>
+    <!-- Results Info -->
+    <div class="mb-3">
+        <span class="text-muted" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+            <span th:switch="${searchType}">
+                <span th:case="'title'">Showing copies for books with title containing: "<strong
+                        th:text="${searchQuery}"></strong>"</span>
+                <span th:case="'isbn'">Showing copies for book with ISBN: "<strong
+                        th:text="${searchQuery}"></strong>"</span>
+                <span th:case="'customer'">Showing copies for customer ID: <strong
+                        th:text="${searchQuery}"></strong></span>
+            </span>
+        </span>
+        <span class="text-muted" th:if="${searchQuery == null or searchQuery.isEmpty()}">
+            Showing all copies
+        </span>
+    </div>
+
     <table class="table table-striped table-hover">
         <thead>
         <tr>
@@ -50,14 +96,16 @@
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                 <a class="page-link"
                    tabindex="-1"
-                   th:href="@{/admin/copies/browse(page=${currentPage - 1})}">&laquo; Previous</a>
+                   th:href="@{/admin/copies/browse(page=${currentPage - 1}, q=${searchQuery}, searchType=${searchType})}">&laquo;
+                    Previous</a>
             </li>
 
             <!-- First page -->
             <li class="page-item"
                 th:classappend="${0 == currentPage} ? 'active'"
                 th:if="${startPage > 0}">
-                <a class="page-link" th:href="@{/admin/copies/browse(page=0)}">1</a>
+                <a class="page-link"
+                   th:href="@{/admin/copies/browse(page=0, q=${searchQuery}, searchType=${searchType})}">1</a>
             </li>
 
             <!-- Left ellipsis -->
@@ -70,7 +118,7 @@
                 th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="pageNum : ${#numbers.sequence(startPage, endPage)}">
                 <a class="page-link"
-                   th:href="@{/admin/copies/browse(page=${pageNum})}"
+                   th:href="@{/admin/copies/browse(page=${pageNum}, q=${searchQuery}, searchType=${searchType})}"
                    th:text="${pageNum + 1}"></a>
             </li>
 
@@ -84,14 +132,15 @@
                 th:classappend="${totalPages - 1 == currentPage} ? 'active'"
                 th:if="${endPage < totalPages - 1}">
                 <a class="page-link"
-                   th:href="@{/admin/copies/browse(page=${totalPages - 1})}"
+                   th:href="@{/admin/copies/browse(page=${totalPages - 1}, q=${searchQuery}, searchType=${searchType})}"
                    th:text="${totalPages}">Last</a>
             </li>
 
             <!-- Next button -->
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/admin/copies/browse(page=${currentPage + 1})}">Next &raquo;</a>
+                   th:href="@{/admin/copies/browse(page=${currentPage + 1}, q=${searchQuery}, searchType=${searchType})}">Next
+                    &raquo;</a>
             </li>
 
         </ul>

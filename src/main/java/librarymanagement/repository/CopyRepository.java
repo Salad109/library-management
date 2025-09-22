@@ -17,8 +17,6 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
 
     Optional<Copy> findFirstByBookIsbnAndStatus(String isbn, CopyStatus status);
 
-    long countByBookIsbnAndStatus(String isbn, CopyStatus status);
-
     @Query("SELECT c.id FROM Copy c ORDER BY c.id")
     Page<Long> findAllIds(Pageable pageable);
 
@@ -34,4 +32,7 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
 
     @Query("SELECT c.id FROM Copy c WHERE c.customer.id = :customerId ORDER BY c.id")
     Page<Long> findIdsByCustomerId(@Param("customerId") Long customerId, Pageable pageable);
+
+    @Query("SELECT c.id FROM Copy c WHERE c.book.title ILIKE CONCAT('%', :title, '%') ORDER BY c.id")
+    Page<Long> findIdsByBookTitle(@Param("title") String title, Pageable pageable);
 }
