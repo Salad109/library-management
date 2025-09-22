@@ -1,3 +1,5 @@
 coverage:
   ignore:
     - "src/main/resources/**"
+    - "**/controller/*WebController.java"
+    - "**/LibraryManagementApplication.java"

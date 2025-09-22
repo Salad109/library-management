@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AdminWebController {
@@ -41,8 +42,18 @@ public class AdminWebController {
     }
 
     @GetMapping("/admin/books/browse")
-    public String bookBrowsePage(Model model, Pageable pageable) {
-        Page<Book> books = bookService.getAllBooks(pageable);
+    public String bookBrowsePage(
+            Model model, Pageable pageable, @RequestParam(value = "q", required = false) String searchQuery) {
+        Page<Book> books;
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            books = bookService.searchBooks(searchQuery.trim(), pageable);
+            model.addAttribute("searchQuery", searchQuery.trim());
+        } else {
+            books = bookService.getAllBooks(pageable);
+            model.addAttribute("searchQuery", "");
+        }
+
         model.addAttribute("books", books);
         model.addAttribute("bookCount", books.getTotalElements());
 
@@ -56,7 +67,6 @@ public class AdminWebController {
         int endPage = Math.min(totalPages - 1, currentPage + windowSize);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("windowSize", windowSize);
 
         int startItem = currentPage * books.getSize() + 1;
         int endItem = Math.min(startItem + books.getSize() - 1, (int) books.getTotalElements());
@@ -87,7 +97,6 @@ public class AdminWebController {
         int endPage = Math.min(totalPages - 1, currentPage + windowSize);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("windowSize", windowSize);
 
         int startItem = currentPage * copies.getSize() + 1;
         int endItem = Math.min(startItem + copies.getSize() - 1, (int) copies.getTotalElements());
@@ -118,7 +127,6 @@ public class AdminWebController {
         int endPage = Math.min(totalPages - 1, currentPage + windowSize);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("windowSize", windowSize);
 
         int startItem = currentPage * customers.getSize() + 1;
         int endItem = Math.min(startItem + customers.getSize() - 1, (int) customers.getTotalElements());
