@@ -27,7 +27,6 @@ class AdminWebControllerTest {
             "/admin/books/browse",
             "/admin/books/add",
             "/admin/copies/browse",
-            "/admin/copies/add",
             "/admin/customers/browse",
             "/admin/customers/add",
     })

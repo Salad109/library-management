@@ -143,11 +143,6 @@ public class AdminWebController {
         return "copies-browse";
     }
 
-    @GetMapping("/admin/copies/add")
-    public String copiesAddPage() {
-        return "copies-add";
-    }
-
     @GetMapping("/admin/customers/browse")
     public String customerBrowsePage(Model model, Pageable pageable) {
         Page<Customer> customers = customerService.getAllCustomers(pageable);

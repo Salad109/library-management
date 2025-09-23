@@ -7,6 +7,23 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container">
+
+    <!-- Operations Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Operations</h2>
+            <button class="btn btn-success me-2" data-bs-target="#checkoutModal" data-bs-toggle="modal">
+                Process Checkout...
+            </button>
+            <button class="btn btn-warning me-2" data-bs-target="#returnModal" data-bs-toggle="modal">
+                Process Return...
+            </button>
+            <button class="btn btn-info" data-bs-target="#addCopiesModal" data-bs-toggle="modal">
+                Add Copies...
+            </button>
+        </div>
+    </div>
+
     <h1>Copy Browser</h1>
 
     <!-- Search Form -->
@@ -164,10 +181,167 @@
         Page [[${currentPage + 1}]] of [[${totalPages}]]
     </div>
 
+    <!-- Checkout Modal -->
+    <div class="modal fade" id="checkoutModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Checkout Copy</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert" id="checkoutMessage" style="display:none"></div>
+                    <div class="mb-3">
+                        <label for="checkoutCustomerId">Customer ID</label>
+                        <input class="form-control" id="checkoutCustomerId" required type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="checkoutCopyId">Copy ID</label>
+                        <input class="form-control" id="checkoutCopyId" required type="number">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="processCheckout()">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Return Modal -->
+    <div class="modal fade" id="returnModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Return Copy</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert" id="returnMessage" style="display:none"></div>
+                    <div class="mb-3">
+                        <label for="returnCustomerId">Customer ID</label>
+                        <input class="form-control" id="returnCustomerId" required type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="returnCopyId">Copy ID</label>
+                        <input class="form-control" id="returnCopyId" required type="number">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="processReturn()">Return</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Copies Modal -->
+    <div class="modal fade" id="addCopiesModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Add Copies</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert" id="addCopiesMessage" style="display:none"></div>
+                    <div class="mb-3">
+                        <label for="addCopiesIsbn">Book ISBN</label>
+                        <input class="form-control" id="addCopiesIsbn" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="addCopiesQuantity">Quantity</label>
+                        <input class="form-control" id="addCopiesQuantity" max="100" min="1" required type="number"
+                               value="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="addCopies()">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function viewCopy(button) {
             const id = button.dataset.id;
             window.open('/api/admin/copies/' + id);
+        }
+
+        async function processCheckout() {
+            const customerId = document.getElementById('checkoutCustomerId').value;
+            const copyId = document.getElementById('checkoutCopyId').value;
+
+            const response = await fetch('/api/desk/checkout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    copyId: parseInt(copyId),
+                    customerId: parseInt(customerId)
+                })
+            });
+
+            const msg = document.getElementById('checkoutMessage');
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+                location.reload();
+            } else {
+                const errorData = await response.json();
+                msg.className = 'alert alert-danger';
+                msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error processing checkout';
+            }
+            msg.style.display = 'block';
+        }
+
+        async function processReturn() {
+            const customerId = document.getElementById('returnCustomerId').value;
+            const copyId = document.getElementById('returnCopyId').value;
+
+            const response = await fetch('/api/desk/return', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    copyId: parseInt(copyId),
+                    customerId: parseInt(customerId)
+                })
+            });
+
+            const msg = document.getElementById('returnMessage');
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('returnModal')).hide();
+                location.reload();
+            } else {
+                const errorData = await response.json();
+                msg.className = 'alert alert-danger';
+                msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error processing return';
+            }
+            msg.style.display = 'block';
+        }
+
+        async function addCopies() {
+            const isbn = document.getElementById('addCopiesIsbn').value;
+            const quantity = document.getElementById('addCopiesQuantity').value;
+
+            const response = await fetch('/api/admin/copies', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    bookIsbn: isbn,
+                    quantity: parseInt(quantity)
+                })
+            });
+
+            const msg = document.getElementById('addCopiesMessage');
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('addCopiesModal')).hide();
+                location.reload();
+            } else {
+                const errorData = await response.json();
+                msg.className = 'alert alert-danger';
+                msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error adding copies';
+            }
+            msg.style.display = 'block';
         }
     </script>
 </div>
