@@ -110,7 +110,13 @@
             </td>
             <td th:text="${copy.status}">-</td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick="viewCopy(this)" th:data-id="${copy.id}">View
+                <button class="btn btn-sm btn-primary" onclick="viewCopy(this)" th:data-id="${copy.id}">View</button>
+                <button class="btn btn-sm btn-danger"
+                        onclick="confirmMarkLost(this)"
+                        th:data-id="${copy.id}"
+                        th:data-title="${copy.book.title}"
+                        th:disabled="${copy.status.name() == 'LOST'}">
+                    Mark Lost
                 </button>
             </td>
         </tr>
@@ -263,10 +269,107 @@
         </div>
     </div>
 
+    <!-- Mark Lost Confirmation Modal -->
+    <div class="modal fade" id="markLostModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Mark Copy as Lost</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <strong>Warning:</strong> This will permanently mark the copy as lost and remove it from
+                        available inventory.
+                    </div>
+                    <p>Copy ID: <strong id="lostCopyId"></strong></p>
+                    <p>Book: <strong id="lostBookTitle"></strong></p>
+                    <div class="mb-3">
+                        <label for="confirmLostText">Type "lost" to confirm:</label>
+                        <input autocomplete="off" class="form-control" id="confirmLostText" type="text">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" disabled id="confirmLostButton" onclick="markCopyLost()">Mark as
+                        Lost
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast" id="successToast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto">Success</strong>
+                <button class="btn-close" data-bs-dismiss="toast" type="button"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Operation completed successfully
+            </div>
+        </div>
+    </div>
+
     <script>
         function viewCopy(button) {
             const id = button.dataset.id;
             window.open('/api/admin/copies/' + id);
+        }
+
+        function showToast(message) {
+            document.getElementById('toastMessage').textContent = message;
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
+        }
+
+        // Check for success message on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const successMessage = sessionStorage.getItem('successMessage');
+            if (successMessage) {
+                showToast(successMessage);
+                sessionStorage.removeItem('successMessage');
+            }
+
+            // Enable/disable mark lost button based on input
+            document.getElementById('confirmLostText').addEventListener('input', function () {
+                const button = document.getElementById('confirmLostButton');
+                button.disabled = this.value.toLowerCase() !== 'lost';
+            });
+        });
+
+        function confirmMarkLost(button) {
+            const copyId = button.dataset.id;
+            const bookTitle = button.dataset.title;
+
+            document.getElementById('lostCopyId').textContent = copyId;
+            document.getElementById('lostBookTitle').textContent = bookTitle;
+            document.getElementById('confirmLostText').value = '';
+            document.getElementById('confirmLostButton').disabled = true;
+
+            const modal = new bootstrap.Modal(document.getElementById('markLostModal'));
+            modal.show();
+        }
+
+        async function markCopyLost() {
+            const copyId = document.getElementById('lostCopyId').textContent;
+
+            const response = await fetch('/api/desk/mark-lost', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    copyId: parseInt(copyId)
+                })
+            });
+
+            if (response.ok) {
+                sessionStorage.setItem('successMessage', 'Copy marked as lost');
+                location.reload();
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || 'Error marking copy as lost');
+            }
         }
 
         async function processCheckout() {
@@ -282,16 +385,16 @@
                 })
             });
 
-            const msg = document.getElementById('checkoutMessage');
             if (response.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+                sessionStorage.setItem('successMessage', 'Checkout completed successfully');
                 location.reload();
             } else {
                 const errorData = await response.json();
+                const msg = document.getElementById('checkoutMessage');
                 msg.className = 'alert alert-danger';
                 msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error processing checkout';
+                msg.style.display = 'block';
             }
-            msg.style.display = 'block';
         }
 
         async function processReturn() {
@@ -307,16 +410,16 @@
                 })
             });
 
-            const msg = document.getElementById('returnMessage');
             if (response.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('returnModal')).hide();
+                sessionStorage.setItem('successMessage', 'Return completed successfully');
                 location.reload();
             } else {
                 const errorData = await response.json();
+                const msg = document.getElementById('returnMessage');
                 msg.className = 'alert alert-danger';
                 msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error processing return';
+                msg.style.display = 'block';
             }
-            msg.style.display = 'block';
         }
 
         async function addCopies() {
@@ -332,16 +435,16 @@
                 })
             });
 
-            const msg = document.getElementById('addCopiesMessage');
             if (response.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('addCopiesModal')).hide();
+                sessionStorage.setItem('successMessage', 'Copies added successfully');
                 location.reload();
             } else {
                 const errorData = await response.json();
+                const msg = document.getElementById('addCopiesMessage');
                 msg.className = 'alert alert-danger';
                 msg.innerHTML = errorData.error || Object.values(errorData).join('<br>') || 'Error adding copies';
+                msg.style.display = 'block';
             }
-            msg.style.display = 'block';
         }
     </script>
 </div>

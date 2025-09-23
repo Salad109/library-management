@@ -36,6 +36,6 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
     @Query("SELECT c.id FROM Copy c WHERE c.book.title ILIKE CONCAT('%', :title, '%') ORDER BY c.id")
     Page<Long> findIdsByBookTitle(@Param("title") String title, Pageable pageable);
 
-        @Query("SELECT c.id FROM Copy c WHERE c.customer.lastName ILIKE CONCAT('%', :lastName, '%') ORDER BY c.id")
+    @Query("SELECT c.id FROM Copy c WHERE c.customer.lastName ILIKE CONCAT('%', :lastName, '%') ORDER BY c.id")
     Page<Long> findIdsByCustomerLastName(@Param("lastName") String lastName, Pageable pageable);
 }
