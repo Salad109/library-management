@@ -96,10 +96,13 @@ public class AdminWebController {
             model.addAttribute("searchType", "");
         } else {
             switch (searchType) {
+                case "title":
+                    copies = copyService.getCopiesByBookTitle(cleanQuery, pageable);
+                    break;
                 case "isbn":
                     copies = copyService.getCopiesByBookIsbn(cleanQuery, pageable);
                     break;
-                case "customer":
+                case "customerId":
                     try {
                         Long customerId = Long.parseLong(cleanQuery);
                         copies = copyService.getCopiesByCustomerId(customerId, pageable);
@@ -107,8 +110,8 @@ public class AdminWebController {
                         copies = Page.empty(pageable);
                     }
                     break;
-                case "title":
-                    copies = copyService.getCopiesByBookTitle(cleanQuery, pageable);
+                case "customerLastName":
+                    copies = copyService.getCopiesByCustomerLastName(cleanQuery, pageable);
                     break;
                 default:
                     copies = copyService.getAllCopies(pageable);

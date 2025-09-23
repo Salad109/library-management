@@ -106,6 +106,24 @@ public class CopyService {
         return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
+    public Page<Copy> getCopiesByCustomerLastName(String lastName, Pageable pageable) {
+        log.debug("Fetching copies for customer last name: {}, page: {}, size: {}",
+                lastName, pageable.getPageNumber(), pageable.getPageSize());
+
+        Page<Long> idPage = copyRepository.findIdsByCustomerLastName(lastName, pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No copies found for customer last name: {}", lastName);
+            return Page.empty(pageable);
+        }
+
+        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+        log.debug("Retrieved {} copies for customer last name: {} out of {} total",
+                copies.size(), lastName, idPage.getTotalElements());
+
+        return new PageImpl<>(copies, pageable, idPage.getTotalElements());
+    }
+
     @Transactional
     public List<Copy> addCopies(String isbn, int quantity) {
         log.debug("Adding {} copies for book with ISBN: {}", quantity, isbn);

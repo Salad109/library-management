@@ -19,20 +19,30 @@
                        placeholder="Enter search term..."
                        th:value="${searchQuery}"
                        type="text">
-                <button class="btn btn-primary me-1" name="searchType" th:classappend="${searchType == 'title'} ? 'active' : ''"
+                <button class="btn btn-primary me-1" name="searchType"
+                        th:classappend="${searchType == 'title'} ? 'active' : ''"
                         type="submit"
                         value="title">
                     Search by Title
                 </button>
-                <button class="btn btn-primary me-1" name="searchType" th:classappend="${searchType == 'isbn'} ? 'active' : ''"
+                <button class="btn btn-primary me-1" name="searchType"
+                        th:classappend="${searchType == 'isbn'} ? 'active' : ''"
                         type="submit"
                         value="isbn">
                     Get by ISBN
                 </button>
-                <button class="btn btn-primary me-1" name="searchType" th:classappend="${searchType == 'customer'} ? 'active' : ''"
+                <button class="btn btn-primary me-1" name="searchType"
+                        th:classappend="${searchType == 'customerId'} ? 'active' : ''"
                         type="submit"
-                        value="customer">
+                        value="customerId">
                     Get by Customer ID
+                </button>
+                <button class="btn btn-primary me-1"
+                        name="searchType"
+                        th:classappend="${searchType == 'customerLastName'} ? 'active' : ''"
+                        type="submit"
+                        value="customerLastName">
+                    Search by Customer Last Name
                 </button>
                 <a class="btn btn-outline-secondary" th:href="@{/admin/copies/browse}">
                     Clear
@@ -45,12 +55,14 @@
     <div class="mb-3">
         <span class="text-muted" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
             <span th:switch="${searchType}">
-                <span th:case="'title'">Showing copies for books with title containing: "<strong
-                        th:text="${searchQuery}"></strong>"</span>
-                <span th:case="'isbn'">Showing copies for book with ISBN: "<strong
-                        th:text="${searchQuery}"></strong>"</span>
-                <span th:case="'customer'">Showing copies for customer ID: <strong
-                        th:text="${searchQuery}"></strong></span>
+                <span th:case="'title'">Showing copies for books with title containing: "<span
+                        th:text="${searchQuery}"></span>"</span>
+                <span th:case="'isbn'">Showing copies for book with ISBN: "<span
+                        th:text="${searchQuery}"></span>"</span>
+                <span th:case="'customerId'">Showing copies for customer ID: <span
+                        th:text="${searchQuery}"></span></span>
+                <span th:case="'customerLastName'">Showing copies for customers with last name containing: "<span
+                        th:text="${searchQuery}"></span>"</span>
             </span>
         </span>
         <span class="text-muted" th:if="${searchQuery == null or searchQuery.isEmpty()}">
@@ -148,7 +160,7 @@
 
     <!-- Page and item range info -->
     <div class="text-center text-muted">
-        Showing [[${startItem}]]–[[${endItem}]] of [[${copyCount}]] copies<br>
+        Showing [[${startItem}]]-[[${endItem}]] of [[${copyCount}]] copies<br>
         Page [[${currentPage + 1}]] of [[${totalPages}]]
     </div>
 
