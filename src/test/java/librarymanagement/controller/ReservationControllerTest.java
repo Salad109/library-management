@@ -16,18 +16,20 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
+import java.util.concurrent.CountDownLatch;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Transactional
 class ReservationControllerTest {
 
     @Autowired
     private MockMvcTester mockMvcTester;
 
     @Test
+    @Transactional
     void testMyReservations() {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
@@ -48,12 +50,13 @@ class ReservationControllerTest {
     }
 
     @Test
+    @Transactional
     void testCreateReservation() throws Exception {
         // Create a librarian and add a book and a copy
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1");
         assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian");
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian1");
         assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
 
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
@@ -98,6 +101,137 @@ class ReservationControllerTest {
     }
 
     @Test
+    void testCreateConcurrentReservations() throws Exception {
+        // Create a librarian and add a book and a copy
+        String isbn = "9783213211230";
+
+        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarianCon");
+        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarianCon");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
+
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        assertThat(librarianSession).isNotNull();
+
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Test Book", "Author Name"))
+                .hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
+        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
+
+        String reservationJson = """
+                {
+                    "bookIsbn": "%s"
+                }
+                """.formatted(isbn);
+
+        // Setup latches to coordinate customer threads
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(2);
+
+        MvcTestResult[] results = new MvcTestResult[2];
+        Exception[] exceptions = new Exception[2];
+
+        // Customer A reservation thread
+        Thread customerAThread = new Thread(() -> {
+            try {
+                startLatch.await();
+
+                // Register and login
+                MvcTestResult regResult = ControllerTestUtils.registerCustomer(mockMvcTester, "customerACon", "Joe", "Mama");
+                if (regResult.getResponse().getStatus() != HttpStatus.CREATED.value()) {
+                    exceptions[0] = new RuntimeException("Failed to register customerA");
+                    return;
+                }
+
+                MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "customerACon");
+                if (loginResult.getResponse().getStatus() != HttpStatus.OK.value()) {
+                    exceptions[0] = new RuntimeException("Failed to login customerA");
+                    return;
+                }
+
+                MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
+
+                results[0] = mockMvcTester.post()
+                        .uri("/api/reservations")
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reservationJson)
+                        .exchange();
+            } catch (Exception e) {
+                exceptions[0] = e;
+            } finally {
+                doneLatch.countDown();
+            }
+        });
+
+        // Customer B reservation thread
+        Thread customerBThread = new Thread(() -> {
+            try {
+                startLatch.await();
+
+                // Register and login customer
+                MvcTestResult regResult = ControllerTestUtils.registerCustomer(mockMvcTester, "customerBCon", "Jane", "Mama");
+                if (regResult.getResponse().getStatus() != HttpStatus.CREATED.value()) {
+                    exceptions[1] = new RuntimeException("Failed to register customerB");
+                    return;
+                }
+
+                MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "customerBCon");
+                if (loginResult.getResponse().getStatus() != HttpStatus.OK.value()) {
+                    exceptions[1] = new RuntimeException("Failed to login customerB");
+                    return;
+                }
+
+                MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
+
+                results[1] = mockMvcTester.post()
+                        .uri("/api/reservations")
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reservationJson)
+                        .exchange();
+            } catch (Exception e) {
+                exceptions[1] = e;
+            } finally {
+                doneLatch.countDown();
+            }
+        });
+
+        // Start both threads simultaneously
+        customerAThread.start();
+        customerBThread.start();
+        startLatch.countDown();
+
+        // Wait to complete
+        doneLatch.await();
+
+        if (exceptions[0] != null) throw exceptions[0];
+        if (exceptions[1] != null) throw exceptions[1];
+
+        int successCount = 0;
+        int failureCount = 0;
+
+        for (MvcTestResult result : results) {
+            if (result.getResponse().getStatus() == HttpStatus.CREATED.value()) {
+                successCount++;
+                assertThat(result)
+                        .bodyJson()
+                        .extractingPath("id")
+                        .isEqualTo(ControllerTestUtils.extractIdFromResponseArray(copyCreationResult));
+            } else if (result.getResponse().getStatus() == HttpStatus.NOT_FOUND.value()) {
+                failureCount++;
+            }
+        }
+
+        // Exactly one should succeed and fail
+        assertThat(successCount).isEqualTo(1);
+        assertThat(failureCount).isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
     void testCreateInvalidReservations() {
         MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
         assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
@@ -145,6 +279,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @Transactional
     void testCancelOtherCustomersReservation() throws Exception {
         // Create a librarian and add a book and a copy
         MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");
@@ -215,6 +350,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(roles = "LIBRARIAN")
     void testLibrarianCannotReserve() {
         String reservationJson = """
@@ -233,6 +369,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @Transactional
     void testCancelReservation() throws Exception {
         // Create a librarian and add a book and a copy
         MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");
@@ -285,6 +422,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @Transactional
     void testCancelInvalidReservations() throws Exception {
         // Create a librarian and add a book and a copy
         MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");

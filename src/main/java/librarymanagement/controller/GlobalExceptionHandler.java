@@ -5,6 +5,7 @@ import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -39,8 +40,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException ex) {
+    @ExceptionHandler({ResourceNotFoundException.class, OptimisticLockingFailureException.class})
+    public ResponseEntity<Map<String, String>> handleResourceNotFound(Exception ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);

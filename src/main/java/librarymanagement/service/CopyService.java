@@ -10,9 +10,12 @@ import librarymanagement.model.Customer;
 import librarymanagement.repository.CopyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -187,6 +190,7 @@ public class CopyService {
     }
 
     @Transactional
+    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50))
     public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.debug("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
         Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
@@ -196,20 +200,17 @@ public class CopyService {
         }
 
         Copy copyToReserve = availableCopy.get();
+        long copyId = copyToReserve.getId();
         log.debug("Reserving copy with ID: {} for customer ID: {}", copyToReserve.getId(), customerId);
-        return reserveCopy(copyToReserve.getId(), customerId);
-    }
 
-    private Copy reserveCopy(Long copyId, Long customerId) {
-        Copy existingCopy = getCopyOrThrow(copyId);
         Customer customer = customerService.getCustomerById(customerId);
+        Book book = copyToReserve.getBook();
 
-        Book book = existingCopy.getBook();
+        copyToReserve.setCustomer(customer);
+        copyToReserve.setStatus(CopyStatus.RESERVED);
+        Copy savedCopy = copyRepository.save(copyToReserve);
+
         bookService.updateAvailableCopies(book.getIsbn(), -1);
-
-        existingCopy.setCustomer(customer);
-        existingCopy.setStatus(CopyStatus.RESERVED);
-        Copy savedCopy = copyRepository.save(existingCopy);
         log.info("Copy with ID: {} reserved for customer ID: {}", copyId, customerId);
         return savedCopy;
     }

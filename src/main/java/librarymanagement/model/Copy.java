@@ -11,6 +11,9 @@ public class Copy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @JoinColumn(nullable = false)
     @NotNull(message = Messages.COPY_BOOK_VALIDATION_MESSAGE)
     @ManyToOne
