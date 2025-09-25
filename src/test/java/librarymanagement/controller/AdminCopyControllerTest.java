@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -85,7 +86,7 @@ class AdminCopyControllerTest {
 
     @Test
     void testGetCopyById() throws Exception {
-        String isbn = "9781234567890";
+        String isbn = TestISBNGenerator.next();
         // Create the book and a copy first
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
                 .hasStatus(HttpStatus.CREATED);
@@ -114,7 +115,7 @@ class AdminCopyControllerTest {
 
     @Test
     void testGetCopiesByBookIsbn() {
-        String isbn = "9781234567890";
+        String isbn = TestISBNGenerator.next();
         // Create the book and some copies first
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
                 .hasStatus(HttpStatus.CREATED);

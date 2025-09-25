@@ -3,6 +3,7 @@ package librarymanagement.controller;
 import jakarta.transaction.Transactional;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,17 +47,18 @@ class DeskControllerTest {
         assertThat(librarianSession).isNotNull();
 
         // Create book
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9781234567890", "Test Book", "Test Author");
+        String isbn = TestISBNGenerator.next();
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Checkout Book", "Checkout Author");
         assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Create a copy to be reserved and checked out
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         int reservedCopyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create another copy for unreserved checkout
-        MvcTestResult secondCopyResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        MvcTestResult secondCopyResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
         assertThat(secondCopyResult).hasStatus(HttpStatus.CREATED);
 
         int unreservedCopyId = ControllerTestUtils.extractIdFromResponseArray(secondCopyResult);
@@ -76,9 +78,9 @@ class DeskControllerTest {
         // Customer reserves a copy
         String reservationJson = """
                 {
-                    "bookIsbn": "9781234567890"
+                    "bookIsbn": "%s"
                 }
-                """;
+                """.formatted(isbn);
 
         MvcTestResult reservationResult = mockMvcTester.post()
                 .uri("/api/reservations")
@@ -160,10 +162,11 @@ class DeskControllerTest {
         assertThat(librarianSession).isNotNull();
 
         // Create book and copy
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9787654321098", "Return Test Book", "Return Author");
+        String isbn = TestISBNGenerator.next();
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Return Book", "Return Author");
         assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9787654321098", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
@@ -233,16 +236,17 @@ class DeskControllerTest {
         assertThat(librarianSession).isNotNull();
 
         // Create book and copy
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9785555555555", "Not Borrowed Book", "Some Author");
+        String isbn = TestISBNGenerator.next();
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Not Borrowed Book", "Not Borrowed Author");
         assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9785555555555", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Register customer
-        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "bob", "Bob", "Smith");
+        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "baby joe", "Joe Jr", "Mama");
         assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
 
         int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
@@ -278,10 +282,11 @@ class DeskControllerTest {
         assertThat(librarianSession).isNotNull();
 
         // Create book and copy
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, "9783333333333", "Lost Book", "Lost Author");
+        String isbn = TestISBNGenerator.next();
+        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Lost Book", "Lost Author");
         assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9783333333333", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);

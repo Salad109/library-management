@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -23,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationControllerTest {
 
     @Autowired
@@ -62,10 +65,11 @@ class ReservationControllerTest {
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
         assertThat(librarianSession).isNotNull();
 
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, "9781234567890", "Test Book", "Author Name"))
+        String isbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Test Book", "Author Name"))
                 .hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
@@ -82,9 +86,9 @@ class ReservationControllerTest {
 
         String reservationJson = """
                 {
-                    "bookIsbn": "9781234567890"
+                    "bookIsbn": "%s"
                 }
-                """;
+                """.formatted(isbn);
 
         MvcTestResult reservationResult = mockMvcTester.post()
                 .uri("/api/reservations")
@@ -291,10 +295,11 @@ class ReservationControllerTest {
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
         assertThat(librarianSession).isNotNull();
 
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, "9781234567890", "Test Book", "Author Name"))
+        String isbn2 = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn2, "Test Book", "Author Name"))
                 .hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn2, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Customer A reserves a book
@@ -311,9 +316,9 @@ class ReservationControllerTest {
 
         String reservationJson = """
                 {
-                    "bookIsbn": "9781234567890"
+                    "bookIsbn": "%s"
                 }
-                """;
+                """.formatted(isbn2);
 
         MvcTestResult reservationResult = mockMvcTester.post()
                 .uri("/api/reservations")
@@ -353,11 +358,12 @@ class ReservationControllerTest {
     @Transactional
     @WithMockUser(roles = "LIBRARIAN")
     void testLibrarianCannotReserve() {
+        String isbn3 = TestISBNGenerator.next();
         String reservationJson = """
                 {
-                    "bookIsbn": "9781234567890"
+                    "bookIsbn": "%s"
                 }
-                """;
+                """.formatted(isbn3);
 
         MvcTestResult result = mockMvcTester.post()
                 .uri("/api/reservations")
@@ -381,10 +387,11 @@ class ReservationControllerTest {
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
         assertThat(librarianSession).isNotNull();
 
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, "9781234567890", "Test Book", "Author Name"))
+        String isbn4 = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn4, "Test Book", "Author Name"))
                 .hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn4, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Create a customer and make a reservation
@@ -399,9 +406,9 @@ class ReservationControllerTest {
 
         String reservationJson = """
                 {
-                    "bookIsbn": "9781234567890"
+                    "bookIsbn": "%s"
                 }
-                """;
+                """.formatted(isbn4);
 
         MvcTestResult reservationResult = mockMvcTester.post()
                 .uri("/api/reservations")
@@ -434,10 +441,11 @@ class ReservationControllerTest {
         MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
         assertThat(librarianSession).isNotNull();
 
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, "9781234567890", "Test Book", "Author Name"))
+        String isbn5 = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn5, "Test Book", "Author Name"))
                 .hasStatus(HttpStatus.CREATED);
 
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, "9781234567890", 1);
+        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn5, 1);
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         int nonReservedCopyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);

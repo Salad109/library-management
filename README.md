@@ -11,8 +11,8 @@ role-based authentication, and real-time monitoring.
 - Book management with ISBN validation and author relationships
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
-- Customer management
-- Borrowing and reservation system with optimistic locking to prevent concurrency issues
+- Customer management with borrowing and reservation capabilities
+- Optimistic locking and retry mechanisms to prevent concurrency issues
 - Authentication and authorization with Spring Security and password hashing
 - Comprehensive integration and unit testing
 - Application monitoring with Prometheus and Grafana

@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.BookTestData;
 import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -73,7 +74,7 @@ class AdminBookControllerTest {
 
     @Test
     void testUpdateNonExistentBook() {
-        String isbn = "9784567891230"; // Nonexistent ISBN
+        String isbn = TestISBNGenerator.next(); // Nonexistent ISBN
         MvcTestResult result = mockMvcTester.put()
                 .uri("/api/admin/books/" + isbn)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +115,7 @@ class AdminBookControllerTest {
 
     @Test
     void testDeleteNonExistentBook() {
-        String isbn = "9784567891230"; // Nonexistent ISBN
+        String isbn = TestISBNGenerator.next(); // Nonexistent ISBN
 
         assertThat(mockMvcTester.delete().uri("/api/admin/books/" + isbn))
                 .hasStatus(HttpStatus.NOT_FOUND)

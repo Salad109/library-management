@@ -2,6 +2,7 @@ package librarymanagement.controller;
 
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,10 +57,10 @@ class BookControllerTest {
     @Test
     @WithMockUser(roles = "LIBRARIAN")
     void searchBook() {
-        String isbn = "777888999X";
+        String isbn = TestISBNGenerator.next();
         String title = "1984";
         // Create the book first
-        assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, title, "George Orwell"))
+        assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, title, "Jorjor Wel"))
                 .hasStatus(HttpStatus.CREATED);
 
         // Search by title
