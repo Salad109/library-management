@@ -12,10 +12,15 @@ role-based authentication, and real-time monitoring.
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
 - Customer management
-- Borrowing and reservation system
+- Borrowing and reservation system with optimistic locking to prevent concurrency issues
 - Authentication and authorization with Spring Security and password hashing
-- Application monitoring with Prometheus and Grafana
 - Comprehensive integration and unit testing
+- Application monitoring with Prometheus and Grafana
+- Detailed API documentation with Swagger
+- Docker Compose setup for easy deployment
+- Caching book catalog with Caffeine
+- Logs in JSON format with MDC
+- CI with GitHub Actions
 - Frontend for staff operations using Thymeleaf and Bootstrap
 
 ## Tech Stack
@@ -135,6 +140,6 @@ exampleRequests/
     - [x] Books
     - [x] Copies
     - [x] Customers
-- [ ] Desk operations panel
+- [x] Concurrency protection
 - [ ] Enhance admin panel with HTMX
 - [ ] Deployment

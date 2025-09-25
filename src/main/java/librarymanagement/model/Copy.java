@@ -1,5 +1,6 @@
 package librarymanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import librarymanagement.constants.Messages;
@@ -12,6 +13,7 @@ public class Copy {
     private Long id;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @JoinColumn(nullable = false)
