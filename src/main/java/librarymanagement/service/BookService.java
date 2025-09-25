@@ -12,9 +12,13 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -94,6 +98,7 @@ public class BookService {
     @Caching(evict = {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
+    @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
     public Book addBook(Book book) {
         String authorNames = book.getFormattedAuthors();
         log.debug("Adding book: '{}' by [{}] (ISBN: {})", book.getTitle(), authorNames, book.getIsbn());
@@ -126,6 +131,7 @@ public class BookService {
         Book existingBook = optionalBook.get();
         String oldTitle = existingBook.getTitle();
         String oldAuthors = existingBook.getFormattedAuthors();
+        int oldYear = existingBook.getPublicationYear();
 
         existingBook.setAuthors(book.getAuthors());
         existingBook.setTitle(book.getTitle());
@@ -133,9 +139,9 @@ public class BookService {
 
         Book savedBook = bookRepository.save(existingBook);
 
-        log.info("Updated book (ISBN: {}): '{}' by [{}] to '{}' by [{}]",
-                isbn, oldTitle, oldAuthors,
-                savedBook.getTitle(), savedBook.getFormattedAuthors());
+        log.info("Updated book (ISBN: {}): '{}' {} by [{}] to '{}' {} by [{}]",
+                isbn, oldTitle, oldYear, oldAuthors,
+                savedBook.getTitle(), savedBook.getPublicationYear(), savedBook.getFormattedAuthors());
 
         return savedBook;
     }
@@ -143,6 +149,7 @@ public class BookService {
     @CachePut(value = "books", key = "#isbn")
     @CacheEvict(value = "book-pages", allEntries = true)
     @Transactional
+    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50))
     public Book updateAvailableCopies(String isbn, int delta) {
         log.debug("Updating available copies for ISBN: {} by delta: {}", isbn, delta);
 

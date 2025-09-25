@@ -38,6 +38,10 @@ public class Book {
     @Min(value = 0, message = Messages.BOOK_COPY_COUNT_VALIDATION_MESSAGE)
     private Integer availableCopies = 0;
 
+    @Version
+    @JsonIgnore
+    private Long version;
+
     public Book() {
         authors = new LinkedHashSet<>();
     }

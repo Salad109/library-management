@@ -8,9 +8,12 @@ import librarymanagement.model.Customer;
 import librarymanagement.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +58,7 @@ public class CustomerService {
         return existingCustomer;
     }
 
+    @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
     public Customer addCustomer(Customer customer) {
         log.debug("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());
         String email = customer.getEmail();

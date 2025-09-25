@@ -241,6 +241,7 @@ public class CopyService {
     }
 
     @Transactional
+    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
     public Copy checkout(Long copyId, Long customerId) {
         log.debug("Checking out copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy copy = getCopyOrThrow(copyId);
