@@ -58,6 +58,21 @@ public class CustomerService {
         return existingCustomer;
     }
 
+    public Page<Customer> getCustomersByLastName(String lastName, Pageable pageable) {
+        log.debug("Searching customers by last name: {}, page: {}, size: {}", lastName, pageable.getPageNumber(), pageable.getPageSize());
+
+        Page<Long> idPage = customerRepository.findIdsByLastName(lastName, pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No customers found with last name containing: {}", lastName);
+            return Page.empty(pageable);
+        }
+
+        List<Customer> customers = customerRepository.findByIds(idPage.getContent());
+        log.debug("Found {} customers with last name containing: {}", customers.size(), lastName);
+        return new PageImpl<>(customers, pageable, idPage.getTotalElements());
+    }
+
     @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
     public Customer addCustomer(Customer customer) {
         log.debug("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());

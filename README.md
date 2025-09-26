@@ -11,7 +11,8 @@ role-based authentication, and real-time monitoring.
 - Book management with ISBN validation and author relationships
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
-- Customer management with borrowing and reservation capabilities
+- Borrowing and reservation system with state transition validation
+- Customer management with offline and online accounts
 - Optimistic locking and retry mechanisms to prevent concurrency issues
 - Authentication and authorization with Spring Security and password hashing
 - Comprehensive integration and unit testing
@@ -49,7 +50,7 @@ cp .env.example .env
 # POSTGRES_DB=library_db
 
 # Start all services
-docker-compose up
+docker compose up
 ```
 
 The application runs on `http://localhost:8080`. API documentation is available

@@ -21,4 +21,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("SELECT c FROM Customer c " +
             "WHERE c.id IN :ids ORDER BY c.lastName, c.firstName")
     List<Customer> findByIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT c.id FROM Customer c WHERE c.lastName ILIKE CONCAT('%', :lastName, '%') ORDER BY c.lastName, c.firstName")
+    Page<Long> findIdsByLastName(@Param("lastName") String lastName, Pageable pageable);
 }

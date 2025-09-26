@@ -144,8 +144,17 @@ public class AdminWebController {
     }
 
     @GetMapping("/admin/customers/browse")
-    public String customerBrowsePage(Model model, Pageable pageable) {
-        Page<Customer> customers = customerService.getAllCustomers(pageable);
+    public String customerBrowsePage(Model model, Pageable pageable, @RequestParam(required = false) String q) {
+        Page<Customer> customers;
+
+        if (q != null && !q.trim().isEmpty()) {
+            customers = customerService.getCustomersByLastName(q.trim(), pageable);
+            model.addAttribute("searchQuery", q.trim());
+        } else {
+            customers = customerService.getAllCustomers(pageable);
+            model.addAttribute("searchQuery", "");
+        }
+
         model.addAttribute("customers", customers);
         model.addAttribute("customerCount", customers.getTotalElements());
 

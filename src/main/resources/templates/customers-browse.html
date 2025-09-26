@@ -9,7 +9,28 @@
 <div class="container">
     <h1>Customer Browser</h1>
 
-    <h2>Customer list</h2>
+        <!-- Search Form -->
+    <div class="col-4">
+        <form action="/admin/customers/browse" method="get">
+            <div class="input-group">
+                <input autocomplete="off" class="form-control"
+                       name="q" placeholder="Customer's last name..." th:value="${searchQuery}" type="text">
+                <button class="btn btn-primary" type="submit">Search</button>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/customers/browse}">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Info -->
+    <div class="mb-3">
+        <span class="text-muted" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+            Showing results for: "<span th:text="${searchQuery}"></span>"
+        </span>
+        <span class="text-muted" th:if="${searchQuery == null or searchQuery.isEmpty()}">
+            Showing all customers
+        </span>
+    </div>
+
     <table class="table table-striped table-hover">
         <thead>
         <tr>
@@ -53,14 +74,14 @@
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                 <a class="page-link"
                    tabindex="-1"
-                   th:href="@{/admin/customers/browse(page=${currentPage - 1})}">&laquo; Previous</a>
+                   th:href="@{/admin/customers/browse(page=${currentPage - 1}, q=${searchQuery})}">&laquo; Previous</a>
             </li>
 
             <!-- First page -->
             <li class="page-item"
                 th:classappend="${0 == currentPage} ? 'active'"
                 th:if="${startPage > 0}">
-                <a class="page-link" th:href="@{/admin/customers/browse(page=0)}">1</a>
+                <a class="page-link" th:href="@{/admin/customers/browse(page=0, q=${searchQuery})}">1</a>
             </li>
 
             <!-- Left ellipsis -->
@@ -73,7 +94,7 @@
                 th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="pageNum : ${#numbers.sequence(startPage, endPage)}">
                 <a class="page-link"
-                   th:href="@{/admin/customers/browse(page=${pageNum})}"
+                   th:href="@{/admin/customers/browse(page=${pageNum}, q=${searchQuery})}"
                    th:text="${pageNum + 1}"></a>
             </li>
 
@@ -87,14 +108,14 @@
                 th:classappend="${totalPages - 1 == currentPage} ? 'active'"
                 th:if="${endPage < totalPages - 1}">
                 <a class="page-link"
-                   th:href="@{/admin/customers/browse(page=${totalPages - 1})}"
+                   th:href="@{/admin/customers/browse(page=${totalPages - 1}, q=${searchQuery})}"
                    th:text="${totalPages}">Last</a>
             </li>
 
             <!-- Next button -->
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/admin/customers/browse(page=${currentPage + 1})}">Next &raquo;</a>
+                   th:href="@{/admin/customers/browse(page=${currentPage + 1}, q=${searchQuery})}">Next &raquo;</a>
             </li>
 
         </ul>
