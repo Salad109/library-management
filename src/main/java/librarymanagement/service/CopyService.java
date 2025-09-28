@@ -148,6 +148,7 @@ public class CopyService {
     }
 
     @Transactional
+    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
     public Copy returnCopy(Long copyId, Long customerId) {
         log.debug("Returning copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -173,6 +174,7 @@ public class CopyService {
     }
 
     @Transactional
+    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
     public Copy markLost(Long copyId) {
         log.debug("Marking copy with ID: {} as lost", copyId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -216,6 +218,7 @@ public class CopyService {
     }
 
     @Transactional
+    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
     public Copy cancelReservation(Long copyId, Long customerId) {
         log.debug("Cancelling reservation for copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -241,7 +244,7 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
+    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
     public Copy checkout(Long copyId, Long customerId) {
         log.debug("Checking out copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy copy = getCopyOrThrow(copyId);

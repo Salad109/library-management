@@ -33,6 +33,10 @@ public class Customer {
     @JsonIgnore
     private Set<Copy> copies;
 
+    @Version
+    @JsonIgnore
+    private Long version;
+
     public Customer() {
         copies = new LinkedHashSet<>();
     }
