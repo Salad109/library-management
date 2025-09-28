@@ -15,6 +15,8 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
     @Query("SELECT c.id FROM Customer c ORDER BY c.lastName, c.firstName")
     Page<Long> findAllIds(Pageable pageable);
 

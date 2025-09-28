@@ -12,7 +12,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -73,16 +72,13 @@ public class CustomerService {
         return new PageImpl<>(customers, pageable, idPage.getTotalElements());
     }
 
-    @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
+    @Retryable(retryFor = DataIntegrityViolationException.class, maxAttempts = 2)
     public Customer addCustomer(Customer customer) {
         log.debug("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());
         String email = customer.getEmail();
-        if (email != null && !email.isBlank()) {
-            Optional<Customer> duplicateCustomer = customerRepository.findByEmail(email);
-            if (duplicateCustomer.isPresent()) {
-                log.warn("Duplicate customer found with email: {}", email);
-                throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + email);
-            }
+        if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
+            log.warn("Duplicate customer found with email: {}", email);
+            throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + email);
         }
 
         Customer savedCustomer = customerRepository.save(customer);
