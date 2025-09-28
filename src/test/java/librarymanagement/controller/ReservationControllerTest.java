@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -25,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationControllerTest {
 
     @Autowired
@@ -66,7 +64,7 @@ class ReservationControllerTest {
         assertThat(librarianSession).isNotNull();
 
         String isbn = TestISBNGenerator.next();
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Test Book", "Author Name"))
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Reserved Book", "Reserved Author"))
                 .hasStatus(HttpStatus.CREATED);
 
         MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
@@ -156,6 +154,7 @@ class ReservationControllerTest {
                 }
 
                 MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
+                assertThat(session).isNotNull();
 
                 results[0] = mockMvcTester.post()
                         .uri("/api/reservations")
@@ -189,6 +188,7 @@ class ReservationControllerTest {
                 }
 
                 MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
+                assertThat(session).isNotNull();
 
                 results[1] = mockMvcTester.post()
                         .uri("/api/reservations")
@@ -296,7 +296,7 @@ class ReservationControllerTest {
         assertThat(librarianSession).isNotNull();
 
         String isbn2 = TestISBNGenerator.next();
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn2, "Test Book", "Author Name"))
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn2, "Evil Book", "Evil Author"))
                 .hasStatus(HttpStatus.CREATED);
 
         MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn2, 1);
@@ -388,7 +388,7 @@ class ReservationControllerTest {
         assertThat(librarianSession).isNotNull();
 
         String isbn4 = TestISBNGenerator.next();
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn4, "Test Book", "Author Name"))
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn4, "Cancelled Book", "Cancelled Author"))
                 .hasStatus(HttpStatus.CREATED);
 
         MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn4, 1);
@@ -442,7 +442,7 @@ class ReservationControllerTest {
         assertThat(librarianSession).isNotNull();
 
         String isbn5 = TestISBNGenerator.next();
-        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn5, "Test Book", "Author Name"))
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn5, "Broken Book", "Broken Author"))
                 .hasStatus(HttpStatus.CREATED);
 
         MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn5, 1);
