@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: library-management
+  datasource:
+    url: jdbc:postgresql://localhost:5432/library_management
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 12
+      minimum-idle: 4
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_batch_fetch_size: 20
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        max-page-size: 100
+springdoc:
+  swagger-ui:
+    operations-sorter: alpha
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+logging:
+  level:
+    root: WARN
+    librarymanagement: INFO

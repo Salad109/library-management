@@ -13,9 +13,7 @@
         </encoder>
     </appender>
 
-    <root level="WARN">
+    <root>
         <appender-ref ref="CONSOLE"/>
     </root>
-
-    <logger name="librarymanagement" level="DEBUG"/>
 </configuration>
