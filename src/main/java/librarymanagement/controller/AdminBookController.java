@@ -34,7 +34,7 @@ public class AdminBookController {
     @PostMapping("/api/admin/books")
     @ResponseStatus(HttpStatus.CREATED)
     public Book createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
-        return bookService.addBook(bookCreateRequest.toBook());
+        return bookService.addBook(bookCreateRequest);
     }
 
     @Operation(summary = "Update an existing book's details")
@@ -46,7 +46,7 @@ public class AdminBookController {
     })
     @PutMapping("/api/admin/books/{isbn}")
     public Book updateBook(@PathVariable String isbn, @Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
-        return bookService.updateBook(isbn, bookUpdateRequest.toBook());
+        return bookService.updateBook(isbn, bookUpdateRequest);
     }
 
     @Operation(summary = "Remove a book from the catalog")

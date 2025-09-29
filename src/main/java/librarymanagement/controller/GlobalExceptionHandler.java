@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleUnexpectedError(Exception ex, HttpServletRequest request) {
-        log.error("Unexpected error occurred during request to {} {}", request.getMethod(), request.getRequestURI(), ex);
+        log.error("Unexpected error occurred during request to {} {}: {}", request.getMethod(), request.getRequestURI(), ex.getMessage());
 
         Map<String, String> error = new HashMap<>();
         error.put("error", "An unexpected error occurred. Please try again later");

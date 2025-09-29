@@ -32,8 +32,9 @@ class BookRepositoryTest {
         assertThat(books).isEmpty();
 
         Author author = new Author("The Goober");
-        Book book = new Book("1112223334", "This is a title", Set.of(author), 2025);
+        testEntityManager.persistAndFlush(author);
 
+        Book book = new Book("1112223334", "This is a title", Set.of(author), 2025);
         testEntityManager.persistAndFlush(book);
 
         isbns = bookRepository.findAllIsbns(PageRequest.of(0, 10));
@@ -43,8 +44,10 @@ class BookRepositoryTest {
 
     @Test
     void testSearchBooksByTitle() {
-        // Create book
+        // Create author and book
         Author author = new Author("The Goober");
+        testEntityManager.persistAndFlush(author);
+
         Book book = new Book("112233445X", "The Goober Lore", Set.of(author), 2025);
 
         // Put book in the database

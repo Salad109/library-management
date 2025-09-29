@@ -2,9 +2,13 @@ package librarymanagement.service;
 
 import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
+import librarymanagement.dto.BookCreateRequest;
+import librarymanagement.dto.BookUpdateRequest;
 import librarymanagement.exception.DuplicateResourceException;
 import librarymanagement.exception.ResourceNotFoundException;
+import librarymanagement.model.Author;
 import librarymanagement.model.Book;
+import librarymanagement.repository.AuthorRepository;
 import librarymanagement.repository.BookRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +25,21 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class BookService {
 
     private static final Logger log = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
     }
 
     @Cacheable(value = "book-pages", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
@@ -99,14 +107,22 @@ public class BookService {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
     @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
-    public Book addBook(Book book) {
-        String authorNames = book.getFormattedAuthors();
-        log.debug("Adding book: '{}' by [{}] (ISBN: {})", book.getTitle(), authorNames, book.getIsbn());
+    public Book addBook(BookCreateRequest bookCreateRequest) {
+        String formattedAuthors = String.join(", ", bookCreateRequest.authorNames());
+        log.debug("Adding book: '{}' by [{}] (ISBN: {})", bookCreateRequest.title(), formattedAuthors, bookCreateRequest.isbn());
 
-        if (bookRepository.existsByIsbn(book.getIsbn())) {
-            log.warn("Attempted to add duplicate book with ISBN: {}", book.getIsbn());
-            throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + book.getIsbn());
+        if (bookRepository.existsByIsbn(bookCreateRequest.isbn())) {
+            log.warn("Attempted to add duplicate book with ISBN: {}", bookCreateRequest.isbn());
+            throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + bookCreateRequest.isbn());
         }
+
+        Book book = new Book();
+        book.setIsbn(bookCreateRequest.isbn());
+        book.setTitle(bookCreateRequest.title());
+        book.setPublicationYear(bookCreateRequest.publicationYear());
+
+        Set<Author> resolvedAuthors = resolveAuthors(bookCreateRequest.authorNames());
+        book.setAuthors(resolvedAuthors);
 
         Book savedBook = bookRepository.save(book);
         log.info("Successfully added book: '{}' (ISBN: {})", savedBook.getTitle(), savedBook.getIsbn());
@@ -119,7 +135,7 @@ public class BookService {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
-    public Book updateBook(String isbn, Book book) {
+    public Book updateBook(String isbn, BookUpdateRequest bookUpdateRequest) {
         log.debug("Updating book with ISBN: {}", isbn);
 
         Optional<Book> optionalBook = bookRepository.findById(isbn);
@@ -133,9 +149,10 @@ public class BookService {
         String oldAuthors = existingBook.getFormattedAuthors();
         int oldYear = existingBook.getPublicationYear();
 
-        existingBook.setAuthors(book.getAuthors());
-        existingBook.setTitle(book.getTitle());
-        existingBook.setPublicationYear(book.getPublicationYear());
+        Set<Author> resolvedAuthors = resolveAuthors(bookUpdateRequest.authorNames());
+        existingBook.setAuthors(resolvedAuthors);
+        existingBook.setTitle(bookUpdateRequest.title());
+        existingBook.setPublicationYear(bookUpdateRequest.publicationYear());
 
         Book savedBook = bookRepository.save(existingBook);
 
@@ -191,5 +208,23 @@ public class BookService {
 
         bookRepository.deleteById(isbn);
         log.info("Successfully deleted book: '{}' (ISBN: {})", title, isbn);
+    }
+
+    private Set<Author> resolveAuthors(Set<String> authorNames) {
+        Set<Author> authors = new LinkedHashSet<>();
+
+        for (String authorName : authorNames) {
+            Optional<Author> existingAuthor = authorRepository.findById(authorName);
+            if (existingAuthor.isPresent()) {
+                log.debug("Using existing author: {}", authorName);
+                authors.add(existingAuthor.get());
+            } else {
+                log.debug("Creating new author: {}", authorName);
+                Author savedAuthor = authorRepository.save(new Author(authorName));
+                authors.add(savedAuthor);
+            }
+        }
+
+        return authors;
     }
 }
