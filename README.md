@@ -68,9 +68,6 @@ via Swagger. Monitoring dashboard is available via Grafana and Prometheus.
 5. Select the created Prometheus data source
 6. Generate sample data by running `exampleRequests/complete-workflow.http`
 
-![Grafana dashboard screenshot](images/dashboard-screenshot.webp)
-Grafana dashboard screenshot during high load simulation using the config in `grafana/dashboard.json`.
-
 ## API Overview
 
 Full API Documentation and details are available at http://localhost:8080/swagger-ui/index.html. The API is organized
@@ -144,3 +141,17 @@ exampleRequests/
 - [x] Concurrency protection
 - [ ] Enhance admin panel with HTMX
 - [ ] Deployment
+
+## Gallery
+Book browsing page
+![](https://github.com/user-attachments/assets/de1e5a27-031c-4ee2-b841-a2b0b95eb057)
+Book adding form showcasing data validation
+![](https://github.com/user-attachments/assets/8cbd7744-e983-46ee-816b-94e2f8ed8681)
+Copy browsing page
+![](https://github.com/user-attachments/assets/38449a6c-95f3-45a6-9a75-de6939fff8a4)
+Copy checkout form
+![](https://github.com/user-attachments/assets/44070f8f-1ade-4554-8b98-d986bacba02f)
+Customer browsing page
+![](https://github.com/user-attachments/assets/e55750aa-2dd4-4edf-8680-38cef5afc4cc)
+Grafana dashboard during high load simulation using the config in `grafana/dashboard.json`.
+![](https://github.com/user-attachments/assets/4735967b-be79-4f21-970d-33bcfbd1bebf)
