@@ -2,17 +2,17 @@
 
 # Library Management System
 
-A library management system built with Spring Boot, featuring public book catalog
-browsing, customer self-service reservations, librarian workflow management,
-role-based authentication, and real-time monitoring.
+A library management system built with Spring Boot, split into public book catalog browsing, customer self-service
+reservations, and librarian workflow management.
 
 ## Features
 
-- Book management with ISBN validation and author relationships
+- Book management with data validation and author relationships
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
 - Borrowing and reservation system with state transition validation
-- Customer management with offline and online accounts
+- Customer management with offline and online account separation
+- Role-based access control (Librarian vs Customer vs Public)
 - Optimistic locking and retry mechanisms to prevent concurrency issues
 - Authentication and authorization with Spring Security and password hashing
 - Comprehensive integration and unit testing
@@ -53,12 +53,12 @@ cp .env.example .env
 docker compose up
 ```
 
-The application runs on `http://localhost:8080`. API documentation is available
-via Swagger. Monitoring dashboard is available via Grafana and Prometheus.
+The application runs on `http://localhost:8080`. API documentation is available via Swagger. Monitoring dashboard is
+available via Grafana and Prometheus. Access the staff panel at`http://localhost:8080/register`.
 
 ## Monitoring Setup Guide
 
-1. Visit Grafana at http://localhost:3000 (admin/admin)
+1. Visit Grafana at `http://localhost:3000` (admin/admin)
 2. Create a new data source:
     - Type: Prometheus
     - URL: `http://prometheus:9090`
@@ -143,6 +143,7 @@ exampleRequests/
 - [ ] Deployment
 
 ## Gallery
+
 Book browsing page
 ![](https://github.com/user-attachments/assets/de1e5a27-031c-4ee2-b841-a2b0b95eb057)
 Book adding form showcasing data validation
