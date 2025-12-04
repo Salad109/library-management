@@ -1,0 +1,61 @@
+package librarymanagement.authors;
+
+import librarymanagement.constants.Messages;
+import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestContainersConfig;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(TestContainersConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class AuthorControllerTest {
+
+    @Autowired
+    private MockMvcTester mockMvcTester;
+
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetAuthor() {
+        String authorName = "George Orwell";
+
+        // Author will be created when the book is created
+        assertThat(DataBuilder.createTestBook(mockMvcTester,
+                "123123123X",
+                "Book Title",
+                authorName))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertThat(mockMvcTester.get().uri("/api/authors/" + authorName))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("name")
+                .isEqualTo(authorName);
+    }
+
+    @Test
+    void testGetNonExistentAuthor() {
+        String nonExistentAuthorName = "Sir Goober";
+
+        MvcTestResult result = mockMvcTester.get().uri("/api/authors/" + nonExistentAuthorName).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.AUTHOR_NOT_FOUND + nonExistentAuthorName);
+    }
+}

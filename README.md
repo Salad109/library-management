@@ -36,8 +36,10 @@ reservations, and librarian workflow management.
 - Swagger for API documentation
 - Caffeine for caching
 - JUnit 5 + MockMvc for testing
+- Flyway for database migrations
+- Testcontainers for integration tests
+- Thymeleaf + Bootstrap for staff frontend
 - Maven
-- Thymeleaf + Bootstrap for frontend
 
 ## Starting Guide
 
@@ -139,8 +141,11 @@ exampleRequests/
     - [x] Copies
     - [x] Customers
 - [x] Concurrency protection
+- [x] Deployment
+- [x] Flyway migrations
+- [x] PostgreSQL testcontainers for integration tests
 - [ ] Enhance admin panel with HTMX
-- [ ] Deployment
+- [ ] Separate frontend for customers
 
 ## Gallery
 
