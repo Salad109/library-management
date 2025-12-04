@@ -194,7 +194,7 @@ public class CopyService {
     @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50))
     public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.debug("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
-        Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatus(isbn, CopyStatus.AVAILABLE);
+        Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusWithRelations(isbn, CopyStatus.AVAILABLE);
         if (availableCopy.isEmpty()) {
             log.info("No available copies found for book with ISBN: {}", isbn);
             throw new ResourceNotFoundException(Messages.COPY_NO_AVAILABLE + isbn);

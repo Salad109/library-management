@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,8 +20,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     @Query("SELECT c FROM Customer c " +
             "WHERE c.id IN :ids ORDER BY c.lastName, c.firstName")
-    List<Customer> findByIds(@Param("ids") List<Long> ids);
+    List<Customer> findByIds(List<Long> ids);
 
     @Query("SELECT c.id FROM Customer c WHERE c.lastName ILIKE CONCAT('%', :lastName, '%') ORDER BY c.lastName, c.firstName")
-    Page<Long> findIdsByLastName(@Param("lastName") String lastName, Pageable pageable);
+    Page<Long> findIdsByLastName(String lastName, Pageable pageable);
 }

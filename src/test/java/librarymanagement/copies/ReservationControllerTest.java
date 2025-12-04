@@ -4,11 +4,14 @@ import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
+import librarymanagement.utils.TestContainersConfig;
 import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -24,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(TestContainersConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ReservationControllerTest {
 
     @Autowired
@@ -218,18 +223,21 @@ class ReservationControllerTest {
         int failureCount = 0;
 
         for (MvcTestResult result : results) {
-            if (result.getResponse().getStatus() == HttpStatus.CREATED.value()) {
+            int status = result.getResponse().getStatus();
+
+            if (status == HttpStatus.CREATED.value()) {
                 successCount++;
                 assertThat(result)
                         .bodyJson()
                         .extractingPath("id")
                         .isEqualTo(ControllerTestUtils.extractIdFromResponseArray(copyCreationResult));
-            } else if (result.getResponse().getStatus() == HttpStatus.NOT_FOUND.value()) {
+            } else if (status == HttpStatus.NOT_FOUND.value() || status == HttpStatus.CONFLICT.value()) {
+                // NOT_FOUND when no copies available, CONFLICT on optimistic lock failure
                 failureCount++;
             }
         }
 
-        // Exactly one should succeed and fail
+        // Exactly one should succeed and one should fail
         assertThat(successCount).isEqualTo(1);
         assertThat(failureCount).isEqualTo(1);
     }
