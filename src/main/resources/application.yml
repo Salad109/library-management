@@ -10,16 +10,12 @@ spring:
       maximum-pool-size: 12
       minimum-idle: 4
   jpa:
-    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         default_batch_fetch_size: 20
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
+    open-in-view: false
   data:
     web:
       pageable:
