@@ -1,6 +1,5 @@
 package librarymanagement.copies;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
@@ -15,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,8 +54,7 @@ class AdminCopyControllerTest extends IntegrationTest {
             "'123456789X', 0, quantity, " + Messages.COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE,
             "'invalid-isbn',, bookIsbn, " + Messages.BOOK_ISBN_VALIDATION_MESSAGE
     })
-    void testCreateCopiesInvalidParameters(String isbn, Integer quantity, String errorField, String expectedMessage)
-            throws Exception {
+    void testCreateCopiesInvalidParameters(String isbn, Integer quantity, String errorField, String expectedMessage) {
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("bookIsbn", isbn);
         if (quantity != null) {

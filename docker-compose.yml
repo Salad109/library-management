@@ -12,15 +12,15 @@ services:
       - postgres
 
   postgres:
-    image: postgres:17
+    image: postgres:18
     env_file: .env
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.15.1
     ports:
       - "9090:9090"
     volumes:
@@ -29,7 +29,7 @@ services:
       - library-management-app
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.3.0
     ports:
       - "3000:3000"
     volumes:

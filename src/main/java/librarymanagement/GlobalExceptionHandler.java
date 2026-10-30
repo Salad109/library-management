@@ -1,6 +1,7 @@
 package librarymanagement;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // Reshapes Spring's ProblemDetail responses into a custom error format
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex,
-                                                             Object body,
+                                                             @Nullable Object body,
                                                              HttpHeaders headers,
                                                              HttpStatusCode statusCode,
                                                              WebRequest request) {

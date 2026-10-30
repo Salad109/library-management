@@ -8,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,7 +30,7 @@ public class UserService {
     }
 
     @Transactional
-    @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
+    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1, delay = 50)
     public User addUser(UserRegistrationRequest request) {
         log.debug("Adding new user with username: {}", request.username());
         Optional<User> existingUser = userRepository.findByUsername(request.username());

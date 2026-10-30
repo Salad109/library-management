@@ -13,8 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -148,7 +147,7 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public Copy returnCopy(Long copyId, Long customerId) {
         log.debug("Returning copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -174,7 +173,7 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public Copy markLost(Long copyId) {
         log.debug("Marking copy with ID: {} as lost", copyId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -192,7 +191,7 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50))
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
     public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.debug("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
         Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusWithRelations(isbn, CopyStatus.AVAILABLE);
@@ -218,7 +217,7 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public Copy cancelReservation(Long copyId, Long customerId) {
         log.debug("Cancelling reservation for copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -244,7 +243,7 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 2)
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public Copy checkout(Long copyId, Long customerId) {
         log.debug("Checking out copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy copy = getCopyOrThrow(copyId);

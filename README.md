@@ -26,7 +26,7 @@ reservations, and librarian workflow management.
 
 ## Tech Stack
 
-- Java 21 + Spring Boot 3.5
+- Java 25 + Spring Boot 4.1
 - JPA/Hibernate with PostgreSQL
 - Spring Security for authentication and role-based authorization
 - Slf4j + Logback for logging
@@ -35,7 +35,7 @@ reservations, and librarian workflow management.
 - Docker Compose for containerization
 - Swagger for API documentation
 - Caffeine for caching
-- JUnit 5 + MockMvc for testing
+- JUnit 6 + MockMvc for testing
 - Flyway for database migrations
 - Testcontainers for integration tests
 - Thymeleaf + Bootstrap for staff frontend

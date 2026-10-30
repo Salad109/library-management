@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -70,7 +70,7 @@ public class CustomerService {
         return new PageImpl<>(customers, pageable, idPage.getTotalElements());
     }
 
-    @Retryable(retryFor = DataIntegrityViolationException.class, maxAttempts = 2)
+    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1)
     public Customer addCustomer(Customer customer) {
         log.debug("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());
         String email = customer.getEmail();

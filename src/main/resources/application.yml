@@ -16,6 +16,9 @@ spring:
       hibernate:
         default_batch_fetch_size: 20
     open-in-view: false
+  jackson:
+    mapper:
+      sort-properties-alphabetically: false
   data:
     web:
       pageable:

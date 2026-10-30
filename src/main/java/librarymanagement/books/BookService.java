@@ -16,8 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -102,7 +101,7 @@ public class BookService {
     @Caching(evict = {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
-    @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 50), maxAttempts = 2)
+    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1, delay = 50)
     public Book addBook(BookCreateRequest bookCreateRequest) {
         String formattedAuthors = String.join(", ", bookCreateRequest.authorNames());
         log.debug("Adding book: '{}' by [{}] (ISBN: {})", bookCreateRequest.title(), formattedAuthors, bookCreateRequest.isbn());
@@ -162,7 +161,7 @@ public class BookService {
     @CachePut(value = "books", key = "#isbn")
     @CacheEvict(value = "book-pages", allEntries = true)
     @Transactional
-    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 50))
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
     public Book updateAvailableCopies(String isbn, int delta) {
         log.debug("Updating available copies for ISBN: {} by delta: {}", isbn, delta);
 
