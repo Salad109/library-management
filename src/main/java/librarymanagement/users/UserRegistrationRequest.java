@@ -2,6 +2,7 @@ package librarymanagement.users;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import librarymanagement.constants.Messages;
 
 public record UserRegistrationRequest(
@@ -10,7 +11,7 @@ public record UserRegistrationRequest(
         @NotNull(message = Messages.USER_ROLE_VALIDATION_MESSAGE) Role role,
         String firstName,
         String lastName,
-        String email) {
+        @Pattern(regexp = Messages.CUSTOMER_EMAIL_REGEX, message = Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE) String email) {
 
     public UserRegistrationRequest {
         if (username != null) {

@@ -54,6 +54,17 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testCreateBookWithBlankAuthor() {
+        MvcTestResult result = DataBuilder.createTestBook(mockMvcTester,
+                BookTestData.TestBook1.ISBN,
+                BookTestData.TestBook1.TITLE,
+                " ");
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("$['authorNames[]']").isEqualTo(Messages.AUTHOR_NAME_VALIDATION_MESSAGE);
+    }
+
+    @Test
     void testUpdateBook() {
         // Create a book to update
         assertThat(DataBuilder.createTestBook(mockMvcTester,

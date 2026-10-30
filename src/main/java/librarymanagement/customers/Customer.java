@@ -1,9 +1,6 @@
 package librarymanagement.customers;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import librarymanagement.constants.Messages;
 import librarymanagement.copies.Copy;
 
 import java.util.LinkedHashSet;
@@ -16,17 +13,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    @NotBlank(message = Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE)
     private String firstName;
 
-    @Column(nullable = false, length = 100)
-    @NotBlank(message = Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE)
     private String lastName;
 
-    @Column(unique = true, length = 150)
-    @Pattern(regexp = Messages.CUSTOMER_EMAIL_REGEX,
-            message = Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE)
     private String email;
 
     @OneToMany(mappedBy = "customer")

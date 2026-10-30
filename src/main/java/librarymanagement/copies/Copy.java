@@ -1,9 +1,7 @@
 package librarymanagement.copies;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import librarymanagement.books.Book;
-import librarymanagement.constants.Messages;
 import librarymanagement.customers.Customer;
 
 @Entity
@@ -16,16 +14,12 @@ public class Copy {
     @Version
     private Long version;
 
-    @JoinColumn(nullable = false)
-    @NotNull(message = Messages.COPY_BOOK_VALIDATION_MESSAGE)
     @ManyToOne
     private Book book;
 
     @ManyToOne
     private Customer customer;
 
-    @Column(length = 9)
-    @NotNull(message = Messages.COPY_STATUS_VALIDATION_MESSAGE)
     @Enumerated(EnumType.STRING)
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
 

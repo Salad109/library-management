@@ -26,8 +26,6 @@ public class Messages {
     public static final String COPY_NOT_RESERVED = "Copy is not currently reserved. Current status: ";
     public static final String COPY_UNAVAILABLE_FOR_CHECKOUT = "Copy is not available for checkout. Current status: ";
     public static final String COPY_RESERVED_FOR_ANOTHER_CUSTOMER = "Copy is reserved for another customer. Customer ID: ";
-    public static final String COPY_BOOK_VALIDATION_MESSAGE = "Book cannot be null";
-    public static final String COPY_STATUS_VALIDATION_MESSAGE = "Status cannot be null";
     public static final String COPY_MINIMUM_QUANTITY_VALIDATION_MESSAGE = "Minimum quantity must be at least 1";
     public static final String COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE = "Maximum quantity cannot exceed 100";
     // Customer

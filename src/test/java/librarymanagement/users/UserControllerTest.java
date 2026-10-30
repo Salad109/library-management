@@ -153,6 +153,32 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testRegisterCustomerInvalidEmail() {
+        String invalidEmailJson = """
+                {
+                    "username": "goober iii",
+                    "password": "goober123",
+                    "role": "ROLE_CUSTOMER",
+                    "firstName": "Goober",
+                    "lastName": "III",
+                    "email": "not-an-email"
+                }
+                """;
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidEmailJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("email")
+                .isEqualTo(Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE);
+    }
+
+    @Test
     void testAdminLoginFailure() {
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/admin/login")

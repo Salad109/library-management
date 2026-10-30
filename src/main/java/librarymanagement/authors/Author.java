@@ -1,9 +1,7 @@
 package librarymanagement.authors;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import librarymanagement.books.Book;
-import librarymanagement.constants.Messages;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,8 +10,6 @@ import java.util.Set;
 @Table(name = "authors")
 public class Author {
     @Id
-    @NotBlank(message = Messages.AUTHOR_NAME_VALIDATION_MESSAGE)
-    @Column(length = 100)
     private String name;
 
     @ManyToMany(mappedBy = "authors")

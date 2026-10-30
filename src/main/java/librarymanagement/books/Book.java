@@ -1,11 +1,7 @@
 package librarymanagement.books;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import librarymanagement.authors.Author;
-import librarymanagement.constants.Messages;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Formula;
 
@@ -17,22 +13,14 @@ import java.util.stream.Collectors;
 @Table(name = "books")
 public class Book {
     @Id
-    @Column(unique = true, length = 13)
-    @Pattern(
-            regexp = Messages.BOOK_ISBN_REGEX,
-            message = Messages.BOOK_ISBN_VALIDATION_MESSAGE
-    )
     private String isbn;
 
-    @Column(nullable = false, length = 150)
-    @NotBlank(message = Messages.BOOK_TITLE_VALIDATION_MESSAGE)
     private String title;
 
     @BatchSize(size = 20)
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Author> authors;
 
-    @Min(value = 1, message = Messages.BOOK_PUBLICATION_YEAR_VALIDATION_MESSAGE)
     private Integer publicationYear;
 
     @Formula("(SELECT COUNT(*) FROM copies c WHERE c.book_isbn = isbn AND c.status = 'AVAILABLE')")
@@ -52,7 +40,6 @@ public class Book {
         this.publicationYear = publicationYear;
     }
 
-    @Transient
     public String getFormattedAuthors() {
         return authors.stream()
                 .map(Author::getName)
