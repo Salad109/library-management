@@ -1,23 +1,15 @@
 package librarymanagement.web;
 
-import librarymanagement.utils.TestContainersConfig;
+import librarymanagement.utils.IntegrationTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import(TestContainersConfig.class)
-@ActiveProfiles("test")
 @WithMockUser(roles = "LIBRARIAN")
-class AdminWebControllerTest {
+class AdminWebControllerTest extends IntegrationTest {
 
     @Autowired
     private MockMvcTester mockMvcTester;
