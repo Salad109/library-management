@@ -25,7 +25,7 @@ public class BookController {
     @Operation(summary = "Get all books")
     @ApiResponse(responseCode = "200", description = "Books retrieved successfully")
     @GetMapping("/api/books")
-    public Page<Book> getAllBooks(Pageable pageable) {
+    public Page<BookResponse> getAllBooks(Pageable pageable) {
         return bookService.getAllBooks(pageable);
     }
 
@@ -35,7 +35,7 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Book not found with the given ISBN")
     })
     @GetMapping("/api/books/{isbn}")
-    public Book getBookByIsbn(@PathVariable String isbn) {
+    public BookResponse getBookByIsbn(@PathVariable String isbn) {
         return bookService.getBookByIsbn(isbn);
     }
 
@@ -43,7 +43,7 @@ public class BookController {
             description = "Simple search that looks for the term in both book titles and author names")
     @ApiResponse(responseCode = "200", description = "Books found matching the search term")
     @GetMapping("/api/books/search")
-    public Page<Book> searchBooks(@RequestParam(required = false) String q, Pageable pageable) {
+    public Page<BookResponse> searchBooks(@RequestParam(required = false) String q, Pageable pageable) {
         return bookService.searchBooks(q, pageable);
     }
 }

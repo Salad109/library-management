@@ -48,13 +48,13 @@
             <td th:text="${book.isbn}">-</td>
             <td th:text="${book.title}">-</td>
             <td th:text="${book.publicationYear}">-</td>
-            <td th:text="${book.getFormattedAuthors()}">-</td>
+            <td th:text="${book.formattedAuthors()}">-</td>
             <td th:text="${book.availableCopies}">-</td>
             <td>
                 <button class="btn btn-sm btn-primary" onclick="viewBook(this)" th:data-isbn="${book.isbn}">View
                 </button>
                 <button class="btn btn-sm btn-warning" onclick="editBook(this)"
-                        th:data-authors="${book.getFormattedAuthors()}"
+                        th:data-authors="${book.formattedAuthors()}"
                         th:data-isbn="${book.isbn}"
                         th:data-title="${book.title}"
                         th:data-year="${book.publicationYear}">Edit

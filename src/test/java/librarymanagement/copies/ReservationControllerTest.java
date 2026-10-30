@@ -416,7 +416,7 @@ class ReservationControllerTest extends IntegrationTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
 
-        assertThat(cancelResult).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(cancelResult).hasStatus(HttpStatus.NO_CONTENT).bodyText().isEmpty();
     }
 
     @Test

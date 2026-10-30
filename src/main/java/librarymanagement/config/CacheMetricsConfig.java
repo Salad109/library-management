@@ -4,24 +4,20 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CacheMetricsConfig {
 
     public CacheMetricsConfig(MeterRegistry meterRegistry, CacheManager cacheManager) {
-        if (cacheManager instanceof CaffeineCacheManager caffeineCacheManager) {
+        Gauge.builder("cache_hit_rate_total", () -> getTotalHitRate(cacheManager))
+                .register(meterRegistry);
 
-            Gauge.builder("cache_hit_rate_total", () -> getTotalHitRate(caffeineCacheManager))
-                    .register(meterRegistry);
-
-            Gauge.builder("cache_size_total", () -> getTotalSize(caffeineCacheManager))
-                    .register(meterRegistry);
-        }
+        Gauge.builder("cache_size_total", () -> getTotalSize(cacheManager))
+                .register(meterRegistry);
     }
 
-    private double getTotalHitRate(CaffeineCacheManager cacheManager) {
+    private double getTotalHitRate(CacheManager cacheManager) {
         long totalHits = 0;
         long totalRequests = 0;
 
@@ -38,7 +34,7 @@ public class CacheMetricsConfig {
         return totalRequests > 0 ? (double) totalHits / totalRequests : 0.0;
     }
 
-    private long getTotalSize(CaffeineCacheManager cacheManager) {
+    private long getTotalSize(CacheManager cacheManager) {
         long totalSize = 0;
 
         for (String cacheName : cacheManager.getCacheNames()) {

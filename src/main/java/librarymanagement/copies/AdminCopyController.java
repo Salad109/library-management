@@ -30,7 +30,7 @@ public class AdminCopyController {
             @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role")
     })
     @GetMapping("/api/admin/copies")
-    public Page<Copy> getAllCopies(Pageable pageable) {
+    public Page<CopyResponse> getAllCopies(Pageable pageable) {
         return copyService.getAllCopies(pageable);
     }
 
@@ -41,7 +41,7 @@ public class AdminCopyController {
             @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role")
     })
     @GetMapping("/api/admin/copies/{id}")
-    public Copy getCopyById(@PathVariable Long id) {
+    public CopyResponse getCopyById(@PathVariable Long id) {
         return copyService.getCopyById(id);
     }
 
@@ -51,7 +51,7 @@ public class AdminCopyController {
             @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role")
     })
     @GetMapping("/api/admin/copies/book/{isbn}")
-    public Page<Copy> getCopiesByBookIsbn(@PathVariable String isbn, Pageable pageable) {
+    public Page<CopyResponse> getCopiesByBookIsbn(@PathVariable String isbn, Pageable pageable) {
         return copyService.getCopiesByBookIsbn(isbn, pageable);
     }
 
@@ -64,7 +64,7 @@ public class AdminCopyController {
     })
     @PostMapping("/api/admin/copies")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<Copy> createCopies(@Valid @RequestBody CopyCreateRequest copyCreateRequest) {
+    public List<CopyResponse> createCopies(@Valid @RequestBody CopyCreateRequest copyCreateRequest) {
         return copyService.addCopies(copyCreateRequest.bookIsbn(), copyCreateRequest.quantity());
     }
 }

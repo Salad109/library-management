@@ -32,7 +32,7 @@ public class ReservationController {
             @ApiResponse(responseCode = "403", description = "Requires CUSTOMER role")
     })
     @GetMapping("/api/reservations/mine")
-    public Page<Copy> getMyReservations(Pageable pageable) {
+    public Page<CopyResponse> getMyReservations(Pageable pageable) {
         Long customerId = securityService.getCurrentCustomerId();
         return copyService.getCopiesByCustomerId(customerId, pageable);
     }
@@ -48,7 +48,7 @@ public class ReservationController {
     })
     @PostMapping("/api/reservations")
     @ResponseStatus(HttpStatus.CREATED)
-    public Copy createReservation(@Valid @RequestBody CopyReservationRequest request) {
+    public CopyResponse createReservation(@Valid @RequestBody CopyReservationRequest request) {
         Long customerId = securityService.getCurrentCustomerId();
         return copyService.reserveAnyAvailableCopy(request.bookIsbn(), customerId);
     }
@@ -64,8 +64,8 @@ public class ReservationController {
     })
     @DeleteMapping("/api/reservations/{copyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Copy cancelReservation(@PathVariable Long copyId) {
+    public void cancelReservation(@PathVariable Long copyId) {
         Long customerId = securityService.getCurrentCustomerId();
-        return copyService.cancelReservation(copyId, customerId);
+        copyService.cancelReservation(copyId, customerId);
     }
 }

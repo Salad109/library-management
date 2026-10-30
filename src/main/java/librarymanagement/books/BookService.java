@@ -38,7 +38,8 @@ public class BookService {
     }
 
     @Cacheable(value = "book-pages", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
-    public Page<Book> getAllBooks(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<BookResponse> getAllBooks(Pageable pageable) {
         log.debug("Fetching all books, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
         Page<String> isbnPage = bookRepository.findAllIsbns(pageable);
@@ -48,7 +49,7 @@ public class BookService {
             return Page.empty(pageable);
         }
 
-        List<Book> books = bookRepository.findByIsbnsWithAuthors(isbnPage.getContent());
+        List<BookResponse> books = toResponses(bookRepository.findByIsbnsWithAuthors(isbnPage.getContent()));
 
         log.debug("Retrieved {} books out of {} total", books.size(), isbnPage.getTotalElements());
 
@@ -56,18 +57,13 @@ public class BookService {
     }
 
     @Cacheable(value = "books", key = "#isbn")
-    public Book getBookByIsbn(String isbn) {
-        log.debug("Looking up book by ISBN: {}", isbn);
-        Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
-        if (book.isEmpty()) {
-            log.warn("Book not found with ISBN: {}", isbn);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
-        }
-        log.debug("Found book: '{}'", book.get().getTitle());
-        return book.get();
+    @Transactional(readOnly = true)
+    public BookResponse getBookByIsbn(String isbn) {
+        return BookResponse.from(getBookOrThrow(isbn));
     }
 
-    public Page<Book> searchBooks(String searchTerm, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<BookResponse> searchBooks(String searchTerm, Pageable pageable) {
         log.debug("Searching books with term: '{}', page: {}, size: {}", searchTerm, pageable.getPageNumber(), pageable.getPageSize());
 
         if (searchTerm == null || searchTerm.isBlank()) {
@@ -81,7 +77,7 @@ public class BookService {
         if (titleIsbns.getTotalElements() > 0) {
             log.debug("Found {} books matching title search for term: '{}'", titleIsbns.getTotalElements(), cleanTerm);
 
-            List<Book> books = bookRepository.findByIsbnsWithAuthors(titleIsbns.getContent());
+            List<BookResponse> books = toResponses(bookRepository.findByIsbnsWithAuthors(titleIsbns.getContent()));
             return new PageImpl<>(books, pageable, titleIsbns.getTotalElements());
         }
 
@@ -93,7 +89,7 @@ public class BookService {
             return Page.empty(pageable);
         }
 
-        List<Book> books = bookRepository.findByIsbnsWithAuthors(authorIsbns.getContent());
+        List<BookResponse> books = toResponses(bookRepository.findByIsbnsWithAuthors(authorIsbns.getContent()));
         return new PageImpl<>(books, pageable, authorIsbns.getTotalElements());
     }
 
@@ -101,8 +97,9 @@ public class BookService {
     @Caching(evict = {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
+    @Transactional
     @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1, delay = 50)
-    public Book addBook(BookCreateRequest bookCreateRequest) {
+    public BookResponse addBook(BookCreateRequest bookCreateRequest) {
         String formattedAuthors = String.join(", ", bookCreateRequest.authorNames());
         log.debug("Adding book: '{}' by [{}] (ISBN: {})", bookCreateRequest.title(), formattedAuthors, bookCreateRequest.isbn());
 
@@ -122,7 +119,7 @@ public class BookService {
         Book savedBook = bookRepository.save(book);
         log.info("Successfully added book: '{}' (ISBN: {})", savedBook.getTitle(), savedBook.getIsbn());
 
-        return savedBook;
+        return BookResponse.from(savedBook);
     }
 
     @CachePut(value = "books", key = "#isbn")
@@ -130,7 +127,7 @@ public class BookService {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
-    public Book updateBook(String isbn, BookUpdateRequest bookUpdateRequest) {
+    public BookResponse updateBook(String isbn, BookUpdateRequest bookUpdateRequest) {
         log.debug("Updating book with ISBN: {}", isbn);
 
         Optional<Book> optionalBook = bookRepository.findById(isbn);
@@ -155,14 +152,15 @@ public class BookService {
                 isbn, oldTitle, oldYear, oldAuthors,
                 savedBook.getTitle(), savedBook.getPublicationYear(), savedBook.getFormattedAuthors());
 
-        return savedBook;
+        return BookResponse.from(savedBook);
     }
 
-    @CachePut(value = "books", key = "#isbn")
-    @CacheEvict(value = "book-pages", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#isbn"),
+            @CacheEvict(value = "book-pages", allEntries = true)})
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
-    public Book updateAvailableCopies(String isbn, int delta) {
+    public void updateAvailableCopies(String isbn, int delta) {
         log.debug("Updating available copies for ISBN: {} by delta: {}", isbn, delta);
 
         Optional<Book> optionalBook = bookRepository.findById(isbn);
@@ -179,10 +177,9 @@ public class BookService {
         }
 
         book.setAvailableCopies(newCount);
-        Book savedBook = bookRepository.save(book);
+        bookRepository.save(book);
 
         log.debug("Updated available copies for ISBN: {} to {}", isbn, newCount);
-        return savedBook;
     }
 
     @Caching(evict = {
@@ -203,6 +200,23 @@ public class BookService {
 
         bookRepository.deleteById(isbn);
         log.info("Successfully deleted book: '{}' (ISBN: {})", title, isbn);
+    }
+
+    // Helpers
+
+    public Book getBookOrThrow(String isbn) {
+        log.debug("Looking up book by ISBN: {}", isbn);
+        Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
+        if (book.isEmpty()) {
+            log.warn("Book not found with ISBN: {}", isbn);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
+        }
+        log.debug("Found book: '{}'", book.get().getTitle());
+        return book.get();
+    }
+
+    private List<BookResponse> toResponses(List<Book> books) {
+        return books.stream().map(BookResponse::from).toList();
     }
 
     private Set<Author> resolveAuthors(Set<String> authorNames) {

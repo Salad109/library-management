@@ -39,6 +39,22 @@ class BookControllerTest extends IntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testGetBookAfterCopiesAdded() {
+        String isbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestCopy(mockMvcTester, isbn, 3))
+                .hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult result = mockMvcTester.get().uri("/api/books/" + isbn).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("availableCopies").isEqualTo(3);
+        assertThat(result).bodyJson().extractingPath("authors[0].name").isEqualTo("Test Author");
+    }
+
+    @Test
     void testGetNonExistentBook() {
         String isbn = "987654321X"; // Nonexistent ISBN
 

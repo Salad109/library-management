@@ -32,7 +32,7 @@ public class DeskController {
             @ApiResponse(responseCode = "404", description = "Copy or customer not found")
     })
     @PostMapping("/api/desk/checkout")
-    public Copy checkout(@Valid @RequestBody CopyCheckoutRequest request) {
+    public CopyResponse checkout(@Valid @RequestBody CopyCheckoutRequest request) {
         return copyService.checkout(request.copyId(), request.customerId());
     }
 
@@ -46,7 +46,7 @@ public class DeskController {
             @ApiResponse(responseCode = "404", description = "Copy or customer not found")
     })
     @PostMapping("/api/desk/return")
-    public Copy returnCopy(@Valid @RequestBody CopyReturnRequest request) {
+    public CopyResponse returnCopy(@Valid @RequestBody CopyReturnRequest request) {
         return copyService.returnCopy(request.copyId(), request.customerId());
     }
 
@@ -60,7 +60,7 @@ public class DeskController {
             @ApiResponse(responseCode = "404", description = "Copy not found")
     })
     @PostMapping("/api/desk/mark-lost")
-    public Copy markLost(@Valid @RequestBody CopyMarkLostRequest request) {
+    public CopyResponse markLost(@Valid @RequestBody CopyMarkLostRequest request) {
         return copyService.markLost(request.copyId());
     }
 }

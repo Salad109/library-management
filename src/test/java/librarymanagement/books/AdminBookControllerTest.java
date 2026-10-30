@@ -36,6 +36,24 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testCreateBookWithExistingAuthor() {
+        assertThat(DataBuilder.createTestBook(mockMvcTester,
+                BookTestData.TestBook1.ISBN,
+                BookTestData.TestBook1.TITLE,
+                BookTestData.TestBook1.AUTHOR_NAME)
+        ).hasStatus(HttpStatus.CREATED);
+
+        // Second book by the same author reuses the stored author
+        MvcTestResult result = DataBuilder.createTestBook(mockMvcTester,
+                BookTestData.TestBook2.ISBN,
+                BookTestData.TestBook2.TITLE,
+                BookTestData.TestBook1.AUTHOR_NAME);
+
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        assertThat(result).bodyJson().extractingPath("authors[0].name").isEqualTo(BookTestData.TestBook1.AUTHOR_NAME);
+    }
+
+    @Test
     void testUpdateBook() {
         // Create a book to update
         assertThat(DataBuilder.createTestBook(mockMvcTester,

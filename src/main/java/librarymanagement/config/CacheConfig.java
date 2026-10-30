@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.transaction.TransactionAwareCacheManagerProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,6 +21,7 @@ public class CacheConfig {
                 .maximumSize(10_000)
                 .expireAfterAccess(Duration.ofHours(36))
                 .recordStats());
-        return cacheManager;
+        // Cache puts and evictions inside a transaction wait for its commit, so a rollback can't leave stale entries
+        return new TransactionAwareCacheManagerProxy(cacheManager);
     }
 }

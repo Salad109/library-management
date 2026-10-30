@@ -1,8 +1,8 @@
 package librarymanagement.web;
 
-import librarymanagement.books.Book;
+import librarymanagement.books.BookResponse;
 import librarymanagement.books.BookService;
-import librarymanagement.copies.Copy;
+import librarymanagement.copies.CopyResponse;
 import librarymanagement.copies.CopyService;
 import librarymanagement.customers.Customer;
 import librarymanagement.customers.CustomerService;
@@ -44,7 +44,7 @@ public class AdminWebController {
     @GetMapping("/admin/books/browse")
     public String bookBrowsePage(
             Model model, Pageable pageable, @RequestParam(required = false) String q) {
-        Page<Book> books;
+        Page<BookResponse> books;
 
         if (q != null && !q.trim().isEmpty()) {
             books = bookService.searchBooks(q.trim(), pageable);
@@ -87,7 +87,7 @@ public class AdminWebController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String searchType) {
 
-        Page<Copy> copies;
+        Page<CopyResponse> copies;
         String cleanQuery = (q != null) ? q.trim() : "";
 
         if (cleanQuery.isEmpty() || searchType == null) {

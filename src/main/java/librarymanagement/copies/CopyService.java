@@ -35,7 +35,8 @@ public class CopyService {
         this.customerService = customerService;
     }
 
-    public Page<Copy> getAllCopies(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<CopyResponse> getAllCopies(Pageable pageable) {
         log.debug("Fetching all copies, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Long> idPage = copyRepository.findAllIds(pageable);
@@ -45,18 +46,20 @@ public class CopyService {
             return Page.empty(pageable);
         }
 
-        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+        List<CopyResponse> copies = toResponses(copyRepository.findByIdsWithAllRelations(idPage.getContent()));
 
         log.debug("Retrieved {} copies out of {} total", copies.size(), idPage.getTotalElements());
 
         return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
-    public Copy getCopyById(Long id) {
-        return getCopyOrThrow(id);
+    @Transactional(readOnly = true)
+    public CopyResponse getCopyById(Long id) {
+        return CopyResponse.from(getCopyOrThrow(id));
     }
 
-    public Page<Copy> getCopiesByBookIsbn(String isbn, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<CopyResponse> getCopiesByBookIsbn(String isbn, Pageable pageable) {
         log.debug("Fetching copies for book ISBN: {}, page: {}, size: {}", isbn, pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Long> idPage = copyRepository.findIdsByBookIsbn(isbn, pageable);
@@ -66,14 +69,15 @@ public class CopyService {
             return Page.empty(pageable);
         }
 
-        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+        List<CopyResponse> copies = toResponses(copyRepository.findByIdsWithAllRelations(idPage.getContent()));
 
         log.debug("Retrieved {} copies for ISBN: {} out of {} total", copies.size(), isbn, idPage.getTotalElements());
 
         return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
-    public Page<Copy> getCopiesByCustomerId(Long customerId, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<CopyResponse> getCopiesByCustomerId(Long customerId, Pageable pageable) {
         log.debug("Fetching copies for customer ID: {}, page: {}, size: {}", customerId, pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Long> idPage = copyRepository.findIdsByCustomerId(customerId, pageable);
@@ -83,14 +87,15 @@ public class CopyService {
             return Page.empty(pageable);
         }
 
-        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+        List<CopyResponse> copies = toResponses(copyRepository.findByIdsWithAllRelations(idPage.getContent()));
 
         log.debug("Retrieved {} copies for customer ID: {} out of {} total", copies.size(), customerId, idPage.getTotalElements());
 
         return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
-    public Page<Copy> getCopiesByBookTitle(String title, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<CopyResponse> getCopiesByBookTitle(String title, Pageable pageable) {
         log.debug("Fetching copies for book title: {}, page: {}, size: {}",
                 title, pageable.getPageNumber(), pageable.getPageSize());
 
@@ -101,14 +106,15 @@ public class CopyService {
             return Page.empty(pageable);
         }
 
-        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+        List<CopyResponse> copies = toResponses(copyRepository.findByIdsWithAllRelations(idPage.getContent()));
         log.debug("Retrieved {} copies for book title: {} out of {} total",
                 copies.size(), title, idPage.getTotalElements());
 
         return new PageImpl<>(copies, pageable, idPage.getTotalElements());
     }
 
-    public Page<Copy> getCopiesByCustomerLastName(String lastName, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<CopyResponse> getCopiesByCustomerLastName(String lastName, Pageable pageable) {
         log.debug("Fetching copies for customer last name: {}, page: {}, size: {}",
                 lastName, pageable.getPageNumber(), pageable.getPageSize());
 
@@ -119,7 +125,7 @@ public class CopyService {
             return Page.empty(pageable);
         }
 
-        List<Copy> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent());
+        List<CopyResponse> copies = toResponses(copyRepository.findByIdsWithAllRelations(idPage.getContent()));
         log.debug("Retrieved {} copies for customer last name: {} out of {} total",
                 copies.size(), lastName, idPage.getTotalElements());
 
@@ -127,9 +133,9 @@ public class CopyService {
     }
 
     @Transactional
-    public List<Copy> addCopies(String isbn, int quantity) {
+    public List<CopyResponse> addCopies(String isbn, int quantity) {
         log.debug("Adding {} copies for book with ISBN: {}", quantity, isbn);
-        Book book = bookService.getBookByIsbn(isbn);
+        Book book = bookService.getBookOrThrow(isbn);
 
         List<Copy> copies = new ArrayList<>(quantity);
         for (int i = 0; i < quantity; i++) {
@@ -143,12 +149,12 @@ public class CopyService {
 
         bookService.updateAvailableCopies(isbn, quantity);
         log.info("Added {} copies for book with ISBN: {}", savedCopies.size(), isbn);
-        return savedCopies;
+        return toResponses(savedCopies);
     }
 
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
-    public Copy returnCopy(Long copyId, Long customerId) {
+    public CopyResponse returnCopy(Long copyId, Long customerId) {
         log.debug("Returning copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.BORROWED) {
@@ -169,12 +175,12 @@ public class CopyService {
 
         bookService.updateAvailableCopies(existingCopy.getBook().getIsbn(), 1);
         log.info("Copy with ID: {} returned successfully", savedCopy.getId());
-        return savedCopy;
+        return CopyResponse.from(savedCopy);
     }
 
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
-    public Copy markLost(Long copyId) {
+    public CopyResponse markLost(Long copyId) {
         log.debug("Marking copy with ID: {} as lost", copyId);
         Copy existingCopy = getCopyOrThrow(copyId);
 
@@ -187,12 +193,12 @@ public class CopyService {
             bookService.updateAvailableCopies(book.getIsbn(), -1);
         }
         log.info("Copy with ID: {} marked as lost", savedCopy.getId());
-        return savedCopy;
+        return CopyResponse.from(savedCopy);
     }
 
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
-    public Copy reserveAnyAvailableCopy(String isbn, Long customerId) {
+    public CopyResponse reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.debug("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
         Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusWithRelations(isbn, CopyStatus.AVAILABLE);
         if (availableCopy.isEmpty()) {
@@ -213,12 +219,12 @@ public class CopyService {
 
         bookService.updateAvailableCopies(book.getIsbn(), -1);
         log.info("Copy with ID: {} reserved for customer ID: {}", copyId, customerId);
-        return savedCopy;
+        return CopyResponse.from(savedCopy);
     }
 
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
-    public Copy cancelReservation(Long copyId, Long customerId) {
+    public void cancelReservation(Long copyId, Long customerId) {
         log.debug("Cancelling reservation for copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.RESERVED) {
@@ -239,24 +245,23 @@ public class CopyService {
 
         bookService.updateAvailableCopies(existingCopy.getBook().getIsbn(), 1);
         log.info("Cancelled reservation for copy with ID: {}", savedCopy.getId());
-        return savedCopy;
     }
 
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
-    public Copy checkout(Long copyId, Long customerId) {
+    public CopyResponse checkout(Long copyId, Long customerId) {
         log.debug("Checking out copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy copy = getCopyOrThrow(copyId);
         Customer customer = customerService.getCustomerById(customerId);
 
         // Reserved copy checkout
         if (copy.getStatus() == CopyStatus.RESERVED) {
-            return checkoutReservedCopy(copy, customer);
+            return CopyResponse.from(checkoutReservedCopy(copy, customer));
         }
 
         // Direct checkout
         if (copy.getStatus() == CopyStatus.AVAILABLE) {
-            return checkoutAvailableCopy(copy, customer);
+            return CopyResponse.from(checkoutAvailableCopy(copy, customer));
         }
 
         log.info("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
@@ -299,5 +304,9 @@ public class CopyService {
         Copy savedCopy = optionalCopy.get();
         log.debug("Found copy with ID: {}, status: {}", savedCopy.getId(), savedCopy.getStatus());
         return savedCopy;
+    }
+
+    private List<CopyResponse> toResponses(List<Copy> copies) {
+        return copies.stream().map(CopyResponse::from).toList();
     }
 }

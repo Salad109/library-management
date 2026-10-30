@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -23,10 +24,11 @@ public class AuthorService {
     }
 
     @Cacheable(value = "authors", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
-    public Page<Author> getAllAuthors(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<AuthorResponse> getAllAuthors(Pageable pageable) {
         log.debug("Fetching all authors, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
-        Page<Author> authors = authorRepository.findAllByOrderByName(pageable);
+        Page<AuthorResponse> authors = authorRepository.findAllByOrderByName(pageable).map(AuthorResponse::from);
 
         log.debug("Retrieved {} authors out of {} total", authors.getNumberOfElements(), authors.getTotalElements());
 
@@ -34,7 +36,8 @@ public class AuthorService {
     }
 
     @Cacheable(value = "authors", key = "#name")
-    public Author getAuthorByName(String name) {
+    @Transactional(readOnly = true)
+    public AuthorResponse getAuthorByName(String name) {
         log.debug("Looking up author by name: {}", name);
         Optional<Author> author = authorRepository.findById(name);
         if (author.isEmpty()) {
@@ -42,6 +45,6 @@ public class AuthorService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.AUTHOR_NOT_FOUND + name);
         }
         log.debug("Found author: '{}'", author.get().getName());
-        return author.get();
+        return AuthorResponse.from(author.get());
     }
 }

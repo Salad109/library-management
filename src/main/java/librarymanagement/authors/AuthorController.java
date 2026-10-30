@@ -23,7 +23,7 @@ public class AuthorController {
     @Operation(summary = "Get all authors")
     @ApiResponse(responseCode = "200", description = "Authors retrieved successfully")
     @GetMapping("/api/authors")
-    public Page<Author> getAuthors(Pageable pageable) {
+    public Page<AuthorResponse> getAuthors(Pageable pageable) {
         return authorService.getAllAuthors(pageable);
     }
 
@@ -33,7 +33,7 @@ public class AuthorController {
             @ApiResponse(responseCode = "404", description = "Author not found")
     })
     @GetMapping("/api/authors/{name}")
-    public Author getAuthorByName(@PathVariable String name) {
+    public AuthorResponse getAuthorByName(@PathVariable String name) {
         return authorService.getAuthorByName(name);
     }
 }

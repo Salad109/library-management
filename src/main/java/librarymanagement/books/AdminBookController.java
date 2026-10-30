@@ -29,7 +29,7 @@ public class AdminBookController {
     })
     @PostMapping("/api/admin/books")
     @ResponseStatus(HttpStatus.CREATED)
-    public Book createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
+    public BookResponse createBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
         return bookService.addBook(bookCreateRequest);
     }
 
@@ -41,7 +41,7 @@ public class AdminBookController {
             @ApiResponse(responseCode = "404", description = "Book not found with the given ISBN")
     })
     @PutMapping("/api/admin/books/{isbn}")
-    public Book updateBook(@PathVariable String isbn, @Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
+    public BookResponse updateBook(@PathVariable String isbn, @Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
         return bookService.updateBook(isbn, bookUpdateRequest);
     }
 
