@@ -179,6 +179,53 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testRegisterTooLongUsername() {
+        String userJson = """
+                {
+                    "username": "%s",
+                    "password": "secret123",
+                    "role": "ROLE_LIBRARIAN"
+                }
+                """.formatted("a".repeat(51));
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("username")
+                .isEqualTo(Messages.USER_USERNAME_LENGTH_VALIDATION_MESSAGE);
+    }
+
+    @Test
+    void testRegisterTooLongPassword() {
+        // 40 characters, but 80 bytes in UTF-8
+        String userJson = """
+                {
+                    "username": "librarian1",
+                    "password": "%s",
+                    "role": "ROLE_LIBRARIAN"
+                }
+                """.formatted("ą".repeat(40));
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
+    }
+
+    @Test
     void testAdminLoginFailure() {
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/admin/login")

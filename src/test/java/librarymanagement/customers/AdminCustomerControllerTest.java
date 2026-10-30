@@ -60,6 +60,19 @@ class AdminCustomerControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testCreateCustomerWithTooLongFields() {
+        MvcTestResult result = DataBuilder.createTestCustomer(mockMvcTester,
+                "a".repeat(101),
+                "a".repeat(101),
+                "a".repeat(146) + "@x.io");
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_LENGTH_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_LENGTH_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("email").isEqualTo(Messages.CUSTOMER_EMAIL_LENGTH_VALIDATION_MESSAGE);
+    }
+
+    @Test
     void testGetCustomerById() throws Exception {
         MvcTestResult customerCreationResult = DataBuilder.createTestCustomer(
                 mockMvcTester,

@@ -65,6 +65,18 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testCreateBookWithTooLongFields() {
+        MvcTestResult result = DataBuilder.createTestBook(mockMvcTester,
+                BookTestData.TestBook1.ISBN,
+                "a".repeat(151),
+                "a".repeat(101));
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("title").isEqualTo(Messages.BOOK_TITLE_LENGTH_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("$['authorNames[]']").isEqualTo(Messages.AUTHOR_NAME_LENGTH_VALIDATION_MESSAGE);
+    }
+
+    @Test
     void testUpdateBook() {
         // Create a book to update
         assertThat(DataBuilder.createTestBook(mockMvcTester,

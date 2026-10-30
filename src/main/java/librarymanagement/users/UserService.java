@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Service
@@ -30,6 +31,12 @@ public class UserService {
     @Transactional
     public UserResponse addUser(UserRegistrationRequest request) {
         log.debug("Adding new user with username: {}", request.username());
+        // BCrypt hashes at most 72 bytes
+        if (request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            log.warn("User registration password exceeds 72 bytes");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.USER_PASSWORD_TOO_LONG);
+        }
+
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
             log.warn("Duplicate user found with username: {}", request.username());
