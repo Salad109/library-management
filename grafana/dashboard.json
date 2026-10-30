@@ -549,7 +549,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "cache_hit_rate",
+          "expr": "sum(rate(cache_gets_total{result=\"hit\"}[5m])) / sum(rate(cache_gets_total[5m]))",
           "legendFormat": "Hit Rate",
           "range": true,
           "refId": "Hit rate",
@@ -564,7 +564,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "cache_size",
+          "expr": "sum(cache_size)",
           "hide": false,
           "instant": false,
           "legendFormat": "Size",
