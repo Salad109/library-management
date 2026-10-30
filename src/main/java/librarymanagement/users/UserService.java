@@ -1,6 +1,5 @@
 package librarymanagement.users;
 
-import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
 import librarymanagement.customers.Customer;
 import librarymanagement.customers.CustomerRepository;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
