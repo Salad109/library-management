@@ -10,7 +10,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -155,31 +154,12 @@ public class BookService {
         return BookResponse.from(savedBook);
     }
 
+    // Cached books include availableCopies, so any copy change makes them stale
     @Caching(evict = {
             @CacheEvict(value = "books", key = "#isbn"),
             @CacheEvict(value = "book-pages", allEntries = true)})
-    @Transactional
-    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
-    public void updateAvailableCopies(String isbn, int delta) {
-        log.debug("Updating available copies for ISBN: {} by delta: {}", isbn, delta);
-
-        Optional<Book> optionalBook = bookRepository.findById(isbn);
-        if (optionalBook.isEmpty()) {
-            log.warn("Attempted to update copies for non-existent book with ISBN: {}", isbn);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
-        }
-
-        Book book = optionalBook.get();
-        int newCount = book.getAvailableCopies() + delta;
-        if (newCount < 0) {
-            log.warn("Available copies would become negative for ISBN: {}", isbn);
-            throw new IllegalStateException("Available copies cannot be negative");
-        }
-
-        book.setAvailableCopies(newCount);
-        bookRepository.save(book);
-
-        log.debug("Updated available copies for ISBN: {} to {}", isbn, newCount);
+    public void evictCachedBook(String isbn) {
+        log.debug("Evicting cached book with ISBN: {} after a copy change", isbn);
     }
 
     @Caching(evict = {

@@ -146,8 +146,7 @@ public class CopyService {
         }
 
         List<Copy> savedCopies = copyRepository.saveAll(copies);
-
-        bookService.updateAvailableCopies(isbn, quantity);
+        bookService.evictCachedBook(isbn);
         log.info("Added {} copies for book with ISBN: {}", savedCopies.size(), isbn);
         return toResponses(savedCopies);
     }
@@ -171,9 +170,7 @@ public class CopyService {
         existingCopy.setCustomer(null);
         existingCopy.setStatus(CopyStatus.AVAILABLE);
 
-        Copy savedCopy = copyRepository.save(existingCopy);
-
-        bookService.updateAvailableCopies(existingCopy.getBook().getIsbn(), 1);
+        Copy savedCopy = save(existingCopy);
         log.info("Copy with ID: {} returned successfully", savedCopy.getId());
         return CopyResponse.from(savedCopy);
     }
@@ -184,14 +181,9 @@ public class CopyService {
         log.debug("Marking copy with ID: {} as lost", copyId);
         Copy existingCopy = getCopyOrThrow(copyId);
 
-        CopyStatus oldStatus = existingCopy.getStatus();
         existingCopy.setStatus(CopyStatus.LOST);
-        Copy savedCopy = copyRepository.save(existingCopy);
+        Copy savedCopy = save(existingCopy);
 
-        if (oldStatus == CopyStatus.AVAILABLE) {
-            Book book = existingCopy.getBook();
-            bookService.updateAvailableCopies(book.getIsbn(), -1);
-        }
         log.info("Copy with ID: {} marked as lost", savedCopy.getId());
         return CopyResponse.from(savedCopy);
     }
@@ -200,7 +192,7 @@ public class CopyService {
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
     public CopyResponse reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.debug("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
-        Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusWithRelations(isbn, CopyStatus.AVAILABLE);
+        Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusOrderById(isbn, CopyStatus.AVAILABLE);
         if (availableCopy.isEmpty()) {
             log.info("No available copies found for book with ISBN: {}", isbn);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.COPY_NO_AVAILABLE + isbn);
@@ -211,13 +203,11 @@ public class CopyService {
         log.debug("Reserving copy with ID: {} for customer ID: {}", copyToReserve.getId(), customerId);
 
         Customer customer = customerService.getCustomerOrThrow(customerId);
-        Book book = copyToReserve.getBook();
 
         copyToReserve.setCustomer(customer);
         copyToReserve.setStatus(CopyStatus.RESERVED);
-        Copy savedCopy = copyRepository.save(copyToReserve);
+        Copy savedCopy = save(copyToReserve);
 
-        bookService.updateAvailableCopies(book.getIsbn(), -1);
         log.info("Copy with ID: {} reserved for customer ID: {}", copyId, customerId);
         return CopyResponse.from(savedCopy);
     }
@@ -241,9 +231,7 @@ public class CopyService {
         existingCopy.setCustomer(null);
         existingCopy.setStatus(CopyStatus.AVAILABLE);
 
-        Copy savedCopy = copyRepository.save(existingCopy);
-
-        bookService.updateAvailableCopies(existingCopy.getBook().getIsbn(), 1);
+        Copy savedCopy = save(existingCopy);
         log.info("Cancelled reservation for copy with ID: {}", savedCopy.getId());
     }
 
@@ -275,7 +263,7 @@ public class CopyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
         }
         copy.setStatus(CopyStatus.BORROWED);
-        Copy savedCopy = copyRepository.save(copy);
+        Copy savedCopy = save(copy);
         log.info("Reserved copy with ID: {} checked out successfully for customer ID: {}", savedCopy.getId(), customer.getId());
         return savedCopy;
     }
@@ -285,9 +273,8 @@ public class CopyService {
         copy.setCustomer(customer);
         copy.setStatus(CopyStatus.BORROWED);
 
-        Copy savedCopy = copyRepository.save(copy);
+        Copy savedCopy = save(copy);
 
-        bookService.updateAvailableCopies(copy.getBook().getIsbn(), -1);
         log.info("Available copy with ID: {} checked out successfully for customer ID: {}", savedCopy.getId(), customer.getId());
         return savedCopy;
     }
@@ -303,6 +290,12 @@ public class CopyService {
         }
         Copy savedCopy = optionalCopy.get();
         log.debug("Found copy with ID: {}, status: {}", savedCopy.getId(), savedCopy.getStatus());
+        return savedCopy;
+    }
+
+    private Copy save(Copy copy) {
+        Copy savedCopy = copyRepository.save(copy);
+        bookService.evictCachedBook(savedCopy.getBook().getIsbn());
         return savedCopy;
     }
 

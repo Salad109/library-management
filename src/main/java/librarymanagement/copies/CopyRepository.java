@@ -12,13 +12,7 @@ import java.util.Optional;
 @Repository
 public interface CopyRepository extends JpaRepository<Copy, Long> {
 
-    @Query("SELECT c FROM Copy c " +
-            "LEFT JOIN FETCH c.book b " +
-            "LEFT JOIN FETCH b.authors " +
-            "LEFT JOIN FETCH c.customer " +
-            "WHERE c.book.isbn = :isbn AND c.status = :status " +
-            "ORDER BY c.id LIMIT 1")
-    Optional<Copy> findFirstByBookIsbnAndStatusWithRelations(String isbn, CopyStatus status);
+    Optional<Copy> findFirstByBookIsbnAndStatusOrderById(String isbn, CopyStatus status);
 
     @Query("SELECT c.id FROM Copy c ORDER BY c.id")
     Page<Long> findAllIds(Pageable pageable);

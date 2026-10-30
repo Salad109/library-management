@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import librarymanagement.authors.Author;
 import librarymanagement.constants.Messages;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Formula;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -34,8 +35,7 @@ public class Book {
     @Min(value = 1, message = Messages.BOOK_PUBLICATION_YEAR_VALIDATION_MESSAGE)
     private Integer publicationYear;
 
-    @Column(nullable = false)
-    @Min(value = 0, message = Messages.BOOK_COPY_COUNT_VALIDATION_MESSAGE)
+    @Formula("(SELECT COUNT(*) FROM copies c WHERE c.book_isbn = isbn AND c.status = 'AVAILABLE')")
     private Integer availableCopies = 0;
 
     @Version
@@ -50,7 +50,6 @@ public class Book {
         this.title = title;
         this.authors = (authors != null) ? new LinkedHashSet<>(authors) : new LinkedHashSet<>();
         this.publicationYear = publicationYear;
-        this.availableCopies = 0;
     }
 
     @Transient
@@ -115,10 +114,6 @@ public class Book {
 
     public Integer getAvailableCopies() {
         return availableCopies;
-    }
-
-    public void setAvailableCopies(Integer availableCopies) {
-        this.availableCopies = availableCopies;
     }
 
 }
