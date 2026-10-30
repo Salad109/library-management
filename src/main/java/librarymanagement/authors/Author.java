@@ -1,6 +1,5 @@
 package librarymanagement.authors;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import librarymanagement.books.Book;
@@ -18,7 +17,6 @@ public class Author {
     private String name;
 
     @ManyToMany(mappedBy = "authors")
-    @JsonIgnore
     private Set<Book> books;
 
     public Author() {

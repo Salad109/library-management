@@ -1,6 +1,5 @@
 package librarymanagement.customers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -31,11 +30,9 @@ public class Customer {
     private String email;
 
     @OneToMany(mappedBy = "customer")
-    @JsonIgnore
     private Set<Copy> copies;
 
     @Version
-    @JsonIgnore
     private Long version;
 
     public Customer() {

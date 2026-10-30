@@ -1,6 +1,5 @@
 package librarymanagement.users;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +29,6 @@ public class User {
     private Customer customer;
 
     @Version
-    @JsonIgnore
     private Long version;
 
     public User() {

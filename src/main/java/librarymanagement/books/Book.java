@@ -1,6 +1,5 @@
 package librarymanagement.books;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -40,7 +39,6 @@ public class Book {
     private Integer availableCopies = 0;
 
     @Version
-    @JsonIgnore
     private Long version;
 
     public Book() {
@@ -55,7 +53,6 @@ public class Book {
         this.availableCopies = 0;
     }
 
-    @JsonIgnore
     @Transient
     public String getFormattedAuthors() {
         return authors.stream()
