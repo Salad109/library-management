@@ -15,7 +15,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - run: ./mvnw test
+      - run: ./mvnw verify
 
       - name: Upload coverage
         uses: codecov/codecov-action@v7
