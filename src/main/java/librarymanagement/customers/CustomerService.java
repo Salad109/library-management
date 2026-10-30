@@ -26,7 +26,8 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public Page<Customer> getAllCustomers(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
         log.debug("Fetching all customers, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Long> idPage = customerRepository.findAllIds(pageable);
@@ -36,14 +37,79 @@ public class CustomerService {
             return Page.empty(pageable);
         }
 
-        List<Customer> customers = customerRepository.findByIds(idPage.getContent());
+        List<CustomerResponse> customers = toResponses(customerRepository.findByIds(idPage.getContent()));
 
         log.debug("Retrieved {} customers out of {} total", customers.size(), idPage.getTotalElements());
 
         return new PageImpl<>(customers, pageable, idPage.getTotalElements());
     }
 
-    public Customer getCustomerById(Long id) {
+    @Transactional(readOnly = true)
+    public CustomerResponse getCustomerById(Long id) {
+        return CustomerResponse.from(getCustomerOrThrow(id));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CustomerResponse> getCustomersByLastName(String lastName, Pageable pageable) {
+        log.debug("Searching customers by last name: {}, page: {}, size: {}", lastName, pageable.getPageNumber(), pageable.getPageSize());
+
+        Page<Long> idPage = customerRepository.findIdsByLastName(lastName, pageable);
+
+        if (idPage.getContent().isEmpty()) {
+            log.debug("No customers found with last name containing: {}", lastName);
+            return Page.empty(pageable);
+        }
+
+        List<CustomerResponse> customers = toResponses(customerRepository.findByIds(idPage.getContent()));
+        log.debug("Found {} customers with last name containing: {}", customers.size(), lastName);
+        return new PageImpl<>(customers, pageable, idPage.getTotalElements());
+    }
+
+    @Transactional
+    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1)
+    public CustomerResponse addCustomer(CustomerRequest request) {
+        log.debug("Adding new customer: {} {}", request.firstName(), request.lastName());
+        String email = request.email();
+        if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
+            log.warn("Duplicate customer found with email: {}", email);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_EMAIL_DUPLICATE + email);
+        }
+
+        Customer customer = new Customer();
+        customer.setFirstName(request.firstName());
+        customer.setLastName(request.lastName());
+        customer.setEmail(request.email());
+        Customer savedCustomer = customerRepository.save(customer);
+        log.info("Customer added with ID: {}", savedCustomer.getId());
+        return CustomerResponse.from(savedCustomer);
+    }
+
+    @Transactional
+    public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
+        log.debug("Updating customer with ID: {}", id);
+        Customer existingCustomer = getCustomerOrThrow(id);
+
+        String newEmail = request.email();
+
+        if (newEmail != null && !newEmail.isBlank()) {
+            Optional<Customer> duplicateCustomer = customerRepository.findByEmail(newEmail);
+            if (duplicateCustomer.isPresent() && !duplicateCustomer.get().getId().equals(id)) {
+                log.warn("Attempted to update customer with duplicate email: {}", newEmail);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_EMAIL_DUPLICATE + newEmail);
+            }
+        }
+
+        existingCustomer.setFirstName(request.firstName());
+        existingCustomer.setLastName(request.lastName());
+        existingCustomer.setEmail(request.email());
+        Customer savedCustomer = customerRepository.save(existingCustomer);
+        log.info("Customer updated with ID: {}", savedCustomer.getId());
+        return CustomerResponse.from(savedCustomer);
+    }
+
+    // Helpers
+
+    public Customer getCustomerOrThrow(Long id) {
         log.debug("Looking up customer by ID: {}", id);
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) {
@@ -55,56 +121,7 @@ public class CustomerService {
         return existingCustomer;
     }
 
-    public Page<Customer> getCustomersByLastName(String lastName, Pageable pageable) {
-        log.debug("Searching customers by last name: {}, page: {}, size: {}", lastName, pageable.getPageNumber(), pageable.getPageSize());
-
-        Page<Long> idPage = customerRepository.findIdsByLastName(lastName, pageable);
-
-        if (idPage.getContent().isEmpty()) {
-            log.debug("No customers found with last name containing: {}", lastName);
-            return Page.empty(pageable);
-        }
-
-        List<Customer> customers = customerRepository.findByIds(idPage.getContent());
-        log.debug("Found {} customers with last name containing: {}", customers.size(), lastName);
-        return new PageImpl<>(customers, pageable, idPage.getTotalElements());
+    private List<CustomerResponse> toResponses(List<Customer> customers) {
+        return customers.stream().map(CustomerResponse::from).toList();
     }
-
-    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1)
-    public Customer addCustomer(Customer customer) {
-        log.debug("Adding new customer: {} {}", customer.getFirstName(), customer.getLastName());
-        String email = customer.getEmail();
-        if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
-            log.warn("Duplicate customer found with email: {}", email);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_EMAIL_DUPLICATE + email);
-        }
-
-        Customer savedCustomer = customerRepository.save(customer);
-        log.info("Customer added with ID: {}", savedCustomer.getId());
-        return savedCustomer;
-    }
-
-    @Transactional
-    public Customer updateCustomer(Long id, Customer customer) {
-        log.debug("Updating customer with ID: {}", id);
-        Customer existingCustomer = getCustomerById(id);
-
-        String newEmail = customer.getEmail();
-
-        if (newEmail != null && !newEmail.isBlank()) {
-            Optional<Customer> duplicateCustomer = customerRepository.findByEmail(newEmail);
-            if (duplicateCustomer.isPresent() && !duplicateCustomer.get().getId().equals(id)) {
-                log.warn("Attempted to update customer with duplicate email: {}", newEmail);
-                throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_EMAIL_DUPLICATE + newEmail);
-            }
-        }
-
-        existingCustomer.setFirstName(customer.getFirstName());
-        existingCustomer.setLastName(customer.getLastName());
-        existingCustomer.setEmail(customer.getEmail());
-        Customer savedCustomer = customerRepository.save(existingCustomer);
-        log.info("Customer updated with ID: {}", savedCustomer.getId());
-        return savedCustomer;
-    }
-
 }

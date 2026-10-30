@@ -31,7 +31,7 @@ public class UserService {
 
     @Transactional
     @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1, delay = 50)
-    public User addUser(UserRegistrationRequest request) {
+    public UserResponse addUser(UserRegistrationRequest request) {
         log.debug("Adding new user with username: {}", request.username());
         Optional<User> existingUser = userRepository.findByUsername(request.username());
         if (existingUser.isPresent()) {
@@ -64,6 +64,6 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         log.info("User added with username: {}", savedUser.getUsername());
-        return savedUser;
+        return UserResponse.from(savedUser);
     }
 }

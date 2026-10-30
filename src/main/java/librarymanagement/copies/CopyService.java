@@ -162,7 +162,7 @@ public class CopyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_NOT_BORROWED + existingCopy.getStatus());
         }
 
-        Customer customer = customerService.getCustomerById(customerId);
+        Customer customer = customerService.getCustomerOrThrow(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             log.warn("Copy with ID: {} is reserved for another customer, current customer ID: {}", copyId, existingCopy.getCustomer().getId());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
@@ -210,7 +210,7 @@ public class CopyService {
         long copyId = copyToReserve.getId();
         log.debug("Reserving copy with ID: {} for customer ID: {}", copyToReserve.getId(), customerId);
 
-        Customer customer = customerService.getCustomerById(customerId);
+        Customer customer = customerService.getCustomerOrThrow(customerId);
         Book book = copyToReserve.getBook();
 
         copyToReserve.setCustomer(customer);
@@ -232,7 +232,7 @@ public class CopyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
         }
 
-        Customer customer = customerService.getCustomerById(customerId);
+        Customer customer = customerService.getCustomerOrThrow(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             log.warn("Copy with ID: {} is reserved for customer ID: {}, not for customer ID: {}", copyId, existingCopy.getCustomer().getId(), customerId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
@@ -252,7 +252,7 @@ public class CopyService {
     public CopyResponse checkout(Long copyId, Long customerId) {
         log.debug("Checking out copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy copy = getCopyOrThrow(copyId);
-        Customer customer = customerService.getCustomerById(customerId);
+        Customer customer = customerService.getCustomerOrThrow(customerId);
 
         // Reserved copy checkout
         if (copy.getStatus() == CopyStatus.RESERVED) {

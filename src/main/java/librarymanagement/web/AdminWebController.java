@@ -4,7 +4,7 @@ import librarymanagement.books.BookResponse;
 import librarymanagement.books.BookService;
 import librarymanagement.copies.CopyResponse;
 import librarymanagement.copies.CopyService;
-import librarymanagement.customers.Customer;
+import librarymanagement.customers.CustomerResponse;
 import librarymanagement.customers.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -145,7 +145,7 @@ public class AdminWebController {
 
     @GetMapping("/admin/customers/browse")
     public String customerBrowsePage(Model model, Pageable pageable, @RequestParam(required = false) String q) {
-        Page<Customer> customers;
+        Page<CustomerResponse> customers;
 
         if (q != null && !q.trim().isEmpty()) {
             customers = customerService.getCustomersByLastName(q.trim(), pageable);

@@ -35,7 +35,7 @@ class UserControllerTest extends IntegrationTest {
 
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("username").isEqualTo("librarian1");
-        assertThat(result).bodyJson().extractingPath("password").asString().isNotEqualTo("secret123"); // Test hashing
+        assertThat(result).bodyJson().doesNotHavePath("password");
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
     }
 
@@ -61,6 +61,7 @@ class UserControllerTest extends IntegrationTest {
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
         assertThat(result).bodyJson().extractingPath("customer.firstName").isEqualTo("Joe");
+        assertThat(result).bodyJson().doesNotHavePath("password");
     }
 
     @Test

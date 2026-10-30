@@ -29,7 +29,7 @@ public class UserController {
     })
     @PostMapping("/api/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public User register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
+    public UserResponse register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
         return userService.addUser(userRegistrationRequest);
     }
 

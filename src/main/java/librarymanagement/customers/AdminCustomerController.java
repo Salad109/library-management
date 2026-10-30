@@ -28,7 +28,7 @@ public class AdminCustomerController {
             @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role")
     })
     @GetMapping("/api/admin/customers")
-    public Page<Customer> getCustomers(Pageable pageable) {
+    public Page<CustomerResponse> getCustomers(Pageable pageable) {
         return customerService.getAllCustomers(pageable);
     }
 
@@ -39,7 +39,7 @@ public class AdminCustomerController {
             @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role")
     })
     @GetMapping("/api/admin/customers/{id}")
-    public Customer getCustomerById(@PathVariable Long id) {
+    public CustomerResponse getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
     }
 
@@ -53,8 +53,8 @@ public class AdminCustomerController {
     })
     @PostMapping("/api/admin/customers")
     @ResponseStatus(HttpStatus.CREATED)
-    public Customer createCustomer(@Valid @RequestBody Customer customer) {
-        return customerService.addCustomer(customer);
+    public CustomerResponse createCustomer(@Valid @RequestBody CustomerRequest customerRequest) {
+        return customerService.addCustomer(customerRequest);
     }
 
     @Operation(summary = "Update an existing customer")
@@ -66,7 +66,7 @@ public class AdminCustomerController {
             @ApiResponse(responseCode = "409", description = "Customer with this email already exists")
     })
     @PutMapping("/api/admin/customers/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
-        return customerService.updateCustomer(id, customer);
+    public CustomerResponse updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest customerRequest) {
+        return customerService.updateCustomer(id, customerRequest);
     }
 }
