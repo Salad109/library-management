@@ -38,11 +38,11 @@ public class ReservationController {
     }
 
     @Operation(summary = "Reserve a copy of a book",
-            description = "Customers can reserve an available copy of a book by its ISBN. " +
-                    "Requires CUSTOMER role")
+            description = "Customers can reserve an available copy of a book by its ISBN, " +
+                    "up to 3 active reservations. Requires CUSTOMER role")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Reservation created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data, or reservation limit reached"),
             @ApiResponse(responseCode = "403", description = "Requires CUSTOMER role"),
             @ApiResponse(responseCode = "404", description = "Book not found with the given ISBN, or no available copies")
     })

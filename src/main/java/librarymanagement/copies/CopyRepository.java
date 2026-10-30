@@ -16,6 +16,8 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
 
     boolean existsByBookIsbn(String isbn);
 
+    long countByCustomerIdAndStatus(Long customerId, CopyStatus status);
+
     @Query("SELECT c.id FROM Copy c ORDER BY c.id")
     Page<Long> findAllIds(Pageable pageable);
 

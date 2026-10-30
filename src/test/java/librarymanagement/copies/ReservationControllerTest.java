@@ -95,6 +95,69 @@ class ReservationControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testReservationLimit() throws Exception {
+        assertThat(ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1")).hasStatus(HttpStatus.CREATED);
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian1");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+
+        String isbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Popular Book", "Author Name"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, CopyService.MAX_ACTIVE_RESERVATIONS + 1))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertThat(ControllerTestUtils.registerCustomer(mockMvcTester, "hoarder", "Joe", "Mama")).hasStatus(HttpStatus.CREATED);
+        MvcTestResult customerLoginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "hoarder");
+        assertThat(customerLoginResult).hasStatus(HttpStatus.OK);
+        MockHttpSession customerSession = (MockHttpSession) customerLoginResult.getRequest().getSession();
+
+        String reservationJson = """
+                {
+                    "bookIsbn": "%s"
+                }
+                """.formatted(isbn);
+
+        int firstCopyId = 0;
+        for (int i = 0; i < CopyService.MAX_ACTIVE_RESERVATIONS; i++) {
+            MvcTestResult result = mockMvcTester.post()
+                    .uri("/api/reservations")
+                    .session(customerSession)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(reservationJson)
+                    .exchange();
+            assertThat(result).hasStatus(HttpStatus.CREATED);
+            if (i == 0) {
+                firstCopyId = ControllerTestUtils.extractIdFromResponse(result);
+            }
+        }
+
+        // One over the limit
+        assertThat(mockMvcTester.post()
+                .uri("/api/reservations")
+                .session(customerSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.COPY_RESERVATION_LIMIT + CopyService.MAX_ACTIVE_RESERVATIONS);
+
+        // Cancelling one frees a slot
+        assertThat(mockMvcTester.delete()
+                .uri("/api/reservations/" + firstCopyId)
+                .session(customerSession))
+                .hasStatus(HttpStatus.NO_CONTENT);
+
+        assertThat(mockMvcTester.post()
+                .uri("/api/reservations")
+                .session(customerSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson))
+                .hasStatus(HttpStatus.CREATED);
+    }
+
+    @Test
     void testConcurrentReservationsGetDifferentCopies() throws Exception {
         assertThat(ControllerTestUtils.registerLibrarian(mockMvcTester, "librarianTwo")).hasStatus(HttpStatus.CREATED);
         MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarianTwo");

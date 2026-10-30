@@ -25,6 +25,7 @@ import java.util.Optional;
 public class CopyService {
 
     private static final Logger log = LoggerFactory.getLogger(CopyService.class);
+    public static final int MAX_ACTIVE_RESERVATIONS = 3;
     private final CopyRepository copyRepository;
     private final BookService bookService;
     private final CustomerService customerService;
@@ -191,6 +192,11 @@ public class CopyService {
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
     public CopyResponse reserveAnyAvailableCopy(String isbn, Long customerId) {
         log.debug("Reserving any available copy for book with ISBN: {} for customer ID: {}", isbn, customerId);
+        if (copyRepository.countByCustomerIdAndStatus(customerId, CopyStatus.RESERVED) >= MAX_ACTIVE_RESERVATIONS) {
+            log.info("Customer ID: {} has reached the reservation limit", customerId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_RESERVATION_LIMIT + MAX_ACTIVE_RESERVATIONS);
+        }
+
         Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusOrderById(isbn, CopyStatus.AVAILABLE);
         if (availableCopy.isEmpty()) {
             log.info("No available copies found for book with ISBN: {}", isbn);
