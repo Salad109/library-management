@@ -5,9 +5,7 @@ import librarymanagement.customers.Customer;
 import librarymanagement.customers.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.resilience.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +28,6 @@ public class UserService {
     }
 
     @Transactional
-    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1, delay = 50)
     public UserResponse addUser(UserRegistrationRequest request) {
         log.debug("Adding new user with username: {}", request.username());
         Optional<User> existingUser = userRepository.findByUsername(request.username());

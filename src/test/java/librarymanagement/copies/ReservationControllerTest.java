@@ -95,6 +95,66 @@ class ReservationControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testConcurrentReservationsGetDifferentCopies() throws Exception {
+        assertThat(ControllerTestUtils.registerLibrarian(mockMvcTester, "librarianTwo")).hasStatus(HttpStatus.CREATED);
+        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarianTwo");
+        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
+        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+
+        String isbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Two Copies", "Author Name"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 2))
+                .hasStatus(HttpStatus.CREATED);
+
+        // Log both customers in first, so only the reservations race
+        MockHttpSession[] sessions = new MockHttpSession[2];
+        for (int i = 0; i < 2; i++) {
+            String username = "racer" + i;
+            assertThat(ControllerTestUtils.registerCustomer(mockMvcTester, username, "Racer", "No" + i))
+                    .hasStatus(HttpStatus.CREATED);
+            sessions[i] = (MockHttpSession) ControllerTestUtils.loginCustomer(mockMvcTester, username).getRequest().getSession();
+        }
+
+        String reservationJson = """
+                {
+                    "bookIsbn": "%s"
+                }
+                """.formatted(isbn);
+
+        // Both pick the same first available copy; the loser's retry must pick the other one
+        CountDownLatch startLatch = new CountDownLatch(1);
+        MvcTestResult[] results = new MvcTestResult[2];
+        Thread[] threads = new Thread[2];
+        for (int i = 0; i < 2; i++) {
+            int index = i;
+            threads[i] = new Thread(() -> {
+                try {
+                    startLatch.await();
+                    results[index] = mockMvcTester.post()
+                            .uri("/api/reservations")
+                            .session(sessions[index])
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(reservationJson)
+                            .exchange();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+            threads[i].start();
+        }
+        startLatch.countDown();
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        assertThat(results[0]).hasStatus(HttpStatus.CREATED);
+        assertThat(results[1]).hasStatus(HttpStatus.CREATED);
+        assertThat(ControllerTestUtils.extractIdFromResponse(results[0]))
+                .isNotEqualTo(ControllerTestUtils.extractIdFromResponse(results[1]));
+    }
+
+    @Test
     void testCreateConcurrentReservations() throws Exception {
         // Create a librarian and add a book and a copy
         String isbn = "9783213211230";

@@ -136,6 +136,26 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testDeleteBookWithCopies() {
+        assertThat(DataBuilder.createTestBook(mockMvcTester,
+                BookTestData.TestBook1.ISBN,
+                BookTestData.TestBook1.TITLE,
+                BookTestData.TestBook1.AUTHOR_NAME)
+        ).hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestCopy(mockMvcTester, BookTestData.TestBook1.ISBN, 1))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertThat(mockMvcTester.delete().uri("/api/admin/books/" + BookTestData.TestBook1.ISBN))
+                .hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("error")
+                .isEqualTo(Messages.BOOK_HAS_COPIES + BookTestData.TestBook1.ISBN);
+
+        assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
+                .hasStatus(HttpStatus.OK);
+    }
+
+    @Test
     void testDeleteNonExistentBook() {
         String isbn = TestISBNGenerator.next(); // Nonexistent ISBN
 

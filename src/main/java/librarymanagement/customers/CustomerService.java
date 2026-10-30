@@ -3,12 +3,10 @@ package librarymanagement.customers;
 import librarymanagement.constants.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -66,7 +64,6 @@ public class CustomerService {
     }
 
     @Transactional
-    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1)
     public CustomerResponse addCustomer(CustomerRequest request) {
         log.debug("Adding new customer: {} {}", request.firstName(), request.lastName());
         String email = request.email();

@@ -152,7 +152,6 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public CopyResponse returnCopy(Long copyId, Long customerId) {
         log.debug("Returning copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -176,7 +175,6 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public CopyResponse markLost(Long copyId) {
         log.debug("Marking copy with ID: {} as lost", copyId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -188,6 +186,7 @@ public class CopyService {
         return CopyResponse.from(savedCopy);
     }
 
+    // Retryable: concurrent reservations pick the same first available copy, so the loser's retry picks the next
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
     public CopyResponse reserveAnyAvailableCopy(String isbn, Long customerId) {
@@ -213,7 +212,6 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public void cancelReservation(Long copyId, Long customerId) {
         log.debug("Cancelling reservation for copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy existingCopy = getCopyOrThrow(copyId);
@@ -236,7 +234,6 @@ public class CopyService {
     }
 
     @Transactional
-    @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 1)
     public CopyResponse checkout(Long copyId, Long customerId) {
         log.debug("Checking out copy with ID: {} for customer ID: {}", copyId, customerId);
         Copy copy = getCopyOrThrow(copyId);

@@ -3,18 +3,17 @@ package librarymanagement.books;
 import librarymanagement.authors.Author;
 import librarymanagement.authors.AuthorRepository;
 import librarymanagement.constants.Messages;
+import librarymanagement.copies.CopyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,10 +29,12 @@ public class BookService {
     private static final Logger log = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final CopyRepository copyRepository;
 
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, CopyRepository copyRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
+        this.copyRepository = copyRepository;
     }
 
     @Cacheable(value = "book-pages", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
@@ -97,7 +98,6 @@ public class BookService {
             @CacheEvict(value = "book-pages", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
-    @Retryable(includes = DataIntegrityViolationException.class, maxRetries = 1, delay = 50)
     public BookResponse addBook(BookCreateRequest bookCreateRequest) {
         String formattedAuthors = String.join(", ", bookCreateRequest.authorNames());
         log.debug("Adding book: '{}' by [{}] (ISBN: {})", bookCreateRequest.title(), formattedAuthors, bookCreateRequest.isbn());
@@ -174,6 +174,11 @@ public class BookService {
         if (book.isEmpty()) {
             log.warn("Attempted to delete non-existent book with ISBN: {}", isbn);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
+        }
+
+        if (copyRepository.existsByBookIsbn(isbn)) {
+            log.warn("Attempted to delete book with copies, ISBN: {}", isbn);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.BOOK_HAS_COPIES + isbn);
         }
 
         String title = book.get().getTitle();
