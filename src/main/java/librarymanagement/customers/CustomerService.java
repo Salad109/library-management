@@ -2,16 +2,16 @@ package librarymanagement.customers;
 
 import jakarta.transaction.Transactional;
 import librarymanagement.constants.Messages;
-import librarymanagement.exception.DuplicateResourceException;
-import librarymanagement.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +48,7 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) {
             log.warn("Customer not found with ID: {}", id);
-            throw new ResourceNotFoundException(Messages.CUSTOMER_NOT_FOUND + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.CUSTOMER_NOT_FOUND + id);
         }
         Customer existingCustomer = customer.get();
         log.debug("Found customer: {} {} with ID: {}", existingCustomer.getFirstName(), existingCustomer.getLastName(), id);
@@ -76,7 +76,7 @@ public class CustomerService {
         String email = customer.getEmail();
         if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
             log.warn("Duplicate customer found with email: {}", email);
-            throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + email);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_EMAIL_DUPLICATE + email);
         }
 
         Customer savedCustomer = customerRepository.save(customer);
@@ -95,7 +95,7 @@ public class CustomerService {
             Optional<Customer> duplicateCustomer = customerRepository.findByEmail(newEmail);
             if (duplicateCustomer.isPresent() && !duplicateCustomer.get().getId().equals(id)) {
                 log.warn("Attempted to update customer with duplicate email: {}", newEmail);
-                throw new DuplicateResourceException(Messages.CUSTOMER_EMAIL_DUPLICATE + newEmail);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_EMAIL_DUPLICATE + newEmail);
             }
         }
 

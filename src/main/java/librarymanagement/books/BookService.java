@@ -4,8 +4,6 @@ import jakarta.transaction.Transactional;
 import librarymanagement.authors.Author;
 import librarymanagement.authors.AuthorRepository;
 import librarymanagement.constants.Messages;
-import librarymanagement.exception.DuplicateResourceException;
-import librarymanagement.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,9 +15,11 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -62,7 +62,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
         if (book.isEmpty()) {
             log.warn("Book not found with ISBN: {}", isbn);
-            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
         }
         log.debug("Found book: '{}'", book.get().getTitle());
         return book.get();
@@ -109,7 +109,7 @@ public class BookService {
 
         if (bookRepository.existsByIsbn(bookCreateRequest.isbn())) {
             log.warn("Attempted to add duplicate book with ISBN: {}", bookCreateRequest.isbn());
-            throw new DuplicateResourceException(Messages.BOOK_DUPLICATE + bookCreateRequest.isbn());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.BOOK_DUPLICATE + bookCreateRequest.isbn());
         }
 
         Book book = new Book();
@@ -137,7 +137,7 @@ public class BookService {
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty()) {
             log.warn("Attempted to update non-existent book with ISBN: {}", isbn);
-            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
         }
 
         Book existingBook = optionalBook.get();
@@ -169,7 +169,7 @@ public class BookService {
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty()) {
             log.warn("Attempted to update copies for non-existent book with ISBN: {}", isbn);
-            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
         }
 
         Book book = optionalBook.get();
@@ -197,7 +197,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findById(isbn);
         if (book.isEmpty()) {
             log.warn("Attempted to delete non-existent book with ISBN: {}", isbn);
-            throw new ResourceNotFoundException(Messages.BOOK_NOT_FOUND + isbn);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
         }
 
         String title = book.get().getTitle();

@@ -1,13 +1,14 @@
 package librarymanagement.authors;
 
 import librarymanagement.constants.Messages;
-import librarymanagement.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class AuthorService {
         Optional<Author> author = authorRepository.findById(name);
         if (author.isEmpty()) {
             log.warn("Author not found with name: {}", name);
-            throw new ResourceNotFoundException(Messages.AUTHOR_NOT_FOUND + name);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.AUTHOR_NOT_FOUND + name);
         }
         log.debug("Found author: '{}'", author.get().getName());
         return author.get();

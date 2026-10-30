@@ -6,16 +6,17 @@ import librarymanagement.books.BookService;
 import librarymanagement.constants.Messages;
 import librarymanagement.customers.Customer;
 import librarymanagement.customers.CustomerService;
-import librarymanagement.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,13 +154,13 @@ public class CopyService {
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.BORROWED) {
             log.warn("Copy with ID: {} is not borrowed, current status: {}", copyId, existingCopy.getStatus());
-            throw new IllegalStateException(Messages.COPY_NOT_BORROWED + existingCopy.getStatus());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_NOT_BORROWED + existingCopy.getStatus());
         }
 
         Customer customer = customerService.getCustomerById(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             log.warn("Copy with ID: {} is reserved for another customer, current customer ID: {}", copyId, existingCopy.getCustomer().getId());
-            throw new IllegalStateException(Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
         }
 
         existingCopy.setCustomer(null);
@@ -197,7 +198,7 @@ public class CopyService {
         Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusWithRelations(isbn, CopyStatus.AVAILABLE);
         if (availableCopy.isEmpty()) {
             log.info("No available copies found for book with ISBN: {}", isbn);
-            throw new ResourceNotFoundException(Messages.COPY_NO_AVAILABLE + isbn);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.COPY_NO_AVAILABLE + isbn);
         }
 
         Copy copyToReserve = availableCopy.get();
@@ -223,13 +224,13 @@ public class CopyService {
         Copy existingCopy = getCopyOrThrow(copyId);
         if (existingCopy.getStatus() != CopyStatus.RESERVED) {
             log.warn("Copy with ID: {} is not reserved, current status: {}", copyId, existingCopy.getStatus());
-            throw new IllegalStateException(Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
         }
 
         Customer customer = customerService.getCustomerById(customerId);
         if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
             log.warn("Copy with ID: {} is reserved for customer ID: {}, not for customer ID: {}", copyId, existingCopy.getCustomer().getId(), customerId);
-            throw new IllegalStateException(Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
         }
 
         existingCopy.setCustomer(null);
@@ -260,14 +261,14 @@ public class CopyService {
         }
 
         log.info("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
-        throw new IllegalStateException(Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
     }
 
     private Copy checkoutReservedCopy(Copy copy, Customer customer) {
         log.debug("Checking out reserved copy with ID: {} for customer ID: {}", copy.getId(), customer.getId());
         if (!copy.getCustomer().getId().equals(customer.getId())) {
             log.info("Copy with ID: {} is reserved for another customer ID: {}, cannot checkout", copy.getId(), copy.getCustomer().getId());
-            throw new IllegalStateException(Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
         }
         copy.setStatus(CopyStatus.BORROWED);
         Copy savedCopy = copyRepository.save(copy);
@@ -294,7 +295,7 @@ public class CopyService {
         Optional<Copy> optionalCopy = copyRepository.findById(id);
         if (optionalCopy.isEmpty()) {
             log.warn("Copy not found with ID: {}", id);
-            throw new ResourceNotFoundException(Messages.COPY_NOT_FOUND + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.COPY_NOT_FOUND + id);
         }
         Copy savedCopy = optionalCopy.get();
         log.debug("Found copy with ID: {}, status: {}", savedCopy.getId(), savedCopy.getStatus());

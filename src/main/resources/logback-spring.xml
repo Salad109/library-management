@@ -9,6 +9,7 @@
                 </loggerName>
                 <mdc/>
                 <message/>
+                <stackTrace/>
             </providers>
         </encoder>
     </appender>
