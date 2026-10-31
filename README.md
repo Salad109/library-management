@@ -20,7 +20,7 @@ reservations, and librarian workflow management.
 - Detailed API documentation with Swagger
 - Docker Compose setup for easy deployment
 - Caching book catalog with Caffeine
-- Logs in JSON format with MDC
+- Logs in JSON format with MDC, collected in Loki
 - CI with GitHub Actions
 - Frontend for staff operations using Thymeleaf and Bootstrap
 
@@ -32,6 +32,7 @@ reservations, and librarian workflow management.
 - Slf4j + Logback for logging
 - Prometheus for metrics collection
 - Grafana for monitoring dashboards
+- Loki + Grafana Alloy for log aggregation
 - Docker Compose for containerization
 - Swagger for API documentation
 - Caffeine for caching
@@ -58,17 +59,10 @@ docker compose up
 The application runs on `http://localhost:8080`. API documentation is available via Swagger. Monitoring dashboard is
 available via Grafana and Prometheus. Access the staff panel at`http://localhost:8080/register`.
 
-## Monitoring Setup Guide
+## Monitoring
 
-1. Visit Grafana at `http://localhost:3000` (admin/admin)
-2. Create a new data source:
-    - Type: Prometheus
-    - URL: `http://prometheus:9090`
-    - Use default settings for everything else
-3. Click "Save & Test"
-4. Import dashboard from `grafana/dashboard.json`
-5. Select the created Prometheus data source
-6. Generate sample data by running `exampleRequests/complete-workflow.http`
+Grafana at `http://localhost:3000` (admin/admin) comes with the "Library Dashboard", including metrics from Prometheus
+and logs from Loki. Run `exampleRequests/complete-workflow.http` to generate some data.
 
 ## API Overview
 
@@ -134,6 +128,7 @@ exampleRequests/
 - [x] Proper API documentation
 - [x] Caching
 - [x] Logs in JSON format with MDC
+- [x] Log aggregation with Loki
 - [x] CI
 - [x] Login and registration pages
 - [x] Admin panel with full operations:
@@ -159,5 +154,5 @@ Copy checkout form
 ![](https://github.com/user-attachments/assets/44070f8f-1ade-4554-8b98-d986bacba02f)
 Customer browsing page
 ![](https://github.com/user-attachments/assets/e55750aa-2dd4-4edf-8680-38cef5afc4cc)
-Grafana dashboard during high load simulation using the config in `grafana/dashboard.json`.
+Grafana dashboard during high load simulation using the config in `grafana/dashboards/dashboard.json`.
 ![](https://github.com/user-attachments/assets/4735967b-be79-4f21-970d-33bcfbd1bebf)

@@ -1,3 +1,5 @@
+name: library-management
+
 services:
   library-management-app:
     build: .
@@ -29,17 +31,35 @@ services:
     depends_on:
       - library-management-app
 
+  loki:
+    image: grafana/loki:3.7.9
+    volumes:
+      - loki_data:/loki
+
+  alloy:
+    image: grafana/alloy:v1.21.3
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+
   grafana:
     image: grafana/grafana:13.3.0
     ports:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
     environment:
       - GF_LOG_LEVEL=warn
     depends_on:
       - prometheus
+      - loki
 
 volumes:
   db_data:
   grafana_data:
+  loki_data:

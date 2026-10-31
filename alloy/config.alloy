@@ -1,0 +1,32 @@
+// Collects the logs of this Compose project's containers and pushes them to Loki
+
+discovery.docker "compose" {
+  host = "unix:///var/run/docker.sock"
+
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=library-management"]
+  }
+}
+
+discovery.relabel "compose" {
+  targets = []
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service_name"
+  }
+}
+
+loki.source.docker "compose" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.compose.targets
+  relabel_rules = discovery.relabel.compose.rules
+  forward_to    = [loki.write.loki.receiver]
+}
+
+loki.write "loki" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
