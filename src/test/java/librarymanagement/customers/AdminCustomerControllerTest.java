@@ -73,6 +73,14 @@ class AdminCustomerControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testCreateCustomerInvalidEmail() {
+        MvcTestResult result = DataBuilder.createTestCustomer(mockMvcTester, "Goober", "III", "not-an-email");
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("email").isEqualTo(Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE);
+    }
+
+    @Test
     void testGetCustomerById() throws Exception {
         MvcTestResult customerCreationResult = DataBuilder.createTestCustomer(
                 mockMvcTester,

@@ -1,15 +1,14 @@
 # Authentication
 
 ### Register a customer
+# Needs an activation code from a librarian (admin/customers.http)
 POST http://localhost:8080/api/register
 Content-Type: application/json
 
 {
+  "activationCode": "ABCD-1234",
   "username": "customer1",
-  "password": "customer123",
-  "firstName": "Joe",
-  "lastName": "Mama",
-  "email": "joe.mama@example.com"
+  "password": "customer123"
 }
 
 ###
@@ -42,7 +41,7 @@ POST http://localhost:8080/api/logout
 
 ###
 
-### Invalid registration - missing customer fields
+### Invalid registration - missing activation code
 POST http://localhost:8080/api/register
 Content-Type: application/json
 

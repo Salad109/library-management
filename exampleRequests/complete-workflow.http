@@ -48,21 +48,40 @@ Content-Type: application/json
 
 ###
 
-### 5. Register a customer
-POST http://localhost:8080/api/register
+### 5. Create a customer at the desk (no account yet)
+POST http://localhost:8080/api/admin/customers
 Content-Type: application/json
 
 {
-  "username": "customer1",
-  "password": "customer123",
   "firstName": "Joe",
   "lastName": "Mama",
   "email": "joe.mama@example.com"
 }
 
+> {% client.global.set("customerId", response.body.id); %}
+
 ###
 
-### 6. Login as customer
+### 6. Generate an activation code and hand it to the customer
+POST http://localhost:8080/api/admin/customers/{{customerId}}/activation-code
+
+> {% client.global.set("activationCode", response.body.activationCode); %}
+
+###
+
+### 7. Customer registers online with the code
+POST http://localhost:8080/api/register
+Content-Type: application/json
+
+{
+  "activationCode": "{{activationCode}}",
+  "username": "customer1",
+  "password": "customer123"
+}
+
+###
+
+### 8. Login as customer
 POST http://localhost:8080/api/login
 Content-Type: application/x-www-form-urlencoded
 
@@ -71,17 +90,17 @@ password = customer123
 
 ###
 
-### 7. Customer browses books (public endpoint)
+### 9. Customer browses books (public endpoint)
 GET http://localhost:8080/api/books/search?q=1984
 
 ###
 
-### 8. Customer checks book details (including available copies)
+### 10. Customer checks book details (including available copies)
 GET http://localhost:8080/api/books/9789876543210
 
 ###
 
-### 9. Customer reserves a copy
+### 11. Customer reserves a copy
 POST http://localhost:8080/api/reservations
 Content-Type: application/json
 
@@ -91,12 +110,12 @@ Content-Type: application/json
 
 ###
 
-### 10. Customer checks their reservations
+### 12. Customer checks their reservations
 GET http://localhost:8080/api/reservations/mine
 
 ###
 
-### 11. Login back as librarian for checkout
+### 13. Login back as librarian for checkout
 POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
@@ -105,27 +124,27 @@ password = secret123
 
 ###
 
-### 12. Librarian checks out the reserved copy
+### 14. Librarian checks out the reserved copy
 POST http://localhost:8080/api/desk/checkout
 Content-Type: application/json
 
 {
   "copyId": 1,
-  "customerId": 1
+  "customerId": {{customerId}}
 }
 
 ###
 
-### 13. Librarian processes return
+### 15. Librarian processes return
 POST http://localhost:8080/api/desk/return
 Content-Type: application/json
 
 {
   "copyId": 1,
-  "customerId": 1
+  "customerId": {{customerId}}
 }
 
 ###
 
-### 14. Check book details to see available copies are 3 again
+### 16. Check book details to see available copies are 3 again
 GET http://localhost:8080/api/books/9789876543210

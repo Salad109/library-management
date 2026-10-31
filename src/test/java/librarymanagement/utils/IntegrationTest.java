@@ -16,6 +16,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.URLEncoder;
@@ -72,28 +73,57 @@ public abstract class IntegrationTest {
     }
 
     /**
-     * Registers a customer account and logs it in through the API login.
+     * The library card flow: a librarian creates the customer and an activation code, the customer registers with it
+     * and logs in through the API login.
      */
     protected CustomerAccount customerAccount(String username, String firstName, String lastName) {
-        String customerJson = """
-                {
-                    "username": "%s",
-                    "password": "%s",
-                    "firstName": "%s",
-                    "lastName": "%s"
-                }
-                """.formatted(username, CUSTOMER_PASSWORD, firstName, lastName);
+        MockHttpSession librarianSession = librarianSession();
+        long customerId = createCustomer(librarianSession, firstName, lastName);
+        String code = activationCode(librarianSession, customerId);
 
-        MvcTestResult registration = mvc.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
+        MvcTestResult registration = register(code, username, CUSTOMER_PASSWORD);
         assertThat(registration).hasStatus(HttpStatus.CREATED);
 
-        long customerId = new ObjectMapper().readTree(registration.getResponse().getContentAsByteArray())
-                .get("customer").get("id").asLong();
         return new CustomerAccount(customerId, login("/api/login", username, CUSTOMER_PASSWORD, HttpStatus.OK));
+    }
+
+    /**
+     * Creates a customer at the desk (no account yet) and returns its ID.
+     */
+    protected long createCustomer(MockHttpSession librarianSession, String firstName, String lastName) {
+        MvcTestResult result = mvc.post()
+                .uri("/api/admin/customers")
+                .session(librarianSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"firstName": "%s", "lastName": "%s"}
+                        """.formatted(firstName, lastName))
+                .exchange();
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        return readJson(result).get("id").asLong();
+    }
+
+    protected String activationCode(MockHttpSession librarianSession, long customerId) {
+        MvcTestResult result = mvc.post()
+                .uri("/api/admin/customers/{id}/activation-code", customerId)
+                .session(librarianSession)
+                .exchange();
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        return readJson(result).get("activationCode").asString();
+    }
+
+    protected MvcTestResult register(String activationCode, String username, String password) {
+        return mvc.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"activationCode": "%s", "username": "%s", "password": "%s"}
+                        """.formatted(activationCode, username, password))
+                .exchange();
+    }
+
+    private static JsonNode readJson(MvcTestResult result) {
+        return new ObjectMapper().readTree(result.getResponse().getContentAsByteArray());
     }
 
     private MockHttpSession login(String uri, String username, String password, HttpStatus expectedStatus) {

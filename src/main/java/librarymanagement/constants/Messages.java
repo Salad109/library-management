@@ -35,6 +35,7 @@ public class Messages {
     // Customer
     public static final String CUSTOMER_NOT_FOUND = "Customer not found with ID: ";
     public static final String CUSTOMER_EMAIL_DUPLICATE = "Email already exists: ";
+    public static final String CUSTOMER_HAS_ACCOUNT = "Customer already has an account. Customer ID: ";
     public static final String CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE = "First name cannot be blank";
     public static final String CUSTOMER_LASTNAME_VALIDATION_MESSAGE = "Last name cannot be blank";
     public static final String CUSTOMER_FIRSTNAME_LENGTH_VALIDATION_MESSAGE = "First name cannot exceed 100 characters";
@@ -49,6 +50,8 @@ public class Messages {
     public static final String USER_PASSWORD_VALIDATION_MESSAGE = "Password cannot be blank";
     public static final String USER_USERNAME_LENGTH_VALIDATION_MESSAGE = "Username cannot exceed 50 characters";
     public static final String USER_PASSWORD_TOO_LONG = "Password cannot exceed 72 bytes";
+    public static final String ACTIVATION_CODE_INVALID = "Activation code is invalid or expired";
+    public static final String ACTIVATION_CODE_VALIDATION_MESSAGE = "Activation code cannot be blank";
 
     private Messages() {
     }

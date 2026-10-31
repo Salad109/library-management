@@ -15,6 +15,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     boolean existsByEmail(String email);
 
+    Optional<Customer> findByActivationCodeHash(String activationCodeHash);
+
     @Query("SELECT c.id FROM Customer c ORDER BY c.lastName, c.firstName")
     Page<Long> findAllIds(Pageable pageable);
 

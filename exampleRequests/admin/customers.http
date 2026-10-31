@@ -16,6 +16,11 @@ GET http://localhost:8080/api/admin/customers/1
 
 ###
 
+### Generate an activation code for the customer to register online with (valid 48h, replaces any older code)
+POST http://localhost:8080/api/admin/customers/1/activation-code
+
+###
+
 ### Update customer information
 PUT http://localhost:8080/api/admin/customers/1
 Content-Type: application/json

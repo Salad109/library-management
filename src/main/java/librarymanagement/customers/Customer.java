@@ -3,6 +3,7 @@ package librarymanagement.customers;
 import jakarta.persistence.*;
 import librarymanagement.copies.Copy;
 
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,6 +19,10 @@ public class Customer {
     private String lastName;
 
     private String email;
+
+    private String activationCodeHash;
+
+    private Instant activationCodeExpiresAt;
 
     @OneToMany(mappedBy = "customer")
     private Set<Copy> copies;
@@ -59,6 +64,22 @@ public class Customer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getActivationCodeHash() {
+        return activationCodeHash;
+    }
+
+    public void setActivationCodeHash(String activationCodeHash) {
+        this.activationCodeHash = activationCodeHash;
+    }
+
+    public Instant getActivationCodeExpiresAt() {
+        return activationCodeExpiresAt;
+    }
+
+    public void setActivationCodeExpiresAt(Instant activationCodeExpiresAt) {
+        this.activationCodeExpiresAt = activationCodeExpiresAt;
     }
 
     public Set<Copy> getCopies() {

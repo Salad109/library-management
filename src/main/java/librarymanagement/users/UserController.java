@@ -20,12 +20,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @Operation(summary = "Register a new customer account",
-            description = "Creates a CUSTOMER user and a new customer record. Librarian accounts are created by librarians.")
+    @Operation(summary = "Register a customer account with an activation code",
+            description = "Creates a CUSTOMER user for the existing customer the activation code belongs to.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Customer registered successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data or missing required fields"),
-            @ApiResponse(responseCode = "409", description = "Username or email already exists")
+            @ApiResponse(responseCode = "400", description = "Invalid request data, or invalid or expired activation code"),
+            @ApiResponse(responseCode = "409", description = "Username already exists")
     })
     @PostMapping("/api/register")
     @ResponseStatus(HttpStatus.CREATED)

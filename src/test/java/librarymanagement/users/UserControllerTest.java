@@ -23,37 +23,32 @@ class UserControllerTest extends IntegrationTest {
 
     @Test
     void testRegisterCustomer() {
-        String customerJson = """
-                {
-                    "username": "customer1",
-                    "password": "customer123",
-                    "firstName": "Joe",
-                    "lastName": "Mama",
-                    "email": "joe@example.com"
-                }
-                """;
+        MockHttpSession librarianSession = librarianSession();
+        long customerId = createCustomer(librarianSession, "Joe", "Mama");
+        String code = activationCode(librarianSession, customerId);
 
-        MvcTestResult result = register(customerJson);
+        MvcTestResult result = register(code, "customer1", "customer123");
 
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
+        assertThat(result).bodyJson().extractingPath("customer.id").isEqualTo((int) customerId);
         assertThat(result).bodyJson().extractingPath("customer.firstName").isEqualTo("Joe");
         assertThat(result).bodyJson().doesNotHavePath("password");
     }
 
     @Test
     void testRegisterIgnoresRequestedRole() {
-        String customerJson = """
+        MockHttpSession librarianSession = librarianSession();
+        String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Evil"));
+
+        MvcTestResult result = registerJson("""
                 {
+                    "activationCode": "%s",
                     "username": "evil",
                     "password": "password123",
-                    "role": "ROLE_LIBRARIAN",
-                    "firstName": "Joe",
-                    "lastName": "Evil"
+                    "role": "ROLE_LIBRARIAN"
                 }
-                """;
-
-        MvcTestResult result = register(customerJson);
+                """.formatted(code));
 
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
@@ -83,15 +78,7 @@ class UserControllerTest extends IntegrationTest {
 
     @Test
     void testLoginCustomer() {
-        String customerJson = """
-                {
-                    "username": "goober",
-                    "password": "password123",
-                    "firstName": "Test",
-                    "lastName": "User"
-                }
-                """;
-        assertThat(register(customerJson)).hasStatus(HttpStatus.CREATED);
+        assertThat(registerNewCustomer("goober", "password123")).hasStatus(HttpStatus.CREATED);
 
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/api/login")
@@ -107,53 +94,17 @@ class UserControllerTest extends IntegrationTest {
 
     @Test
     void testRegisterCustomerMissingFields() {
-        String invalidCustomerJson = """
-                {
-                    "username": "goober jr.",
-                    "password": "goober123"
-                }
-                """;
-
-        MvcTestResult result = register(invalidCustomerJson);
+        MvcTestResult result = registerJson("{}");
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    void testRegisterCustomerInvalidEmail() {
-        String invalidEmailJson = """
-                {
-                    "username": "goober iii",
-                    "password": "goober123",
-                    "firstName": "Goober",
-                    "lastName": "III",
-                    "email": "not-an-email"
-                }
-                """;
-
-        MvcTestResult result = register(invalidEmailJson);
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result)
-                .bodyJson()
-                .extractingPath("email")
-                .isEqualTo(Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("activationCode").isEqualTo(Messages.ACTIVATION_CODE_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("username").isEqualTo(Messages.USER_USERNAME_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("password").isEqualTo(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
     }
 
     @Test
     void testRegisterTooLongUsername() {
-        String userJson = """
-                {
-                    "username": "%s",
-                    "password": "secret123",
-                    "firstName": "Joe",
-                    "lastName": "Mama"
-                }
-                """.formatted("a".repeat(51));
-
-        MvcTestResult result = register(userJson);
+        MvcTestResult result = registerNewCustomer("a".repeat(51), "secret123");
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
@@ -165,22 +116,23 @@ class UserControllerTest extends IntegrationTest {
     @Test
     void testRegisterTooLongPassword() {
         // 40 characters, but 80 bytes in UTF-8
-        String userJson = """
-                {
-                    "username": "customer1",
-                    "password": "%s",
-                    "firstName": "Joe",
-                    "lastName": "Mama"
-                }
-                """.formatted("ą".repeat(40));
-
-        MvcTestResult result = register(userJson);
+        MvcTestResult result = registerNewCustomer("customer1", "ą".repeat(40));
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
                 .bodyJson()
                 .extractingPath("error")
                 .isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
+    }
+
+    @Test
+    void testRegisterDuplicateUsername() {
+        assertThat(registerNewCustomer("customer1", "secret123")).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult result = registerNewCustomer("customer1", "secret123");
+
+        assertThat(result).hasStatus(HttpStatus.CONFLICT);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.USER_DUPLICATE + "customer1");
     }
 
     @Test
@@ -283,7 +235,13 @@ class UserControllerTest extends IntegrationTest {
                 .contains("LIBRARIAN");
     }
 
-    private MvcTestResult register(String json) {
+    private MvcTestResult registerNewCustomer(String username, String password) {
+        MockHttpSession librarianSession = librarianSession();
+        String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
+        return register(code, username, password);
+    }
+
+    private MvcTestResult registerJson(String json) {
         return mockMvcTester.post()
                 .uri("/api/register")
                 .contentType(MediaType.APPLICATION_JSON)
