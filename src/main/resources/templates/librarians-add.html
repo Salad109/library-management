@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add New Librarian</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="container">
+    <h1>Add New Librarian</h1>
+
+    <div class="alert" id="message" style="display:none; white-space: pre-line"></div>
+
+    <form id="librarianForm">
+        <div class="mb-3">
+            <label for="username">Username:</label>
+            <input class="form-control" id="username" name="username" required type="text">
+        </div>
+        <div class="mb-3">
+            <label for="password">Password:</label>
+            <input class="form-control" id="password" name="password" required type="password">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Add Librarian</button>
+    </form>
+
+    <script>
+        document.getElementById('librarianForm').onsubmit = async function (e) {
+            e.preventDefault();
+
+            const data = new FormData(this);
+            const json = {
+                username: data.get('username'),
+                password: data.get('password')
+            };
+
+            const response = await fetch('/api/admin/librarians', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(json)
+            });
+
+            const msg = document.getElementById('message');
+            if (response.ok) {
+                msg.className = 'alert alert-success';
+                msg.textContent = 'Librarian added: ' + (await response.json()).username;
+                this.reset();
+            } else {
+                const errorData = await response.json();
+                msg.className = 'alert alert-danger';
+                msg.textContent = errorData.error || Object.values(errorData).join('\n') || 'Error adding librarian';
+            }
+            msg.style.display = 'block';
+        };
+    </script>
+</div>
+</body>
+</html>

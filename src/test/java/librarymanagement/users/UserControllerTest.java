@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -17,27 +18,8 @@ class UserControllerTest extends IntegrationTest {
     @Autowired
     private MockMvcTester mockMvcTester;
 
-    @Test
-    void testRegisterLibrarian() {
-        String librarianJson = """
-                {
-                    "username": "librarian1",
-                    "password": "secret123",
-                    "role": "ROLE_LIBRARIAN"
-                }
-                """;
-
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(librarianJson)
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.CREATED);
-        assertThat(result).bodyJson().extractingPath("username").isEqualTo("librarian1");
-        assertThat(result).bodyJson().doesNotHavePath("password");
-        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void testRegisterCustomer() {
@@ -45,18 +27,13 @@ class UserControllerTest extends IntegrationTest {
                 {
                     "username": "customer1",
                     "password": "customer123",
-                    "role": "ROLE_CUSTOMER",
                     "firstName": "Joe",
                     "lastName": "Mama",
                     "email": "joe@example.com"
                 }
                 """;
 
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
+        MvcTestResult result = register(customerJson);
 
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
@@ -65,29 +42,38 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testLoginLibrarian() {
-        // Register a librarian
-        String librarianJson = """
+    void testRegisterIgnoresRequestedRole() {
+        String customerJson = """
                 {
-                    "username": "librarian1",
+                    "username": "evil",
                     "password": "password123",
-                    "role": "ROLE_LIBRARIAN"
+                    "role": "ROLE_LIBRARIAN",
+                    "firstName": "Joe",
+                    "lastName": "Evil"
                 }
                 """;
 
-        mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(librarianJson)
-                .exchange()
-                .assertThat()
-                .hasStatus(HttpStatus.CREATED);
+        MvcTestResult result = register(customerJson);
 
-        // Try to log in
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
+
+        MvcTestResult staffLogin = mockMvcTester.post()
+                .uri("/admin/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("username=evil&password=password123")
+                .exchange();
+        assertThat(staffLogin).hasStatus(HttpStatus.FOUND).hasRedirectedUrl("/login?error=true");
+    }
+
+    @Test
+    void testLoginLibrarian() {
+        librarianSession();
+
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/admin/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("username=librarian1&password=password123")
+                .content("username=" + librarianUsername + "&password=" + librarianPassword)
                 .exchange();
 
         assertThat(loginResult)
@@ -97,26 +83,16 @@ class UserControllerTest extends IntegrationTest {
 
     @Test
     void testLoginCustomer() {
-        // Register a customer
         String customerJson = """
                 {
                     "username": "goober",
                     "password": "password123",
-                    "role": "ROLE_CUSTOMER",
                     "firstName": "Test",
                     "lastName": "User"
                 }
                 """;
+        assertThat(register(customerJson)).hasStatus(HttpStatus.CREATED);
 
-        mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange()
-                .assertThat()
-                .hasStatus(HttpStatus.CREATED);
-
-        // Try to log in
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -134,22 +110,15 @@ class UserControllerTest extends IntegrationTest {
         String invalidCustomerJson = """
                 {
                     "username": "goober jr.",
-                    "password": "goober123",
-                    "role": "ROLE_CUSTOMER"
+                    "password": "goober123"
                 }
                 """;
 
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidCustomerJson)
-                .exchange();
+        MvcTestResult result = register(invalidCustomerJson);
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result)
-                .bodyJson()
-                .extractingPath("error")
-                .isEqualTo(Messages.USER_MISSING_CUSTOMER_FIELDS);
+        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
+        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -158,18 +127,13 @@ class UserControllerTest extends IntegrationTest {
                 {
                     "username": "goober iii",
                     "password": "goober123",
-                    "role": "ROLE_CUSTOMER",
                     "firstName": "Goober",
                     "lastName": "III",
                     "email": "not-an-email"
                 }
                 """;
 
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidEmailJson)
-                .exchange();
+        MvcTestResult result = register(invalidEmailJson);
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
@@ -184,15 +148,12 @@ class UserControllerTest extends IntegrationTest {
                 {
                     "username": "%s",
                     "password": "secret123",
-                    "role": "ROLE_LIBRARIAN"
+                    "firstName": "Joe",
+                    "lastName": "Mama"
                 }
                 """.formatted("a".repeat(51));
 
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .exchange();
+        MvcTestResult result = register(userJson);
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
@@ -206,23 +167,80 @@ class UserControllerTest extends IntegrationTest {
         // 40 characters, but 80 bytes in UTF-8
         String userJson = """
                 {
-                    "username": "librarian1",
+                    "username": "customer1",
                     "password": "%s",
-                    "role": "ROLE_LIBRARIAN"
+                    "firstName": "Joe",
+                    "lastName": "Mama"
                 }
                 """.formatted("ą".repeat(40));
 
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .exchange();
+        MvcTestResult result = register(userJson);
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
                 .bodyJson()
                 .extractingPath("error")
                 .isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
+    }
+
+    @Test
+    void testCreateLibrarian() {
+        MockHttpSession librarianSession = librarianSession();
+
+        MvcTestResult result = createLibrarian(librarianSession, "librarian2", "secret123");
+
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        assertThat(result).bodyJson().extractingPath("username").isEqualTo("librarian2");
+        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
+        assertThat(result).bodyJson().doesNotHavePath("password");
+
+        MvcTestResult loginResult = mockMvcTester.post()
+                .uri("/admin/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("username=librarian2&password=secret123")
+                .exchange();
+        assertThat(loginResult).hasStatus(HttpStatus.FOUND).hasRedirectedUrl("/admin");
+    }
+
+    @Test
+    void testCreateDuplicateLibrarian() {
+        MockHttpSession librarianSession = librarianSession();
+
+        MvcTestResult result = createLibrarian(librarianSession, librarianUsername, "secret123");
+
+        assertThat(result).hasStatus(HttpStatus.CONFLICT);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.USER_DUPLICATE + librarianUsername);
+    }
+
+    @Test
+    void testCreateLibrarianTooLongPassword() {
+        MockHttpSession librarianSession = librarianSession();
+
+        MvcTestResult result = createLibrarian(librarianSession, "librarian2", "ą".repeat(40));
+
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
+    }
+
+    @Test
+    void testCustomerCannotCreateLibrarian() {
+        MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
+
+        assertThat(createLibrarian(customerSession, "evil", "secret123")).hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void testAnonymousCannotCreateLibrarian() {
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/admin/librarians")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"username": "evil", "password": "secret123"}
+                        """)
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.FOUND);
+        assertThat(userRepository.findByUsername("evil")).isEmpty();
     }
 
     @Test
@@ -263,5 +281,24 @@ class UserControllerTest extends IntegrationTest {
                 .hasStatus(HttpStatus.OK)
                 .bodyText()
                 .contains("LIBRARIAN");
+    }
+
+    private MvcTestResult register(String json) {
+        return mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .exchange();
+    }
+
+    private MvcTestResult createLibrarian(MockHttpSession session, String username, String password) {
+        return mockMvcTester.post()
+                .uri("/api/admin/librarians")
+                .session(session)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"username": "%s", "password": "%s"}
+                        """.formatted(username, password))
+                .exchange();
     }
 }

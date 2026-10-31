@@ -21,7 +21,6 @@ class AdminWebControllerTest extends IntegrationTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/register",
             "/login",
             "/admin",
             "/admin/books/browse",
@@ -29,6 +28,7 @@ class AdminWebControllerTest extends IntegrationTest {
             "/admin/copies/browse",
             "/admin/customers/browse",
             "/admin/customers/add",
+            "/admin/librarians/add",
     })
     void testPageLoads(String url) {
         mockMvcTester.get().uri(url)

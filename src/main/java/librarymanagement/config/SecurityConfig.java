@@ -33,9 +33,9 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain staffChain(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/admin/**", "/login", "/register")
+                .securityMatcher("/admin/**", "/login")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .anyRequest().hasRole("LIBRARIAN")
                 )
                 .formLogin(form -> form

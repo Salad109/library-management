@@ -1,24 +1,24 @@
 # Complete Library Workflow Example
 # This demonstrates a full library use case from start to finish
 
-### 1. Register a librarian
-POST http://localhost:8080/api/register
+### 1. Login as librarian
+# The first librarian is created on startup from LIBRARY_ADMIN_* in .env
+POST http://localhost:8080/admin/login
+Content-Type: application/x-www-form-urlencoded
+
+username = admin &
+password = change-me
+
+###
+
+### 2. Create another librarian
+POST http://localhost:8080/api/admin/librarians
 Content-Type: application/json
 
 {
   "username": "librarian1",
-  "password": "secret123",
-  "role": "ROLE_LIBRARIAN"
+  "password": "secret123"
 }
-
-###
-
-### 2. Login as librarian
-POST http://localhost:8080/admin/login
-Content-Type: application/x-www-form-urlencoded
-
-username = librarian1 &
-password = secret123
 
 ###
 
@@ -55,7 +55,6 @@ Content-Type: application/json
 {
   "username": "customer1",
   "password": "customer123",
-  "role": "ROLE_CUSTOMER",
   "firstName": "Joe",
   "lastName": "Mama",
   "email": "joe.mama@example.com"

@@ -30,14 +30,7 @@ class DeskControllerTest extends IntegrationTest {
     @Test
     void testCheckout() throws Exception {
         // Register and login the librarian
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian1");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         // Create book
         String isbn = TestISBNGenerator.next();
@@ -57,16 +50,9 @@ class DeskControllerTest extends IntegrationTest {
         int unreservedCopyId = ControllerTestUtils.extractIdFromResponseArray(secondCopyResult);
 
         // Register and login the customer
-        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
-        assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
-
-        MvcTestResult customerLoginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
-        assertThat(customerLoginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession customerSession = (MockHttpSession) customerLoginResult.getRequest().getSession();
-        assertThat(customerSession).isNotNull();
+        CustomerAccount customer = customerAccount("joe", "Joe", "Mama");
+        long customerId = customer.customerId();
+        MockHttpSession customerSession = customer.session();
 
         // Customer reserves a copy
         String reservationJson = """
@@ -145,14 +131,7 @@ class DeskControllerTest extends IntegrationTest {
     @Test
     void testReturnCopy() throws Exception {
         // Register and login the librarian
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian2");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian2");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         // Create book and copy
         String isbn = TestISBNGenerator.next();
@@ -165,11 +144,7 @@ class DeskControllerTest extends IntegrationTest {
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create customer
-        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
-        assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
-
+        long customerId = customerAccount("jane", "Jane", "Mama").customerId();
         // Checkout the copy first
         String checkoutJson = """
                 {
@@ -219,14 +194,7 @@ class DeskControllerTest extends IntegrationTest {
     @Test
     void testReturnNotBorrowedCopy() throws Exception {
         // Register and login the librarian
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian3");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian3");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         // Create book and copy
         String isbn = TestISBNGenerator.next();
@@ -239,11 +207,7 @@ class DeskControllerTest extends IntegrationTest {
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Register customer
-        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "baby joe", "Joe Jr", "Mama");
-        assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        int customerId = ControllerTestUtils.extractCustomerIdFromRegistration(customerRegistrationResult);
-
+        long customerId = customerAccount("baby joe", "Joe Jr", "Mama").customerId();
         // Try to return copy that was never borrowed
         String returnJson = """
                 {
@@ -265,14 +229,7 @@ class DeskControllerTest extends IntegrationTest {
     @Test
     void testMarkLost() throws Exception {
         // Register and login the librarian
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian4");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian4");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         // Create book and copy
         String isbn = TestISBNGenerator.next();

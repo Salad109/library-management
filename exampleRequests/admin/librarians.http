@@ -1,0 +1,11 @@
+# Admin Librarian Management
+# Login as librarian first
+
+### Create a librarian
+POST http://localhost:8080/api/admin/librarians
+Content-Type: application/json
+
+{
+  "username": "librarian2",
+  "password": "secret123"
+}

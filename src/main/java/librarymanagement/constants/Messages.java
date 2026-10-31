@@ -44,13 +44,11 @@ public class Messages {
     public static final String CUSTOMER_EMAIL_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
     // User
     public static final String USERNAME_NOT_FOUND = "User not found: ";
-    public static final String USER_MISSING_CUSTOMER_FIELDS = "First name and last name are required for customers";
     public static final String USER_DUPLICATE = "User already exists with username: ";
     public static final String USER_USERNAME_VALIDATION_MESSAGE = "Username cannot be blank";
     public static final String USER_PASSWORD_VALIDATION_MESSAGE = "Password cannot be blank";
     public static final String USER_USERNAME_LENGTH_VALIDATION_MESSAGE = "Username cannot exceed 50 characters";
     public static final String USER_PASSWORD_TOO_LONG = "Password cannot exceed 72 bytes";
-    public static final String USER_ROLE_VALIDATION_MESSAGE = "Role cannot be null";
 
     private Messages() {
     }

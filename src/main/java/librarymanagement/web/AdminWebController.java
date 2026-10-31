@@ -31,14 +31,14 @@ public class AdminWebController {
         return "login";
     }
 
-    @GetMapping("/register")
-    public String registerPage() {
-        return "register";
-    }
-
     @GetMapping("/admin")
     public String adminPage() {
         return "admin";
+    }
+
+    @GetMapping("/admin/librarians/add")
+    public String librarianAddPage() {
+        return "librarians-add";
     }
 
     @GetMapping("/admin/books/browse")

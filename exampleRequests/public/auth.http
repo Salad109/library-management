@@ -1,17 +1,5 @@
 # Authentication
 
-### Register a librarian
-POST http://localhost:8080/api/register
-Content-Type: application/json
-
-{
-  "username": "librarian1",
-  "password": "secret123",
-  "role": "ROLE_LIBRARIAN"
-}
-
-###
-
 ### Register a customer
 POST http://localhost:8080/api/register
 Content-Type: application/json
@@ -19,7 +7,6 @@ Content-Type: application/json
 {
   "username": "customer1",
   "password": "customer123",
-  "role": "ROLE_CUSTOMER",
   "firstName": "Joe",
   "lastName": "Mama",
   "email": "joe.mama@example.com"
@@ -27,12 +14,12 @@ Content-Type: application/json
 
 ###
 
-### Login as librarian
+### Login as librarian (credentials from .env.example)
 POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
-username = librarian1 &
-password = secret123
+username = admin &
+password = change-me
 
 ###
 
@@ -55,24 +42,11 @@ POST http://localhost:8080/api/logout
 
 ###
 
-### Invalid registration - bad role
-POST http://localhost:8080/api/register
-Content-Type: application/json
-
-{
-  "username": "goober",
-  "password": "password123",
-  "role": "ROLE_GOOBER"
-}
-
-###
-
 ### Invalid registration - missing customer fields
 POST http://localhost:8080/api/register
 Content-Type: application/json
 
 {
   "username": "customer2",
-  "password": "password123",
-  "role": "ROLE_CUSTOMER"
+  "password": "password123"
 }

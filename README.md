@@ -47,17 +47,21 @@ reservations, and librarian workflow management.
 ```bash
 # Clone environment
 cp .env.example .env
-# Edit .env with your database credentials. For example:
+# Edit .env with your database credentials and the first librarian account. For example:
 # POSTGRES_USER=library_admin
 # POSTGRES_PASSWORD=secret123
 # POSTGRES_DB=library_db
+# LIBRARY_ADMIN_USERNAME=admin
+# LIBRARY_ADMIN_PASSWORD=change-me
 
 # Start all services
 docker compose up
 ```
 
 The application runs on `http://localhost:8080`. API documentation is available via Swagger. Monitoring dashboard is
-available via Grafana and Prometheus. Access the staff panel at`http://localhost:8080/register`.
+available via Grafana and Prometheus. Log in to the staff panel at `http://localhost:8080/login` with the
+`LIBRARY_ADMIN_*` account, which is created on first startup if no librarian exists yet. Further librarians are added
+from the panel.
 
 ## Monitoring
 
@@ -83,7 +87,7 @@ Handle checkouts, returns, and mark items as lost
 
 ### Admin Operations (LIBRARIAN role)
 
-Manage books, copies, and customer accounts
+Manage books, copies, customer accounts, and librarian accounts
 
 ## Example HTTP Requests
 
@@ -94,7 +98,8 @@ exampleRequests/
 ├── admin/
 │   ├── books.http        # Book CRUD operations
 │   ├── copies.http       # Copy management
-│   └── customers.http    # Customer management
+│   ├── customers.http    # Customer management
+│   └── librarians.http   # Librarian accounts
 ├── customer/
 │   └── reservations.http # Customer self-service
 ├── librarian/

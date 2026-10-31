@@ -25,14 +25,7 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Test
     void testMyReservations() {
-        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "jane", "Jane", "Mama");
-        assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "jane");
-        assertThat(loginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
-        assertThat(session).isNotNull();
+        MockHttpSession session = customerAccount("jane", "Jane", "Mama").session();
 
         MvcTestResult result = mockMvcTester.get()
                 .uri("/api/reservations/mine")
@@ -46,14 +39,7 @@ class ReservationControllerTest extends IntegrationTest {
     @Test
     void testCreateReservation() throws Exception {
         // Create a librarian and add a book and a copy
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian1");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         String isbn = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Reserved Book", "Reserved Author"))
@@ -65,14 +51,7 @@ class ReservationControllerTest extends IntegrationTest {
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create a customer and make a reservation
-        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
-        assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult customerLoginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
-        assertThat(customerLoginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession customerSession = (MockHttpSession) customerLoginResult.getRequest().getSession();
-        assertThat(customerSession).isNotNull();
+        MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
 
         String reservationJson = """
                 {
@@ -96,10 +75,7 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Test
     void testReservationLimit() throws Exception {
-        assertThat(ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian1")).hasStatus(HttpStatus.CREATED);
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian1");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        MockHttpSession librarianSession = librarianSession();
 
         String isbn = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Popular Book", "Author Name"))
@@ -107,10 +83,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, CopyService.MAX_ACTIVE_RESERVATIONS + 1))
                 .hasStatus(HttpStatus.CREATED);
 
-        assertThat(ControllerTestUtils.registerCustomer(mockMvcTester, "hoarder", "Joe", "Mama")).hasStatus(HttpStatus.CREATED);
-        MvcTestResult customerLoginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "hoarder");
-        assertThat(customerLoginResult).hasStatus(HttpStatus.OK);
-        MockHttpSession customerSession = (MockHttpSession) customerLoginResult.getRequest().getSession();
+        MockHttpSession customerSession = customerAccount("hoarder", "Joe", "Mama").session();
 
         String reservationJson = """
                 {
@@ -159,10 +132,7 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Test
     void testConcurrentReservationsGetDifferentCopies() throws Exception {
-        assertThat(ControllerTestUtils.registerLibrarian(mockMvcTester, "librarianTwo")).hasStatus(HttpStatus.CREATED);
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarianTwo");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
+        MockHttpSession librarianSession = librarianSession();
 
         String isbn = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Two Copies", "Author Name"))
@@ -173,10 +143,7 @@ class ReservationControllerTest extends IntegrationTest {
         // Log both customers in first, so only the reservations race
         MockHttpSession[] sessions = new MockHttpSession[2];
         for (int i = 0; i < 2; i++) {
-            String username = "racer" + i;
-            assertThat(ControllerTestUtils.registerCustomer(mockMvcTester, username, "Racer", "No" + i))
-                    .hasStatus(HttpStatus.CREATED);
-            sessions[i] = (MockHttpSession) ControllerTestUtils.loginCustomer(mockMvcTester, username).getRequest().getSession();
+            sessions[i] = customerAccount("racer" + i, "Racer", "No" + i).session();
         }
 
         String reservationJson = """
@@ -222,14 +189,7 @@ class ReservationControllerTest extends IntegrationTest {
         // Create a librarian and add a book and a copy
         String isbn = "9783213211230";
 
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarianCon");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarianCon");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Test Book", "Author Name"))
                 .hasStatus(HttpStatus.CREATED);
@@ -243,6 +203,10 @@ class ReservationControllerTest extends IntegrationTest {
                 }
                 """.formatted(isbn);
 
+        // Log both customers in first, so only the reservations race
+        MockHttpSession sessionA = customerAccount("customerACon", "Joe", "Mama").session();
+        MockHttpSession sessionB = customerAccount("customerBCon", "Jane", "Mama").session();
+
         // Setup latches to coordinate customer threads
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch doneLatch = new CountDownLatch(2);
@@ -255,25 +219,9 @@ class ReservationControllerTest extends IntegrationTest {
             try {
                 startLatch.await();
 
-                // Register and login
-                MvcTestResult regResult = ControllerTestUtils.registerCustomer(mockMvcTester, "customerACon", "Joe", "Mama");
-                if (regResult.getResponse().getStatus() != HttpStatus.CREATED.value()) {
-                    exceptions[0] = new RuntimeException("Failed to register customerA");
-                    return;
-                }
-
-                MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "customerACon");
-                if (loginResult.getResponse().getStatus() != HttpStatus.OK.value()) {
-                    exceptions[0] = new RuntimeException("Failed to login customerA");
-                    return;
-                }
-
-                MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
-                assertThat(session).isNotNull();
-
                 results[0] = mockMvcTester.post()
                         .uri("/api/reservations")
-                        .session(session)
+                        .session(sessionA)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson)
                         .exchange();
@@ -289,25 +237,9 @@ class ReservationControllerTest extends IntegrationTest {
             try {
                 startLatch.await();
 
-                // Register and login customer
-                MvcTestResult regResult = ControllerTestUtils.registerCustomer(mockMvcTester, "customerBCon", "Jane", "Mama");
-                if (regResult.getResponse().getStatus() != HttpStatus.CREATED.value()) {
-                    exceptions[1] = new RuntimeException("Failed to register customerB");
-                    return;
-                }
-
-                MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "customerBCon");
-                if (loginResult.getResponse().getStatus() != HttpStatus.OK.value()) {
-                    exceptions[1] = new RuntimeException("Failed to login customerB");
-                    return;
-                }
-
-                MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
-                assertThat(session).isNotNull();
-
                 results[1] = mockMvcTester.post()
                         .uri("/api/reservations")
-                        .session(session)
+                        .session(sessionB)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson)
                         .exchange();
@@ -354,14 +286,7 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Test
     void testCreateInvalidReservations() {
-        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
-        assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
-        assertThat(loginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
-        assertThat(session).isNotNull();
+        MockHttpSession session = customerAccount("joe", "Joe", "Mama").session();
 
         String nullIsbnReservationJson = """
                 {
@@ -402,14 +327,7 @@ class ReservationControllerTest extends IntegrationTest {
     @Test
     void testCancelOtherCustomersReservation() throws Exception {
         // Create a librarian and add a book and a copy
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         String isbn2 = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn2, "Evil Book", "Evil Author"))
@@ -419,16 +337,9 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Customer A reserves a book
-        MvcTestResult registrationResultA = ControllerTestUtils.registerCustomer(mockMvcTester, "customerA", "Joe", "Mama");
-        assertThat(registrationResultA).hasStatus(HttpStatus.CREATED);
-
-        int customerAId = ControllerTestUtils.extractCustomerIdFromRegistration(registrationResultA);
-
-        MvcTestResult loginResultA = ControllerTestUtils.loginCustomer(mockMvcTester, "customerA");
-        assertThat(loginResultA).hasStatus(HttpStatus.OK);
-
-        MockHttpSession sessionA = (MockHttpSession) loginResultA.getRequest().getSession();
-        assertThat(sessionA).isNotNull();
+        CustomerAccount customerA = customerAccount("customerA", "Joe", "Mama");
+        long customerAId = customerA.customerId();
+        MockHttpSession sessionA = customerA.session();
 
         String reservationJson = """
                 {
@@ -447,14 +358,7 @@ class ReservationControllerTest extends IntegrationTest {
         int reservedCopyId = ControllerTestUtils.extractIdFromResponse(reservationResult);
 
         // Customer B tries to delete Customer A's reservation
-        MvcTestResult registrationResultB = ControllerTestUtils.registerCustomer(mockMvcTester, "customerB", "Evil Joe", "Mama");
-        assertThat(registrationResultB).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult loginResultB = ControllerTestUtils.loginCustomer(mockMvcTester, "customerB");
-        assertThat(loginResultB).hasStatus(HttpStatus.OK);
-
-        MockHttpSession sessionB = (MockHttpSession) loginResultB.getRequest().getSession();
-        assertThat(sessionB).isNotNull();
+        MockHttpSession sessionB = customerAccount("customerB", "Evil Joe", "Mama").session();
 
         // Invalid delete request by Customer B
         MvcTestResult deleteResult = mockMvcTester.delete()
@@ -492,14 +396,7 @@ class ReservationControllerTest extends IntegrationTest {
     @Test
     void testCancelReservation() throws Exception {
         // Create a librarian and add a book and a copy
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         String isbn4 = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn4, "Cancelled Book", "Cancelled Author"))
@@ -509,14 +406,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Create a customer and make a reservation
-        MvcTestResult customerRegistrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe", "Joe", "Mama");
-        assertThat(customerRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult customerLoginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe");
-        assertThat(customerLoginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession customerSession = (MockHttpSession) customerLoginResult.getRequest().getSession();
-        assertThat(customerSession).isNotNull();
+        MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
 
         String reservationJson = """
                 {
@@ -545,14 +435,7 @@ class ReservationControllerTest extends IntegrationTest {
     @Test
     void testCancelInvalidReservations() throws Exception {
         // Create a librarian and add a book and a copy
-        MvcTestResult librarianRegistrationResult = ControllerTestUtils.registerLibrarian(mockMvcTester, "librarian");
-        assertThat(librarianRegistrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult librarianLoginResult = ControllerTestUtils.loginLibrarian(mockMvcTester, "librarian");
-        assertThat(librarianLoginResult).hasStatus(HttpStatus.FOUND);
-
-        MockHttpSession librarianSession = (MockHttpSession) librarianLoginResult.getRequest().getSession();
-        assertThat(librarianSession).isNotNull();
+        MockHttpSession librarianSession = librarianSession();
 
         String isbn5 = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn5, "Broken Book", "Broken Author"))
@@ -564,14 +447,7 @@ class ReservationControllerTest extends IntegrationTest {
         int nonReservedCopyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create a customer
-        MvcTestResult registrationResult = ControllerTestUtils.registerCustomer(mockMvcTester, "joe jr", "Joe", "Mama Jr");
-        assertThat(registrationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult loginResult = ControllerTestUtils.loginCustomer(mockMvcTester, "joe jr");
-        assertThat(loginResult).hasStatus(HttpStatus.OK);
-
-        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
-        assertThat(session).isNotNull();
+        MockHttpSession session = customerAccount("joe jr", "Joe", "Mama Jr").session();
 
         // Invalid requests
         int nonExistentReservationCopyId = 999;
