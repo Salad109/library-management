@@ -63,6 +63,9 @@ available via Grafana and Prometheus. Log in to the staff panel at `http://local
 `LIBRARY_ADMIN_*` account, which is created on first startup if no librarian exists yet. Further librarians are added
 from the panel.
 
+Customers are created by librarians. To use the customer API, a customer gets a one-time activation code from the staff
+panel's customer pages and registers with it at `POST /api/register`.
+
 ## Monitoring
 
 Grafana at `http://localhost:3000` (admin/admin) comes with the "Library Dashboard", including metrics from Prometheus
@@ -75,7 +78,8 @@ into four main areas:
 
 ### Public Browsing (No Authentication Required)
 
-Browse books and authors, search the catalog, check what's available
+Browse books and authors, search the catalog, check what's available, register a customer account with an activation
+code
 
 ### Customer Self-Service (CUSTOMER role)
 
@@ -87,7 +91,7 @@ Handle checkouts, returns, and mark items as lost
 
 ### Admin Operations (LIBRARIAN role)
 
-Manage books, copies, customer accounts, and librarian accounts
+Manage books, copies, customers and their activation codes, and librarian accounts
 
 ## Example HTTP Requests
 
@@ -144,6 +148,7 @@ exampleRequests/
 - [x] Deployment
 - [x] Flyway migrations
 - [x] PostgreSQL testcontainers for integration tests
+- [x] Closed registration: librarians are created by librarians, customers register with an activation code
 - [ ] Enhance admin panel with HTMX
 - [ ] Separate frontend for customers
 

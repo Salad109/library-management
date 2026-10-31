@@ -10,6 +10,7 @@
     <h1>Add New Customer</h1>
 
     <div class="alert" id="message" style="display:none"></div>
+    <div class="alert" id="codeMessage" style="display:none"></div>
 
     <form id="customerForm">
         <div class="mb-3">
@@ -28,6 +29,7 @@
         <button class="btn btn-primary" type="submit">Add Customer</button>
     </form>
 
+    <th:block th:replace="~{fragments/activation-code :: script}"></th:block>
     <script>
         document.getElementById('customerForm').onsubmit = async function (e) {
             e.preventDefault();
@@ -49,9 +51,18 @@
             });
 
             const msg = document.getElementById('message');
+            const codeMsg = document.getElementById('codeMessage');
+            codeMsg.style.display = 'none';
             if (response.ok) {
+                const customer = await response.json();
+                const codeButton = document.createElement('button');
+                codeButton.type = 'button';
+                codeButton.className = 'btn btn-sm btn-success ms-2';
+                codeButton.textContent = 'Generate activation code';
+                codeButton.onclick = () => generateActivationCode(
+                    customer.id, customer.firstName + ' ' + customer.lastName, codeMsg);
                 msg.className = 'alert alert-success';
-                msg.innerHTML = 'Customer added successfully! Customer ID: ' + (await response.json()).id;
+                msg.replaceChildren('Customer added successfully! Customer ID: ' + customer.id, codeButton);
                 this.reset();
             } else {
                 const errorData = await response.json();

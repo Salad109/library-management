@@ -1,0 +1,20 @@
+<script th:fragment="script">
+    async function generateActivationCode(customerId, customerName, msg) {
+        const response = await fetch(`/api/admin/customers/${customerId}/activation-code`, {method: 'POST'});
+        const data = await response.json();
+
+        if (response.ok) {
+            const code = document.createElement('code');
+            code.className = 'fs-4';
+            code.textContent = data.activationCode;
+            msg.className = 'alert alert-success';
+            msg.replaceChildren(
+                'Activation code for ' + customerName + ': ', code, document.createElement('br'),
+                'Valid until ' + new Date(data.expiresAt).toLocaleString() + '. Generating a new code replaces this one.');
+        } else {
+            msg.className = 'alert alert-danger';
+            msg.textContent = data.error || 'Error generating activation code';
+        }
+        msg.style.display = 'block';
+    }
+</script>

@@ -9,6 +9,8 @@
 <div class="container">
     <h1>Customer Browser</h1>
 
+    <div class="alert" id="codeMessage" style="display:none"></div>
+
     <!-- Search Form -->
     <div class="col-4">
         <form action="/admin/customers/browse" method="get">
@@ -60,6 +62,11 @@
                         th:data-first-name="${customer.firstName}"
                         th:data-id="${customer.id}"
                         th:data-last-name="${customer.lastName}">Edit
+                </button>
+                <button class="btn btn-sm btn-success"
+                        onclick="generateActivationCode(this.dataset.id, this.dataset.name, document.getElementById('codeMessage'))"
+                        th:data-id="${customer.id}"
+                        th:data-name="${customer.firstName + ' ' + customer.lastName}">Activation code
                 </button>
             </td>
         </tr>
@@ -162,6 +169,7 @@
         </div>
     </div>
 
+    <th:block th:replace="~{fragments/activation-code :: script}"></th:block>
     <script>
         function viewCustomer(button) {
             const id = button.dataset.id;

@@ -47,4 +47,16 @@ class AdminWebControllerTest extends IntegrationTest {
                 .bodyText()
                 .contains("Browse Title", "Browse Author");
     }
+
+    @Test
+    void testCustomerBrowseShowsCustomers() {
+        assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Browse", "Customer", "browse@example.com"))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertThat(mockMvcTester.get().uri("/admin/customers/browse"))
+                .hasStatus(HttpStatus.OK)
+                .bodyText()
+                .contains("Browse Customer", "browse@example.com", "data-name=\"Browse Customer\"",
+                        "function generateActivationCode");
+    }
 }
