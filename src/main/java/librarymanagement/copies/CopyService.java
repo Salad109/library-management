@@ -24,8 +24,8 @@ import java.util.Optional;
 @Service
 public class CopyService {
 
-    private static final Logger log = LoggerFactory.getLogger(CopyService.class);
     public static final int MAX_ACTIVE_RESERVATIONS = 3;
+    private static final Logger log = LoggerFactory.getLogger(CopyService.class);
     private final CopyRepository copyRepository;
     private final BookService bookService;
     private final CustomerService customerService;

@@ -71,9 +71,6 @@ public abstract class IntegrationTest {
         return login("/admin/login", librarianUsername, librarianPassword, HttpStatus.FOUND);
     }
 
-    protected record CustomerAccount(long customerId, MockHttpSession session) {
-    }
-
     /**
      * Registers a customer account and logs it in through the API login.
      */
@@ -111,5 +108,8 @@ public abstract class IntegrationTest {
         MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
         assertThat(session).isNotNull();
         return session;
+    }
+
+    protected record CustomerAccount(long customerId, MockHttpSession session) {
     }
 }

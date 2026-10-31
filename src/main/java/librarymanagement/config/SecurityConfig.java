@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain staffChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain staffChain(HttpSecurity http) {
         return http
                 .securityMatcher("/admin/**", "/login")
                 .authorizeHttpRequests(auth -> auth
@@ -51,7 +51,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**",

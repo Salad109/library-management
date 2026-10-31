@@ -9,7 +9,7 @@ import org.springframework.resilience.annotation.EnableResilientMethods;
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 @EnableResilientMethods
 public class LibraryManagementApplication {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(LibraryManagementApplication.class, args);
     }
 }
