@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import librarymanagement.users.SecurityService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class ReservationController {
     @Operation(summary = "Get all my reservations",
             description = "Customers can view their reserved copies. Requires CUSTOMER role")
     @GetMapping("/api/reservations/mine")
-    public Page<CopyResponse> getMyReservations(Pageable pageable) {
+    public Page<CopyResponse> getMyReservations(@ParameterObject Pageable pageable) {
         Long customerId = securityService.getCurrentCustomerId();
         return copyService.getCopiesByCustomerId(customerId, pageable);
     }

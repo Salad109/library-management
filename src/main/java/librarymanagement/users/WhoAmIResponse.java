@@ -1,9 +1,7 @@
 package librarymanagement.users;
 
-import org.jspecify.annotations.Nullable;
-
 /**
- * Both fields are null when nobody is logged in.
+ * Both fields are absent from the JSON when nobody is logged in.
  */
-public record WhoAmIResponse(@Nullable String username, @Nullable Role role) {
+public record WhoAmIResponse(String username, Role role) {
 }

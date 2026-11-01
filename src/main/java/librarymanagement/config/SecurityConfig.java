@@ -78,10 +78,6 @@ public class SecurityConfig {
     }
 
     private void staffSuccessHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException {
-        if (!hasRole(auth, "LIBRARIAN")) {
-            response.sendRedirect("/login?error=true");
-            return;
-        }
         response.sendRedirect("/admin");
     }
 
@@ -90,12 +86,6 @@ public class SecurityConfig {
     }
 
     private void apiSuccessHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException {
-        if (!hasRole(auth, "CUSTOMER")) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType("text/plain");
-            response.getWriter().write(Messages.SECURITY_CUSTOMERS_ONLY);
-            return;
-        }
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("text/plain");
         response.getWriter().write(Messages.SECURITY_LOGIN_SUCCESS);
@@ -111,10 +101,5 @@ public class SecurityConfig {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("text/plain");
         response.getWriter().write(Messages.SECURITY_LOGOUT_SUCCESS);
-    }
-
-    private boolean hasRole(Authentication auth, String role) {
-        return auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
     }
 }

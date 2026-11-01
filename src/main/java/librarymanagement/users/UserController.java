@@ -1,9 +1,13 @@
 package librarymanagement.users;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -31,7 +35,7 @@ public class UserController {
         return userService.registerCustomer(customerRegistrationRequest);
     }
 
-    @Operation(summary = "Get current username and role", description = "Both are null when not logged in.")
+    @Operation(summary = "Get current username and role", description = "Both are absent when not logged in.")
     @GetMapping("/api/whoami")
     public WhoAmIResponse whoAmI() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -46,7 +50,10 @@ public class UserController {
         return new WhoAmIResponse(auth.getName(), role);
     }
 
-    @Operation(summary = "User login", description = "Authenticate with username and password using form data")
+    @Operation(summary = "User login", description = "Authenticate with username and password using form data",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
+                    mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+                    schema = @Schema(implementation = LoginForm.class))))
     @PostMapping("/api/login")
     public String login() {
         // This method is never used.
@@ -58,5 +65,9 @@ public class UserController {
     public String logout() {
         // Same as login.
         return null;
+    }
+
+    // Documents the form Spring Security reads
+    record LoginForm(@NotBlank String username, @NotBlank String password) {
     }
 }

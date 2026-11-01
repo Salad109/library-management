@@ -1,6 +1,7 @@
 package librarymanagement.users;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
-public record ActivationCodeResponse(String activationCode, Instant expiresAt) {
+public record ActivationCodeResponse(@NotNull String activationCode, @NotNull Instant expiresAt) {
 }

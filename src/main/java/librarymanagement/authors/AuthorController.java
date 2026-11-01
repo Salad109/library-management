@@ -1,6 +1,7 @@
 package librarymanagement.authors;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ public class AuthorController {
     }
 
     @GetMapping("/api/authors")
-    public Page<AuthorResponse> getAuthors(Pageable pageable) {
+    public Page<AuthorResponse> getAuthors(@ParameterObject Pageable pageable) {
         return authorService.getAllAuthors(pageable);
     }
 

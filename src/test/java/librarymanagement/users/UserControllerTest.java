@@ -58,7 +58,8 @@ class UserControllerTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("username=evil&password=password123")
                 .exchange();
-        assertThat(staffLogin).hasStatus(HttpStatus.FOUND).hasRedirectedUrl("/login?error=true");
+        assertThat(staffLogin).hasStatus(HttpStatus.FOUND);
+        assertThat(mockMvcTester.get().uri("/admin").session(sessionOf(staffLogin))).hasStatus(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -90,6 +91,23 @@ class UserControllerTest extends IntegrationTest {
                 .hasStatus(HttpStatus.OK)
                 .bodyText()
                 .contains(Messages.SECURITY_LOGIN_SUCCESS);
+    }
+
+    @Test
+    void testLibrarianLoginThroughApiLogin() {
+        librarianSession();
+
+        MvcTestResult loginResult = mockMvcTester.post()
+                .uri("/api/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("username=" + librarianUsername + "&password=" + librarianPassword)
+                .exchange();
+
+        assertThat(loginResult).hasStatus(HttpStatus.OK).bodyText().contains(Messages.SECURITY_LOGIN_SUCCESS);
+        assertThat(mockMvcTester.get().uri("/api/whoami").session(sessionOf(loginResult)))
+                .bodyJson()
+                .extractingPath("role")
+                .isEqualTo("ROLE_LIBRARIAN");
     }
 
     @Test
@@ -246,8 +264,8 @@ class UserControllerTest extends IntegrationTest {
         MvcTestResult result = mockMvcTester.get().uri("/api/whoami").exchange();
 
         assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().extractingPath("username").isNull();
-        assertThat(result).bodyJson().extractingPath("role").isNull();
+        assertThat(result).bodyJson().doesNotHavePath("username");
+        assertThat(result).bodyJson().doesNotHavePath("role");
     }
 
     private MvcTestResult registerNewCustomer(String username, String password) {
@@ -273,5 +291,9 @@ class UserControllerTest extends IntegrationTest {
                         {"username": "%s", "password": "%s"}
                         """.formatted(username, password))
                 .exchange();
+    }
+
+    private static MockHttpSession sessionOf(MvcTestResult loginResult) {
+        return (MockHttpSession) loginResult.getRequest().getSession(false);
     }
 }

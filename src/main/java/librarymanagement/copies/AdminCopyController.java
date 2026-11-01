@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import librarymanagement.constants.Messages;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class AdminCopyController {
                                         @RequestParam(required = false) String title,
                                         @RequestParam(required = false) Long customerId,
                                         @RequestParam(required = false) String customerLastName,
-                                        Pageable pageable) {
+                                        @ParameterObject Pageable pageable) {
         isbn = StringUtils.hasText(isbn) ? isbn.strip() : null;
         title = StringUtils.hasText(title) ? title.strip() : null;
         customerLastName = StringUtils.hasText(customerLastName) ? customerLastName.strip() : null;

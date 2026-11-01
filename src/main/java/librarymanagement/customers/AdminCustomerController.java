@@ -3,6 +3,7 @@ package librarymanagement.customers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class AdminCustomerController {
     @Operation(summary = "Get customers, optionally filtered by last name",
             description = "lastName matches a case-insensitive substring.")
     @GetMapping("/api/admin/customers")
-    public Page<CustomerResponse> getCustomers(@RequestParam(required = false) String lastName, Pageable pageable) {
+    public Page<CustomerResponse> getCustomers(@RequestParam(required = false) String lastName, @ParameterObject Pageable pageable) {
         if (lastName != null) {
             return customerService.getCustomersByLastName(lastName, pageable);
         }

@@ -1,16 +1,17 @@
 package librarymanagement.books;
 
+import jakarta.validation.constraints.NotNull;
 import librarymanagement.authors.AuthorResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record BookResponse(
-        String isbn,
-        String title,
-        List<AuthorResponse> authors,
+        @NotNull String isbn,
+        @NotNull String title,
+        @NotNull List<AuthorResponse> authors,
         Integer publicationYear,
-        Integer availableCopies
+        @NotNull Integer availableCopies
 ) {
 
     public static BookResponse from(Book book) {

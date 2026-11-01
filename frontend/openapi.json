@@ -1,0 +1,1377 @@
+{
+  "openapi" : "3.1.0",
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "tags" : [ {
+    "name" : "Public Browsing",
+    "description" : "No auth required"
+  }, {
+    "name" : "Admin Book Operations",
+    "description" : "Librarians can do CRUD operations on books. Requires LIBRARIAN role"
+  }, {
+    "name" : "Admin Customer Operations",
+    "description" : "Librarians can do CRUD operations on customers. Requires LIBRARIAN role"
+  }, {
+    "name" : "Customer Reservations",
+    "description" : "Customers can manage their reservations. Requires CUSTOMER role"
+  }, {
+    "name" : "Admin Librarian Operations",
+    "description" : "Librarians can create other librarian accounts. Requires LIBRARIAN role"
+  }, {
+    "name" : "Admin Copy Operations",
+    "description" : "Librarians can do CRUD operations on copies. Requires LIBRARIAN role"
+  }, {
+    "name" : "Desk Operations",
+    "description" : "Librarians can manage copy checkouts, returns, and lost copies. Requires LIBRARIAN role"
+  } ],
+  "paths" : {
+    "/api/admin/customers/{id}" : {
+      "get" : {
+        "tags" : [ "Admin Customer Operations" ],
+        "operationId" : "getCustomerById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Admin Customer Operations" ],
+        "operationId" : "updateCustomer",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CustomerRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/books/{isbn}" : {
+      "put" : {
+        "tags" : [ "Admin Book Operations" ],
+        "operationId" : "updateBook",
+        "parameters" : [ {
+          "name" : "isbn",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BookUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BookResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Admin Book Operations" ],
+        "operationId" : "deleteBook",
+        "parameters" : [ {
+          "name" : "isbn",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
+    "/api/reservations" : {
+      "post" : {
+        "tags" : [ "Customer Reservations" ],
+        "summary" : "Reserve a copy of a book",
+        "description" : "Customers can reserve an available copy of a book by its ISBN, up to 3 active reservations. Requires CUSTOMER role",
+        "operationId" : "createReservation",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CopyReservationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/register" : {
+      "post" : {
+        "tags" : [ "Authentication" ],
+        "summary" : "Register a customer account with an activation code",
+        "description" : "Creates a CUSTOMER user for the existing customer the activation code belongs to.",
+        "operationId" : "register",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CustomerRegistrationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout" : {
+      "post" : {
+        "tags" : [ "Authentication" ],
+        "operationId" : "logout",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login" : {
+      "post" : {
+        "tags" : [ "Authentication" ],
+        "summary" : "User login",
+        "description" : "Authenticate with username and password using form data",
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginForm"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/desk/return" : {
+      "post" : {
+        "tags" : [ "Desk Operations" ],
+        "summary" : "Return a copy from a customer",
+        "description" : "Desk operation. Librarians can return a copy from a customer. The copy must be checked out to the specific customer. Requires LIBRARIAN role",
+        "operationId" : "returnCopy",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CopyReturnRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/desk/mark-lost" : {
+      "post" : {
+        "tags" : [ "Desk Operations" ],
+        "summary" : "Mark a copy as lost",
+        "description" : "Desk operation. Librarians mark a copy as lost instead of deleting it from the database. Requires LIBRARIAN role",
+        "operationId" : "markLost",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CopyMarkLostRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/desk/checkout" : {
+      "post" : {
+        "tags" : [ "Desk Operations" ],
+        "summary" : "Checkout a copy to a customer",
+        "description" : "Desk operation. Librarians can checkout a copy to a customer. The copy must be either available or reserved by the specific customer. Requires LIBRARIAN role",
+        "operationId" : "checkout",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CopyCheckoutRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/librarians" : {
+      "post" : {
+        "tags" : [ "Admin Librarian Operations" ],
+        "operationId" : "createLibrarian",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LibrarianCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/customers" : {
+      "get" : {
+        "tags" : [ "Admin Customer Operations" ],
+        "summary" : "Get customers, optionally filtered by last name",
+        "description" : "lastName matches a case-insensitive substring.",
+        "operationId" : "getCustomers",
+        "parameters" : [ {
+          "name" : "lastName",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Zero-based page index (0..N)",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "The size of the page to be returned",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 20,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedModelCustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Admin Customer Operations" ],
+        "summary" : "Create a new customer",
+        "description" : "Creates a new \"offline\" customer without a user account",
+        "operationId" : "createCustomer",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CustomerRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/customers/{id}/activation-code" : {
+      "post" : {
+        "tags" : [ "Admin Customer Operations" ],
+        "summary" : "Generate an activation code for a customer",
+        "description" : "One-time code the customer registers online with (POST /api/register). Valid for 48 hours. Generating a new code replaces the old one.",
+        "operationId" : "generateActivationCode",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ActivationCodeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/copies" : {
+      "get" : {
+        "tags" : [ "Admin Copy Operations" ],
+        "summary" : "Get copies, optionally filtered",
+        "description" : "At most one filter. title and customerLastName match case-insensitive substrings; blank filters are ignored.",
+        "operationId" : "getCopies",
+        "parameters" : [ {
+          "name" : "isbn",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "title",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "customerId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "customerLastName",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Zero-based page index (0..N)",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "The size of the page to be returned",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 20,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedModelCopyResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Admin Copy Operations" ],
+        "operationId" : "createCopies",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CopyCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CopyResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/books" : {
+      "post" : {
+        "tags" : [ "Admin Book Operations" ],
+        "operationId" : "createBook",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BookCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/whoami" : {
+      "get" : {
+        "tags" : [ "Authentication" ],
+        "summary" : "Get current username and role",
+        "description" : "Both are absent when not logged in.",
+        "operationId" : "whoAmI",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WhoAmIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/mine" : {
+      "get" : {
+        "tags" : [ "Customer Reservations" ],
+        "summary" : "Get all my reservations",
+        "description" : "Customers can view their reserved copies. Requires CUSTOMER role",
+        "operationId" : "getMyReservations",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Zero-based page index (0..N)",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "The size of the page to be returned",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 20,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedModelCopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books" : {
+      "get" : {
+        "tags" : [ "Public Browsing" ],
+        "operationId" : "getAllBooks",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Zero-based page index (0..N)",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "The size of the page to be returned",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 20,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedModelBookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books/{isbn}" : {
+      "get" : {
+        "tags" : [ "Public Browsing" ],
+        "operationId" : "getBookByIsbn",
+        "parameters" : [ {
+          "name" : "isbn",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books/search" : {
+      "get" : {
+        "tags" : [ "Public Browsing" ],
+        "summary" : "Search books by title or author name",
+        "description" : "Simple search that looks for the term in both book titles and author names",
+        "operationId" : "searchBooks",
+        "parameters" : [ {
+          "name" : "q",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Zero-based page index (0..N)",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "The size of the page to be returned",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 20,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedModelBookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authors" : {
+      "get" : {
+        "tags" : [ "Public Browsing" ],
+        "operationId" : "getAuthors",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Zero-based page index (0..N)",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "The size of the page to be returned",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "default" : 20,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedModelAuthorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authors/{name}" : {
+      "get" : {
+        "tags" : [ "Public Browsing" ],
+        "operationId" : "getAuthorByName",
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/copies/{id}" : {
+      "get" : {
+        "tags" : [ "Admin Copy Operations" ],
+        "operationId" : "getCopyById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{copyId}" : {
+      "delete" : {
+        "tags" : [ "Customer Reservations" ],
+        "summary" : "Cancel a reservation",
+        "description" : "Customers can cancel their reservation for a copy. Requires CUSTOMER role",
+        "operationId" : "cancelReservation",
+        "parameters" : [ {
+          "name" : "copyId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "CustomerRequest" : {
+        "type" : "object",
+        "properties" : {
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "email" : {
+            "type" : "string",
+            "maxLength" : 150,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+          }
+        },
+        "required" : [ "firstName", "lastName" ]
+      },
+      "CustomerResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "firstName", "id", "lastName" ]
+      },
+      "BookUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "maxLength" : 150,
+            "minLength" : 0
+          },
+          "publicationYear" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1
+          },
+          "authorNames" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : true
+          }
+        },
+        "required" : [ "authorNames", "title" ]
+      },
+      "AuthorResponse" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "BookResponse" : {
+        "type" : "object",
+        "properties" : {
+          "isbn" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "authors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AuthorResponse"
+            }
+          },
+          "publicationYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "availableCopies" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "authors", "availableCopies", "isbn", "title" ]
+      },
+      "CopyReservationRequest" : {
+        "type" : "object",
+        "properties" : {
+          "bookIsbn" : {
+            "type" : "string",
+            "minLength" : 1,
+            "pattern" : "^(?:\\d{9}[\\dX]|97[89]\\d{10})$"
+          }
+        },
+        "required" : [ "bookIsbn" ]
+      },
+      "BookSummaryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "isbn" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "authors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AuthorResponse"
+            }
+          },
+          "publicationYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "authors", "isbn", "title" ]
+      },
+      "CopyResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "book" : {
+            "$ref" : "#/components/schemas/BookSummaryResponse"
+          },
+          "customer" : {
+            "$ref" : "#/components/schemas/CustomerResponse"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/CopyStatus"
+          }
+        },
+        "required" : [ "book", "id", "status" ]
+      },
+      "CopyStatus" : {
+        "type" : "string",
+        "enum" : [ "AVAILABLE", "RESERVED", "BORROWED", "LOST" ]
+      },
+      "CustomerRegistrationRequest" : {
+        "type" : "object",
+        "properties" : {
+          "activationCode" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "username" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "password" : {
+            "type" : "string",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "activationCode", "password", "username" ]
+      },
+      "Role" : {
+        "type" : "string",
+        "enum" : [ "ROLE_LIBRARIAN", "ROLE_CUSTOMER" ]
+      },
+      "UserResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "username" : {
+            "type" : "string"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/Role"
+          },
+          "customer" : {
+            "$ref" : "#/components/schemas/CustomerResponse"
+          }
+        },
+        "required" : [ "id", "role", "username" ]
+      },
+      "LoginForm" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "password" : {
+            "type" : "string",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "password", "username" ]
+      },
+      "CopyReturnRequest" : {
+        "type" : "object",
+        "properties" : {
+          "copyId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "customerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "copyId", "customerId" ]
+      },
+      "CopyMarkLostRequest" : {
+        "type" : "object",
+        "properties" : {
+          "copyId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "copyId" ]
+      },
+      "CopyCheckoutRequest" : {
+        "type" : "object",
+        "properties" : {
+          "copyId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "customerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "copyId", "customerId" ]
+      },
+      "LibrarianCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "password" : {
+            "type" : "string",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "password", "username" ]
+      },
+      "ActivationCodeResponse" : {
+        "type" : "object",
+        "properties" : {
+          "activationCode" : {
+            "type" : "string"
+          },
+          "expiresAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "activationCode", "expiresAt" ]
+      },
+      "CopyCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "bookIsbn" : {
+            "type" : "string",
+            "pattern" : "^(?:\\d{9}[\\dX]|97[89]\\d{10})$"
+          },
+          "quantity" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1
+          }
+        },
+        "required" : [ "bookIsbn" ]
+      },
+      "BookCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "isbn" : {
+            "type" : "string",
+            "pattern" : "^(?:\\d{9}[\\dX]|97[89]\\d{10})$"
+          },
+          "title" : {
+            "type" : "string",
+            "maxLength" : 150,
+            "minLength" : 0
+          },
+          "authorNames" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : true
+          },
+          "publicationYear" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1
+          }
+        },
+        "required" : [ "authorNames", "isbn", "title" ]
+      },
+      "WhoAmIResponse" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/Role"
+          }
+        }
+      },
+      "PageMetadata" : {
+        "type" : "object",
+        "properties" : {
+          "size" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "number" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "number", "size", "totalElements", "totalPages" ]
+      },
+      "PagedModelCopyResponse" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CopyResponse"
+            }
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        },
+        "required" : [ "content", "page" ]
+      },
+      "PagedModelBookResponse" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BookResponse"
+            }
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        },
+        "required" : [ "content", "page" ]
+      },
+      "PagedModelAuthorResponse" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AuthorResponse"
+            }
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        },
+        "required" : [ "content", "page" ]
+      },
+      "PagedModelCustomerResponse" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CustomerResponse"
+            }
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        },
+        "required" : [ "content", "page" ]
+      }
+    }
+  }
+}
