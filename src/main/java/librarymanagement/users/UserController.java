@@ -1,8 +1,6 @@
 package librarymanagement.users;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,11 +25,6 @@ public class UserController {
 
     @Operation(summary = "Register a customer account with an activation code",
             description = "Creates a CUSTOMER user for the existing customer the activation code belongs to.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Customer registered successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data, or invalid or expired activation code"),
-            @ApiResponse(responseCode = "409", description = "Username already exists")
-    })
     @PostMapping("/api/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse register(@Valid @RequestBody CustomerRegistrationRequest customerRegistrationRequest) {
@@ -39,7 +32,6 @@ public class UserController {
     }
 
     @Operation(summary = "Get current username and role", description = "Both are null when not logged in.")
-    @ApiResponse(responseCode = "200", description = "User information retrieved successfully")
     @GetMapping("/api/whoami")
     public WhoAmIResponse whoAmI() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -55,10 +47,6 @@ public class UserController {
     }
 
     @Operation(summary = "User login", description = "Authenticate with username and password using form data")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login successful"),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials")
-    })
     @PostMapping("/api/login")
     public String login() {
         // This method is never used.
@@ -66,8 +54,6 @@ public class UserController {
         return null;
     }
 
-    @Operation(summary = "User logout")
-    @ApiResponse(responseCode = "200", description = "Logout successful")
     @PostMapping("/api/logout")
     public String logout() {
         // Same as login.

@@ -11,11 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 
 @Service
 public class AuthorService {
-
     private static final Logger log = LoggerFactory.getLogger(AuthorService.class);
     private final AuthorRepository authorRepository;
 
@@ -26,25 +24,16 @@ public class AuthorService {
     @Cacheable(value = "authors", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
     @Transactional(readOnly = true)
     public Page<AuthorResponse> getAllAuthors(Pageable pageable) {
-        log.debug("Fetching all authors, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-
-        Page<AuthorResponse> authors = authorRepository.findAllByOrderByName(pageable).map(AuthorResponse::from);
-
-        log.debug("Retrieved {} authors out of {} total", authors.getNumberOfElements(), authors.getTotalElements());
-
-        return authors;
+        return authorRepository.findAllByOrderByName(pageable).map(AuthorResponse::from);
     }
 
     @Cacheable(value = "authors", key = "#name")
     @Transactional(readOnly = true)
     public AuthorResponse getAuthorByName(String name) {
-        log.debug("Looking up author by name: {}", name);
-        Optional<Author> author = authorRepository.findById(name);
-        if (author.isEmpty()) {
+        Author author = authorRepository.findById(name).orElseThrow(() -> {
             log.warn("Author not found with name: {}", name);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.AUTHOR_NOT_FOUND + name);
-        }
-        log.debug("Found author: '{}'", author.get().getName());
-        return AuthorResponse.from(author.get());
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.AUTHOR_NOT_FOUND + name);
+        });
+        return AuthorResponse.from(author);
     }
 }

@@ -19,7 +19,6 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 public class UserService {
-
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private static final Duration ACTIVATION_CODE_VALIDITY = Duration.ofHours(48);
     private final UserRepository userRepository;
@@ -44,7 +43,6 @@ public class UserService {
 
     @Transactional
     public UserResponse addLibrarian(LibrarianCreateRequest request) {
-        log.debug("Adding new librarian with username: {}", request.username());
         User user = newUser(request.username(), request.password(), Role.ROLE_LIBRARIAN);
 
         User savedUser = userRepository.save(user);
@@ -57,7 +55,6 @@ public class UserService {
      */
     @Transactional
     public ActivationCodeResponse generateActivationCode(Long customerId) {
-        log.debug("Generating activation code for customer ID: {}", customerId);
         Customer customer = customerService.getCustomerOrThrow(customerId);
         if (userRepository.existsByCustomerId(customerId)) {
             log.warn("Activation code requested for customer that already has an account, ID: {}", customerId);
@@ -78,7 +75,6 @@ public class UserService {
      */
     @Transactional
     public UserResponse registerCustomer(CustomerRegistrationRequest request) {
-        log.debug("Registering customer account with username: {}", request.username());
         Customer customer = customerRepository.findByActivationCodeHash(ActivationCodes.hash(request.activationCode()))
                 .orElseThrow(() -> {
                     log.warn("Customer registration for username {} failed: unknown activation code", request.username());

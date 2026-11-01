@@ -1,8 +1,5 @@
 package librarymanagement.users;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,13 +20,6 @@ public class AdminLibrarianController {
         this.userService = userService;
     }
 
-    @Operation(summary = "Create a new librarian account")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Librarian created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role"),
-            @ApiResponse(responseCode = "409", description = "Username already exists")
-    })
     @PostMapping("/api/admin/librarians")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createLibrarian(@Valid @RequestBody LibrarianCreateRequest librarianCreateRequest) {

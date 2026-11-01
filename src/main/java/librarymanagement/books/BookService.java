@@ -25,7 +25,6 @@ import java.util.Set;
 
 @Service
 public class BookService {
-
     private static final Logger log = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
@@ -40,20 +39,7 @@ public class BookService {
     @Cacheable(value = "book-pages", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
     @Transactional(readOnly = true)
     public Page<BookResponse> getAllBooks(Pageable pageable) {
-        log.debug("Fetching all books, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-
-        Page<String> isbnPage = bookRepository.findAllIsbns(pageable);
-
-        if (isbnPage.getContent().isEmpty()) {
-            log.debug("No books found, returning empty page");
-            return Page.empty(pageable);
-        }
-
-        List<BookResponse> books = toResponses(bookRepository.findByIsbnsWithAuthors(isbnPage.getContent()));
-
-        log.debug("Retrieved {} books out of {} total", books.size(), isbnPage.getTotalElements());
-
-        return new PageImpl<>(books, pageable, isbnPage.getTotalElements());
+        return loadPage(bookRepository.findAllIsbns(pageable));
     }
 
     @Cacheable(value = "books", key = "#isbn")
@@ -64,33 +50,17 @@ public class BookService {
 
     @Transactional(readOnly = true)
     public Page<BookResponse> searchBooks(String searchTerm, Pageable pageable) {
-        log.debug("Searching books with term: '{}', page: {}, size: {}", searchTerm, pageable.getPageNumber(), pageable.getPageSize());
-
         if (searchTerm == null || searchTerm.isBlank()) {
             return Page.empty(pageable);
         }
 
         String cleanTerm = searchTerm.trim();
-
-        Page<String> titleIsbns = bookRepository.findIsbnsByTitleContaining(cleanTerm, pageable);
-
-        if (titleIsbns.getTotalElements() > 0) {
-            log.debug("Found {} books matching title search for term: '{}'", titleIsbns.getTotalElements(), cleanTerm);
-
-            List<BookResponse> books = toResponses(bookRepository.findByIsbnsWithAuthors(titleIsbns.getContent()));
-            return new PageImpl<>(books, pageable, titleIsbns.getTotalElements());
+        // Match by author only when no titles match
+        Page<String> isbns = bookRepository.findIsbnsByTitleContaining(cleanTerm, pageable);
+        if (isbns.getTotalElements() == 0) {
+            isbns = bookRepository.findIsbnsByAuthorContaining(cleanTerm, pageable);
         }
-
-        Page<String> authorIsbns = bookRepository.findIsbnsByAuthorContaining(cleanTerm, pageable);
-        log.debug("No books found matching title search for term: '{}'. Returning {} books by authors",
-                cleanTerm, authorIsbns.getTotalElements());
-
-        if (authorIsbns.getContent().isEmpty()) {
-            return Page.empty(pageable);
-        }
-
-        List<BookResponse> books = toResponses(bookRepository.findByIsbnsWithAuthors(authorIsbns.getContent()));
-        return new PageImpl<>(books, pageable, authorIsbns.getTotalElements());
+        return loadPage(isbns);
     }
 
     @CachePut(value = "books", key = "#result.isbn")
@@ -99,9 +69,6 @@ public class BookService {
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public BookResponse addBook(BookCreateRequest bookCreateRequest) {
-        String formattedAuthors = String.join(", ", bookCreateRequest.authorNames());
-        log.debug("Adding book: '{}' by [{}] (ISBN: {})", bookCreateRequest.title(), formattedAuthors, bookCreateRequest.isbn());
-
         if (bookRepository.existsByIsbn(bookCreateRequest.isbn())) {
             log.warn("Attempted to add duplicate book with ISBN: {}", bookCreateRequest.isbn());
             throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.BOOK_DUPLICATE + bookCreateRequest.isbn());
@@ -127,19 +94,7 @@ public class BookService {
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public BookResponse updateBook(String isbn, BookUpdateRequest bookUpdateRequest) {
-        log.debug("Updating book with ISBN: {}", isbn);
-
-        Optional<Book> optionalBook = bookRepository.findById(isbn);
-        if (optionalBook.isEmpty()) {
-            log.warn("Attempted to update non-existent book with ISBN: {}", isbn);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
-        }
-
-        Book existingBook = optionalBook.get();
-        String oldTitle = existingBook.getTitle();
-        String oldAuthors = existingBook.getFormattedAuthors();
-        int oldYear = existingBook.getPublicationYear();
-
+        Book existingBook = getBookOrThrow(isbn);
         Set<Author> resolvedAuthors = resolveAuthors(bookUpdateRequest.authorNames());
         existingBook.setAuthors(resolvedAuthors);
         existingBook.setTitle(bookUpdateRequest.title());
@@ -147,9 +102,7 @@ public class BookService {
 
         Book savedBook = bookRepository.save(existingBook);
 
-        log.info("Updated book (ISBN: {}): '{}' {} by [{}] to '{}' {} by [{}]",
-                isbn, oldTitle, oldYear, oldAuthors,
-                savedBook.getTitle(), savedBook.getPublicationYear(), savedBook.getFormattedAuthors());
+        log.info("Updated book with ISBN: {}", isbn);
 
         return BookResponse.from(savedBook);
     }
@@ -159,7 +112,6 @@ public class BookService {
             @CacheEvict(value = "books", key = "#isbn"),
             @CacheEvict(value = "book-pages", allEntries = true)})
     public void evictCachedBook(String isbn) {
-        log.debug("Evicting cached book with ISBN: {} after a copy change", isbn);
     }
 
     @Caching(evict = {
@@ -168,40 +120,33 @@ public class BookService {
             @CacheEvict(value = "authors", allEntries = true)})
     @Transactional
     public void deleteBook(String isbn) {
-        log.debug("Deleting book with ISBN: {}", isbn);
-
-        Optional<Book> book = bookRepository.findById(isbn);
-        if (book.isEmpty()) {
-            log.warn("Attempted to delete non-existent book with ISBN: {}", isbn);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
-        }
-
+        Book book = getBookOrThrow(isbn);
         if (copyRepository.existsByBookIsbn(isbn)) {
             log.warn("Attempted to delete book with copies, ISBN: {}", isbn);
             throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.BOOK_HAS_COPIES + isbn);
         }
 
-        String title = book.get().getTitle();
-
-        bookRepository.deleteById(isbn);
-        log.info("Successfully deleted book: '{}' (ISBN: {})", title, isbn);
+        bookRepository.delete(book);
+        log.info("Deleted book: '{}' (ISBN: {})", book.getTitle(), isbn);
     }
 
     // Helpers
 
     public Book getBookOrThrow(String isbn) {
-        log.debug("Looking up book by ISBN: {}", isbn);
-        Optional<Book> book = bookRepository.findByIsbnWithAuthors(isbn);
-        if (book.isEmpty()) {
+        return bookRepository.findByIsbnWithAuthors(isbn).orElseThrow(() -> {
             log.warn("Book not found with ISBN: {}", isbn);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
-        }
-        log.debug("Found book: '{}'", book.get().getTitle());
-        return book.get();
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
+        });
     }
 
-    private List<BookResponse> toResponses(List<Book> books) {
-        return books.stream().map(BookResponse::from).toList();
+    private Page<BookResponse> loadPage(Page<String> isbnPage) {
+        if (isbnPage.isEmpty()) {
+            return Page.empty(isbnPage.getPageable());
+        }
+        List<BookResponse> books = bookRepository.findByIsbnsWithAuthors(isbnPage.getContent()).stream()
+                .map(BookResponse::from)
+                .toList();
+        return new PageImpl<>(books, isbnPage.getPageable(), isbnPage.getTotalElements());
     }
 
     private Set<Author> resolveAuthors(Set<String> authorNames) {
@@ -210,10 +155,8 @@ public class BookService {
         for (String authorName : authorNames) {
             Optional<Author> existingAuthor = authorRepository.findById(authorName);
             if (existingAuthor.isPresent()) {
-                log.debug("Using existing author: {}", authorName);
                 authors.add(existingAuthor.get());
             } else {
-                log.debug("Creating new author: {}", authorName);
                 Author savedAuthor = authorRepository.save(new Author(authorName));
                 authors.add(savedAuthor);
             }

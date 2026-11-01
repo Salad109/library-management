@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Service
 public class CustomerService {
-
     private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
     private final CustomerRepository customerRepository;
 
@@ -26,20 +25,7 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
-        log.debug("Fetching all customers, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
-
-        Page<Long> idPage = customerRepository.findAllIds(pageable);
-
-        if (idPage.getContent().isEmpty()) {
-            log.debug("No customers found, returning empty page");
-            return Page.empty(pageable);
-        }
-
-        List<CustomerResponse> customers = toResponses(customerRepository.findByIds(idPage.getContent()));
-
-        log.debug("Retrieved {} customers out of {} total", customers.size(), idPage.getTotalElements());
-
-        return new PageImpl<>(customers, pageable, idPage.getTotalElements());
+        return loadPage(customerRepository.findAllIds(pageable));
     }
 
     @Transactional(readOnly = true)
@@ -49,23 +35,11 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public Page<CustomerResponse> getCustomersByLastName(String lastName, Pageable pageable) {
-        log.debug("Searching customers by last name: {}, page: {}, size: {}", lastName, pageable.getPageNumber(), pageable.getPageSize());
-
-        Page<Long> idPage = customerRepository.findIdsByLastName(lastName, pageable);
-
-        if (idPage.getContent().isEmpty()) {
-            log.debug("No customers found with last name containing: {}", lastName);
-            return Page.empty(pageable);
-        }
-
-        List<CustomerResponse> customers = toResponses(customerRepository.findByIds(idPage.getContent()));
-        log.debug("Found {} customers with last name containing: {}", customers.size(), lastName);
-        return new PageImpl<>(customers, pageable, idPage.getTotalElements());
+        return loadPage(customerRepository.findIdsByLastName(lastName, pageable));
     }
 
     @Transactional
     public CustomerResponse addCustomer(CustomerRequest request) {
-        log.debug("Adding new customer: {} {}", request.firstName(), request.lastName());
         String email = request.email();
         if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
             log.warn("Duplicate customer found with email: {}", email);
@@ -83,7 +57,6 @@ public class CustomerService {
 
     @Transactional
     public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
-        log.debug("Updating customer with ID: {}", id);
         Customer existingCustomer = getCustomerOrThrow(id);
 
         String newEmail = request.email();
@@ -107,18 +80,19 @@ public class CustomerService {
     // Helpers
 
     public Customer getCustomerOrThrow(Long id) {
-        log.debug("Looking up customer by ID: {}", id);
-        Optional<Customer> customer = customerRepository.findById(id);
-        if (customer.isEmpty()) {
+        return customerRepository.findById(id).orElseThrow(() -> {
             log.warn("Customer not found with ID: {}", id);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.CUSTOMER_NOT_FOUND + id);
-        }
-        Customer existingCustomer = customer.get();
-        log.debug("Found customer: {} {} with ID: {}", existingCustomer.getFirstName(), existingCustomer.getLastName(), id);
-        return existingCustomer;
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.CUSTOMER_NOT_FOUND + id);
+        });
     }
 
-    private List<CustomerResponse> toResponses(List<Customer> customers) {
-        return customers.stream().map(CustomerResponse::from).toList();
+    private Page<CustomerResponse> loadPage(Page<Long> idPage) {
+        if (idPage.isEmpty()) {
+            return Page.empty(idPage.getPageable());
+        }
+        List<CustomerResponse> customers = customerRepository.findByIds(idPage.getContent()).stream()
+                .map(CustomerResponse::from)
+                .toList();
+        return new PageImpl<>(customers, idPage.getPageable(), idPage.getTotalElements());
     }
 }
