@@ -9,6 +9,7 @@ public class Messages {
     public static final String SECURITY_CUSTOMERS_ONLY = "This login endpoint is for customers only";
     // Book
     public static final String BOOK_NULL_ISBN = "Book ISBN cannot be null";
+    public static final String BOOK_NULL_AUTHORS = "Author names cannot be null";
     public static final String BOOK_NOT_FOUND = "Book not found with ISBN: ";
     public static final String BOOK_DUPLICATE = "A book with this ISBN already exists: ";
     public static final String BOOK_HAS_COPIES = "Cannot delete a book that has copies. ISBN: ";

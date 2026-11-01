@@ -71,6 +71,17 @@ class AdminCopyControllerTest extends IntegrationTest {
         assertFieldError(result, errorField, expectedMessage);
     }
 
+    @Test
+    void testCreateCopiesWithoutIsbn() {
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/admin/copies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}")
+                .exchange();
+
+        assertFieldError(result, "bookIsbn", Messages.BOOK_NULL_ISBN);
+    }
+
 
     @Test
     void testGetCopyById() throws Exception {

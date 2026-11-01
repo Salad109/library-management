@@ -77,6 +77,48 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
+    void testCreateBookWithoutIsbn() {
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/admin/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"title": "Title", "authorNames": ["Author"]}""")
+                .exchange();
+
+        assertFieldError(result, "isbn", Messages.BOOK_NULL_ISBN);
+    }
+
+    @Test
+    void testCreateBookWithoutAuthorNames() {
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/admin/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"isbn": "%s", "title": "Title"}""".formatted(BookTestData.TestBook1.ISBN))
+                .exchange();
+
+        assertFieldError(result, "authorNames", Messages.BOOK_NULL_AUTHORS);
+    }
+
+    @Test
+    void testUpdateBookWithoutAuthorNames() {
+        assertThat(DataBuilder.createTestBook(mockMvcTester,
+                BookTestData.TestBook1.ISBN,
+                BookTestData.TestBook1.TITLE,
+                BookTestData.TestBook1.AUTHOR_NAME)
+        ).hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult result = mockMvcTester.put()
+                .uri("/api/admin/books/" + BookTestData.TestBook1.ISBN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"title": "Title"}""")
+                .exchange();
+
+        assertFieldError(result, "authorNames", Messages.BOOK_NULL_AUTHORS);
+    }
+
+    @Test
     void testUpdateBook() {
         // Create a book to update
         assertThat(DataBuilder.createTestBook(mockMvcTester,
