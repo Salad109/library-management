@@ -115,7 +115,7 @@ class CustomerActivationTest extends IntegrationTest {
         MvcTestResult result = generateCode(librarianSession(), customerId);
 
         assertThat(result).hasStatus(HttpStatus.CONFLICT);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.CUSTOMER_HAS_ACCOUNT + customerId);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.CUSTOMER_HAS_ACCOUNT + customerId);
     }
 
     @Test
@@ -123,7 +123,7 @@ class CustomerActivationTest extends IntegrationTest {
         MvcTestResult result = generateCode(librarianSession(), 999);
 
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.CUSTOMER_NOT_FOUND + 999);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.CUSTOMER_NOT_FOUND + 999);
     }
 
     @Test
@@ -155,6 +155,6 @@ class CustomerActivationTest extends IntegrationTest {
 
     private static void assertInvalidCode(MvcTestResult result) {
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.ACTIVATION_CODE_INVALID);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.ACTIVATION_CODE_INVALID);
     }
 }

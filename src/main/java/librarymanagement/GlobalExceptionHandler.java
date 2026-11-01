@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.*;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.validation.FieldError;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,30 +14,36 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * This adds field errors to validation failures and hides 5xx details.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final String UNEXPECTED_ERROR_MESSAGE = "An unexpected error occurred. Please try again later";
 
+    /**
+     * Adds an errors member in the shape of RFC 9457's example: [{"detail": ..., "pointer": "#/field"}]
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,
                                                                   HttpStatusCode status,
                                                                   WebRequest request) {
-        Map<String, String> errors = new HashMap<>();
-
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
-        }
-
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> Map.of(
+                        "detail", String.valueOf(error.getDefaultMessage()),
+                        "pointer", "#/" + error.getField().replace("[]", ""))) // Set elements: "authorNames[]"
+                .toList();
+        ProblemDetail body = ex.getBody();
+        body.setProperty("errors", errors);
+        return handleExceptionInternal(ex, body, headers, status, request);
     }
 
-    // Reshapes Spring's ProblemDetail responses into a custom error format
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex,
                                                              @Nullable Object body,
@@ -47,42 +51,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                              HttpStatusCode statusCode,
                                                              WebRequest request) {
         if (statusCode.is5xxServerError()) {
-            logUnexpectedError(ex, ((ServletWebRequest) request).getRequest());
-            return new ResponseEntity<>(errorBody(UNEXPECTED_ERROR_MESSAGE), headers, statusCode);
+            HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+            log.error("Unexpected error during {} {}", servletRequest.getMethod(), servletRequest.getRequestURI(), ex);
+            body = ProblemDetail.forStatusAndDetail(statusCode, UNEXPECTED_ERROR_MESSAGE);
         }
-
-        String message = ex.getMessage();
-        if (body instanceof ProblemDetail problemDetail) {
-            message = problemDetail.getDetail();
-        } else if (ex instanceof ErrorResponse errorResponse) {
-            message = errorResponse.getBody().getDetail();
-        }
-        return new ResponseEntity<>(errorBody(message), headers, statusCode);
+        return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
 
     @ExceptionHandler(OptimisticLockingFailureException.class)
-    public ResponseEntity<Map<String, String>> handleOptimisticLock() {
-        return new ResponseEntity<>(errorBody("This item was just modified by another user. Please try again later."), HttpStatus.CONFLICT);
+    public ProblemDetail handleOptimisticLock() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+                "This item was just modified by another user. Please try again later.");
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<Map<String, String>> handleAuthorizationDenied(AuthorizationDeniedException ex) {
-        return new ResponseEntity<>(errorBody(ex.getMessage()), HttpStatus.FORBIDDEN);
+    public ProblemDetail handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleUnexpectedError(Exception ex, HttpServletRequest request) {
-        logUnexpectedError(ex, request);
-        return new ResponseEntity<>(errorBody(UNEXPECTED_ERROR_MESSAGE), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    private void logUnexpectedError(Exception ex, HttpServletRequest request) {
-        log.error("Unexpected error occurred during request to {} {}", request.getMethod(), request.getRequestURI(), ex);
-    }
-
-    private Map<String, String> errorBody(String message) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", message);
-        return error;
+    public ResponseEntity<Object> handleUnexpectedError(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, null, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 }

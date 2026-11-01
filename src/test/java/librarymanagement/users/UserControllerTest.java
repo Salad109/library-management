@@ -97,20 +97,16 @@ class UserControllerTest extends IntegrationTest {
         MvcTestResult result = registerJson("{}");
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("activationCode").isEqualTo(Messages.ACTIVATION_CODE_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("username").isEqualTo(Messages.USER_USERNAME_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("password").isEqualTo(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
+        assertFieldError(result, "activationCode", Messages.ACTIVATION_CODE_VALIDATION_MESSAGE);
+        assertFieldError(result, "username", Messages.USER_USERNAME_VALIDATION_MESSAGE);
+        assertFieldError(result, "password", Messages.USER_PASSWORD_VALIDATION_MESSAGE);
     }
 
     @Test
     void testRegisterTooLongUsername() {
         MvcTestResult result = registerNewCustomer("a".repeat(51), "secret123");
 
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result)
-                .bodyJson()
-                .extractingPath("username")
-                .isEqualTo(Messages.USER_USERNAME_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "username", Messages.USER_USERNAME_LENGTH_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -121,7 +117,7 @@ class UserControllerTest extends IntegrationTest {
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
     }
 
@@ -132,7 +128,7 @@ class UserControllerTest extends IntegrationTest {
         MvcTestResult result = registerNewCustomer("customer1", "secret123");
 
         assertThat(result).hasStatus(HttpStatus.CONFLICT);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.USER_DUPLICATE + "customer1");
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.USER_DUPLICATE + "customer1");
     }
 
     @Test
@@ -161,7 +157,7 @@ class UserControllerTest extends IntegrationTest {
         MvcTestResult result = createLibrarian(librarianSession, librarianUsername, "secret123");
 
         assertThat(result).hasStatus(HttpStatus.CONFLICT);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.USER_DUPLICATE + librarianUsername);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.USER_DUPLICATE + librarianUsername);
     }
 
     @Test
@@ -171,7 +167,7 @@ class UserControllerTest extends IntegrationTest {
         MvcTestResult result = createLibrarian(librarianSession, "librarian2", "ą".repeat(40));
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("error").isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
     }
 
     @Test
@@ -229,10 +225,29 @@ class UserControllerTest extends IntegrationTest {
                 .uri("/api/whoami")
                 .exchange();
 
-        assertThat(result)
-                .hasStatus(HttpStatus.OK)
-                .bodyText()
-                .contains("LIBRARIAN");
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("username").isEqualTo("user");
+        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
+    }
+
+    @Test
+    void testWhoAmIAfterLogin() {
+        MockHttpSession session = customerAccount("joe", "Joe", "Mama").session();
+
+        MvcTestResult result = mockMvcTester.get().uri("/api/whoami").session(session).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("username").isEqualTo("joe");
+        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
+    }
+
+    @Test
+    void testWhoAmIAnonymous() {
+        MvcTestResult result = mockMvcTester.get().uri("/api/whoami").exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("username").isNull();
+        assertThat(result).bodyJson().extractingPath("role").isNull();
     }
 
     private MvcTestResult registerNewCustomer(String username, String password) {

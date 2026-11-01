@@ -55,8 +55,8 @@ class AdminCustomerControllerTest extends IntegrationTest {
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
+        assertFieldError(result, "firstName", Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
+        assertFieldError(result, "lastName", Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -67,9 +67,9 @@ class AdminCustomerControllerTest extends IntegrationTest {
                 "a".repeat(146) + "@x.io");
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("firstName").isEqualTo(Messages.CUSTOMER_FIRSTNAME_LENGTH_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("lastName").isEqualTo(Messages.CUSTOMER_LASTNAME_LENGTH_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("email").isEqualTo(Messages.CUSTOMER_EMAIL_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "firstName", Messages.CUSTOMER_FIRSTNAME_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "lastName", Messages.CUSTOMER_LASTNAME_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "email", Messages.CUSTOMER_EMAIL_LENGTH_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -77,7 +77,7 @@ class AdminCustomerControllerTest extends IntegrationTest {
         MvcTestResult result = DataBuilder.createTestCustomer(mockMvcTester, "Goober", "III", "not-an-email");
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("email").isEqualTo(Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE);
+        assertFieldError(result, "email", Messages.CUSTOMER_EMAIL_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -100,7 +100,7 @@ class AdminCustomerControllerTest extends IntegrationTest {
         assertThat(mockMvcTester.get().uri("/api/admin/customers/9999"))
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.CUSTOMER_NOT_FOUND + "9999");
     }
 
@@ -177,7 +177,28 @@ class AdminCustomerControllerTest extends IntegrationTest {
 
         assertThat(result).hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.CUSTOMER_EMAIL_DUPLICATE + "goober@example.com");
+    }
+
+    @Test
+    void testFilterCustomersByLastName() {
+        assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama", "joe@example.com"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Ann", "Other", "ann@example.com"))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertThat(mockMvcTester.get().uri("/api/admin/customers?lastName=MAM"))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .satisfies(json -> {
+                    assertThat(json).extractingPath("page.totalElements").isEqualTo(1);
+                    assertThat(json).extractingPath("content[0].lastName").isEqualTo("Mama");
+                });
+        assertThat(mockMvcTester.get().uri("/api/admin/customers?lastName="))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("page.totalElements")
+                .isEqualTo(2);
     }
 }

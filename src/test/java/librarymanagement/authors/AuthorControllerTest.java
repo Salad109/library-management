@@ -45,7 +45,7 @@ class AuthorControllerTest extends IntegrationTest {
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
         assertThat(result)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.AUTHOR_NOT_FOUND + nonExistentAuthorName);
     }
 }

@@ -22,13 +22,17 @@ public class AdminCustomerController {
         this.customerService = customerService;
     }
 
-    @Operation(summary = "Get all customers")
+    @Operation(summary = "Get customers, optionally filtered by last name",
+            description = "lastName matches a case-insensitive substring.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Customers found"),
             @ApiResponse(responseCode = "403", description = "Requires LIBRARIAN role")
     })
     @GetMapping("/api/admin/customers")
-    public Page<CustomerResponse> getCustomers(Pageable pageable) {
+    public Page<CustomerResponse> getCustomers(@RequestParam(required = false) String lastName, Pageable pageable) {
+        if (lastName != null) {
+            return customerService.getCustomersByLastName(lastName, pageable);
+        }
         return customerService.getAllCustomers(pageable);
     }
 

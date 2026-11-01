@@ -21,6 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,6 +121,18 @@ public abstract class IntegrationTest {
                         {"activationCode": "%s", "username": "%s", "password": "%s"}
                         """.formatted(activationCode, username, password))
                 .exchange();
+    }
+
+    /**
+     * A 400 whose ProblemDetail errors member has the message for the field.
+     */
+    protected static void assertFieldError(MvcTestResult result, String field, String message) {
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("errors")
+                .asArray()
+                .contains(Map.of("detail", message, "pointer", "#/" + field));
     }
 
     private static JsonNode readJson(MvcTestResult result) {

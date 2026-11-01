@@ -61,7 +61,7 @@ class AdminBookControllerTest extends IntegrationTest {
                 " ");
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("$['authorNames[]']").isEqualTo(Messages.AUTHOR_NAME_VALIDATION_MESSAGE);
+        assertFieldError(result, "authorNames", Messages.AUTHOR_NAME_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -72,8 +72,8 @@ class AdminBookControllerTest extends IntegrationTest {
                 "a".repeat(101));
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("title").isEqualTo(Messages.BOOK_TITLE_LENGTH_VALIDATION_MESSAGE);
-        assertThat(result).bodyJson().extractingPath("$['authorNames[]']").isEqualTo(Messages.AUTHOR_NAME_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "title", Messages.BOOK_TITLE_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "authorNames", Messages.AUTHOR_NAME_LENGTH_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -118,7 +118,7 @@ class AdminBookControllerTest extends IntegrationTest {
         assertThat(result)
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 
@@ -160,7 +160,7 @@ class AdminBookControllerTest extends IntegrationTest {
         assertThat(mockMvcTester.delete().uri("/api/admin/books/" + BookTestData.TestBook1.ISBN))
                 .hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.BOOK_HAS_COPIES + BookTestData.TestBook1.ISBN);
 
         assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
@@ -174,7 +174,7 @@ class AdminBookControllerTest extends IntegrationTest {
         assertThat(mockMvcTester.delete().uri("/api/admin/books/" + isbn))
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 }

@@ -61,7 +61,7 @@ class BookControllerTest extends IntegrationTest {
         assertThat(mockMvcTester.get().uri("/api/books/" + isbn))
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
     }
 

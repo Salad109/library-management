@@ -17,7 +17,20 @@ GET http://localhost:8080/api/admin/copies/1
 ###
 
 ### Get all copies of a specific book
-GET http://localhost:8080/api/admin/copies/book/9781234567890
+GET http://localhost:8080/api/admin/copies?isbn=9781234567890
+
+###
+
+### Search copies by book title, customer ID or customer last name
+GET http://localhost:8080/api/admin/copies?title=1984
+
+###
+
+GET http://localhost:8080/api/admin/copies?customerId=1
+
+###
+
+GET http://localhost:8080/api/admin/copies?customerLastName=mama
 
 ###
 

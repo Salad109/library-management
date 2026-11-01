@@ -113,7 +113,7 @@ class ReservationControllerTest extends IntegrationTest {
                 .content(reservationJson))
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.COPY_RESERVATION_LIMIT + CopyService.MAX_ACTIVE_RESERVATIONS);
 
         // Cancelling one frees a slot
@@ -312,15 +312,11 @@ class ReservationControllerTest extends IntegrationTest {
                 .content(nonExistentIsbnReservationJson)
                 .exchange();
 
-        assertThat(nullIsbnReservationResult)
-                .hasStatus(HttpStatus.BAD_REQUEST)
-                .bodyJson()
-                .extractingPath("bookIsbn")
-                .isEqualTo(Messages.BOOK_NULL_ISBN);
+        assertFieldError(nullIsbnReservationResult, "bookIsbn", Messages.BOOK_NULL_ISBN);
         assertThat(nonExistentIsbnReservationResult)
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.COPY_NO_AVAILABLE + nonExistentIsbn);
     }
 
@@ -370,7 +366,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(deleteResult)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.COPY_WRONG_CUSTOMER + customerAId);
     }
 
@@ -467,7 +463,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(nonReservedReservationCancelResult)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.COPY_NOT_RESERVED + "AVAILABLE");
     }
 }

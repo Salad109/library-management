@@ -11,6 +11,11 @@ GET http://localhost:8080/api/admin/customers?page=0&size=5
 
 ###
 
+### Search customers by last name
+GET http://localhost:8080/api/admin/customers?lastName=mama
+
+###
+
 ### Get specific customer by ID
 GET http://localhost:8080/api/admin/customers/1
 

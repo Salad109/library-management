@@ -6,9 +6,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Set;
 
 @RestController
 @Tag(name = "Authentication")
@@ -33,12 +38,20 @@ public class UserController {
         return userService.registerCustomer(customerRegistrationRequest);
     }
 
-    @Operation(summary = "Get current username and role")
+    @Operation(summary = "Get current username and role", description = "Both are null when not logged in.")
     @ApiResponse(responseCode = "200", description = "User information retrieved successfully")
     @GetMapping("/api/whoami")
-    public String whoAmI() {
+    public WhoAmIResponse whoAmI() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return "Logged in as: " + auth.getName() + " with roles: " + auth.getAuthorities();
+        if (auth == null || auth instanceof AnonymousAuthenticationToken) {
+            return new WhoAmIResponse(null, null);
+        }
+        Set<String> authorities = AuthorityUtils.authorityListToSet(auth.getAuthorities());
+        Role role = Arrays.stream(Role.values())
+                .filter(r -> authorities.contains(r.name()))
+                .findFirst()
+                .orElse(null);
+        return new WhoAmIResponse(auth.getName(), role);
     }
 
     @Operation(summary = "User login", description = "Authenticate with username and password using form data")

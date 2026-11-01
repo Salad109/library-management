@@ -68,11 +68,7 @@ class AdminCopyControllerTest extends IntegrationTest {
                 .content(jsonString)
                 .exchange();
 
-        assertThat(result)
-                .hasStatus(HttpStatus.BAD_REQUEST)
-                .bodyJson()
-                .extractingPath(errorField)
-                .isEqualTo(expectedMessage);
+        assertFieldError(result, errorField, expectedMessage);
     }
 
 
@@ -101,7 +97,7 @@ class AdminCopyControllerTest extends IntegrationTest {
         assertThat(mockMvcTester.get().uri("/api/admin/copies/" + copyId))
                 .hasStatus(HttpStatus.NOT_FOUND)
                 .bodyJson()
-                .extractingPath("error")
+                .extractingPath("detail")
                 .isEqualTo(Messages.COPY_NOT_FOUND + copyId);
     }
 
@@ -114,7 +110,7 @@ class AdminCopyControllerTest extends IntegrationTest {
         assertThat(DataBuilder.createTestCopy(mockMvcTester, isbn, 3))
                 .hasStatus(HttpStatus.CREATED);
 
-        assertThat(mockMvcTester.get().uri("/api/admin/copies/book/" + isbn))
+        assertThat(mockMvcTester.get().uri("/api/admin/copies?isbn={isbn}", isbn))
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("page.totalElements").isEqualTo(3);
@@ -126,5 +122,47 @@ class AdminCopyControllerTest extends IntegrationTest {
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("page").isNotNull();
+    }
+
+    @Test
+    void testFilterCopies() throws Exception {
+        String isbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Filtered Title", "Some Author"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestBook(mockMvcTester, TestISBNGenerator.next(), "Other Book", "Some Author"))
+                .hasStatus(HttpStatus.CREATED);
+        int copyId = ControllerTestUtils.extractIdFromResponseArray(DataBuilder.createTestCopy(mockMvcTester, isbn, 2));
+        int customerId = ControllerTestUtils.extractIdFromResponse(
+                DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama", "joe@example.com"));
+        assertThat(mockMvcTester.post()
+                .uri("/api/desk/checkout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"copyId": %d, "customerId": %d}
+                        """.formatted(copyId, customerId)))
+                .hasStatus(HttpStatus.OK);
+
+        assertCopyCount("/api/admin/copies?isbn={q}", isbn, 2);
+        assertCopyCount("/api/admin/copies?title={q}", "filtered", 2);
+        assertCopyCount("/api/admin/copies?customerId={q}", customerId, 1);
+        assertCopyCount("/api/admin/copies?customerLastName={q}", "mam", 1);
+        assertCopyCount("/api/admin/copies?title={q}", " ", 2);
+    }
+
+    @Test
+    void testFilterCopiesRejectsTwoFilters() {
+        assertThat(mockMvcTester.get().uri("/api/admin/copies?title=a&customerId=1"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.COPY_SINGLE_FILTER);
+    }
+
+    private void assertCopyCount(String uri, Object query, int expected) {
+        assertThat(mockMvcTester.get().uri(uri, query))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("page.totalElements")
+                .isEqualTo(expected);
     }
 }
