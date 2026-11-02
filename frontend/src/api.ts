@@ -13,7 +13,7 @@ export type ProblemDetail = {
 
 export class ApiError extends Error {
   constructor(public problem: ProblemDetail) {
-    super(problem.detail)
+    super(problem.errors?.map((error) => error.detail).join('; ') ?? problem.detail)
   }
 }
 

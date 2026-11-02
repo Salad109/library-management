@@ -75,7 +75,7 @@ public class SecurityConfig {
     public SecurityFilterChain apiChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login.html", "/assets/**", "/favicon.ico",
+                        .requestMatchers("/*.html", "/assets/**", "/favicon.ico",
                                 "/actuator/**",
                                 "/api/register",
                                 "/api/login",
