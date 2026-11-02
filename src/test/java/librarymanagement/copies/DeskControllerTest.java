@@ -74,7 +74,7 @@ class DeskControllerTest extends IntegrationTest {
         MvcTestResult customerLogoutResult = mockMvcTester.post().uri("/api/logout")
                 .session(customerSession)
                 .exchange();
-        assertThat(customerLogoutResult).hasStatus(HttpStatus.OK);
+        assertThat(customerLogoutResult).hasStatus(HttpStatus.NO_CONTENT);
 
         // Librarian checks out the reserved copy
         String reservedCheckoutJson = """

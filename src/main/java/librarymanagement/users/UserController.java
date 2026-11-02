@@ -10,12 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.Set;
 
 @RestController
 @Tag(name = "Authentication")
@@ -42,12 +38,7 @@ public class UserController {
         if (auth == null || auth instanceof AnonymousAuthenticationToken) {
             return new WhoAmIResponse(null, null);
         }
-        Set<String> authorities = AuthorityUtils.authorityListToSet(auth.getAuthorities());
-        Role role = Arrays.stream(Role.values())
-                .filter(r -> authorities.contains(r.name()))
-                .findFirst()
-                .orElse(null);
-        return new WhoAmIResponse(auth.getName(), role);
+        return new WhoAmIResponse(auth.getName(), Role.of(auth));
     }
 
     @Operation(summary = "User login", description = "Authenticate with username and password using form data",
@@ -55,16 +46,16 @@ public class UserController {
                     mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
                     schema = @Schema(implementation = LoginForm.class))))
     @PostMapping("/api/login")
-    public String login() {
+    public LoginResponse login() {
         // This method is never used.
         // It's here purely for documentation and monitoring purposes.
         return null;
     }
 
     @PostMapping("/api/logout")
-    public String logout() {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout() {
         // Same as login.
-        return null;
     }
 
     // Documents the form Spring Security reads

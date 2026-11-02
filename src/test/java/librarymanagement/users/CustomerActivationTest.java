@@ -143,7 +143,7 @@ class CustomerActivationTest extends IntegrationTest {
                 .uri("/api/admin/customers/{id}/activation-code", customerId)
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.FOUND);
+        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     private MvcTestResult generateCode(MockHttpSession session, long customerId) {

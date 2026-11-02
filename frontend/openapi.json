@@ -206,15 +206,8 @@
         "tags" : [ "Authentication" ],
         "operationId" : "logout",
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
+          "204" : {
+            "description" : "No Content"
           }
         }
       }
@@ -240,7 +233,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "string"
+                  "$ref" : "#/components/schemas/LoginResponse"
                 }
               }
             }
@@ -1167,6 +1160,18 @@
           }
         },
         "required" : [ "password", "username" ]
+      },
+      "LoginResponse" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/Role"
+          }
+        },
+        "required" : [ "role", "username" ]
       },
       "CopyReturnRequest" : {
         "type" : "object",

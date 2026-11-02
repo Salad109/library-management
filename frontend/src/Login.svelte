@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { login, Role, whoAmI } from './api'
+  import { login, Role } from './api'
 
   let username = $state('')
   let password = $state('')
@@ -10,12 +10,11 @@
     event.preventDefault()
     error = ''
     try {
-      await login({ body: { username, password } })
-      const { data: me } = await whoAmI()
+      const { data: me } = await login({ body: { username, password } })
       if (me.role === Role.ROLE_LIBRARIAN) {
         location.href = '/admin'
       } else {
-        loggedInAs = me.username ?? username
+        loggedInAs = me.username
       }
     } catch (e) {
       error = (e as Error).message

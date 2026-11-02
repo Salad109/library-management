@@ -87,10 +87,9 @@ class UserControllerTest extends IntegrationTest {
                 .content("username=goober&password=password123")
                 .exchange();
 
-        assertThat(loginResult)
-                .hasStatus(HttpStatus.OK)
-                .bodyText()
-                .contains(Messages.SECURITY_LOGIN_SUCCESS);
+        assertThat(loginResult).hasStatus(HttpStatus.OK).hasContentType(MediaType.APPLICATION_JSON);
+        assertThat(loginResult).bodyJson().extractingPath("username").isEqualTo("goober");
+        assertThat(loginResult).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
     }
 
     @Test
@@ -103,7 +102,8 @@ class UserControllerTest extends IntegrationTest {
                 .content("username=" + librarianUsername + "&password=" + librarianPassword)
                 .exchange();
 
-        assertThat(loginResult).hasStatus(HttpStatus.OK).bodyText().contains(Messages.SECURITY_LOGIN_SUCCESS);
+        assertThat(loginResult).hasStatus(HttpStatus.OK);
+        assertThat(loginResult).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
         assertThat(mockMvcTester.get().uri("/api/whoami").session(sessionOf(loginResult)))
                 .bodyJson()
                 .extractingPath("role")
@@ -192,7 +192,10 @@ class UserControllerTest extends IntegrationTest {
     void testCustomerCannotCreateLibrarian() {
         MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
 
-        assertThat(createLibrarian(customerSession, "evil", "secret123")).hasStatus(HttpStatus.FORBIDDEN);
+        MvcTestResult result = createLibrarian(customerSession, "evil", "secret123");
+
+        assertThat(result).hasStatus(HttpStatus.FORBIDDEN).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo("Access Denied");
     }
 
     @Test
@@ -205,7 +208,8 @@ class UserControllerTest extends IntegrationTest {
                         """)
                 .exchange();
 
-        assertThat(result).hasStatus(HttpStatus.FOUND);
+        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_REQUIRED);
         assertThat(userRepository.findByUsername("evil")).isEmpty();
     }
 
@@ -230,10 +234,44 @@ class UserControllerTest extends IntegrationTest {
                 .content("username=baduser&password=badpass")
                 .exchange();
 
-        assertThat(loginResult)
-                .hasStatus(HttpStatus.UNAUTHORIZED)
-                .bodyText()
-                .contains(Messages.SECURITY_LOGIN_FAILURE);
+        assertThat(loginResult).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(loginResult).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
+    }
+
+    @Test
+    void testApiLogout() {
+        MockHttpSession session = customerAccount("joe", "Joe", "Mama").session();
+
+        MvcTestResult result = mockMvcTester.post().uri("/api/logout").session(session).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(result.getResponse().getContentAsByteArray()).isEmpty();
+        assertThat(session.isInvalid()).isTrue();
+    }
+
+    @Test
+    void testStaffLogout() {
+        MockHttpSession session = librarianSession();
+
+        MvcTestResult result = mockMvcTester.post().uri("/admin/logout").session(session).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.FOUND).hasRedirectedUrl("/login");
+        assertThat(session.isInvalid()).isTrue();
+    }
+
+    @Test
+    void testAnonymousPageStillRedirectsToLogin() {
+        assertThat(mockMvcTester.get().uri("/swagger-ui/index.html").accept(MediaType.TEXT_HTML))
+                .hasStatus(HttpStatus.FOUND)
+                .hasRedirectedUrl("/login");
+    }
+
+    @Test
+    void testAnonymousApiCallFromBrowserIsNotRedirected() {
+        MvcTestResult result = mockMvcTester.get().uri("/api/admin/customers").accept(MediaType.TEXT_HTML).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_REQUIRED);
     }
 
     @Test

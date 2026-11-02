@@ -4,10 +4,10 @@ export * from './generated'
 
 export type ProblemDetail = {
   type?: string
-  title?: string
+  title: string
   status: number
   detail: string
-  instance?: string
+  instance: string
   errors?: { detail: string; pointer: string }[]
 }
 
@@ -19,6 +19,5 @@ export class ApiError extends Error {
 
 client.interceptors.error.use((error, response) => {
   if (!response) return error
-  // Login and logout still answer in plain text
-  return new ApiError(typeof error === 'string' ? { status: response.status, detail: error } : (error as ProblemDetail))
+  return new ApiError(error as ProblemDetail)
 })
