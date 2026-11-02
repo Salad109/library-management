@@ -1,0 +1,7 @@
+.git
+.idea
+.env
+target
+frontend/node
+frontend/node_modules
+frontend/src/generated
