@@ -88,15 +88,13 @@ public final class DataBuilder {
 
     public static MvcTestResult createTestCustomer(MockMvcTester mockMvcTester,
                                                    String firstName,
-                                                   String lastName,
-                                                   String email) {
+                                                   String lastName) {
         String customerJson = """
                 {
                     "firstName": "%s",
-                    "lastName": "%s",
-                    "email": "%s"
+                    "lastName": "%s"
                 }
-                """.formatted(firstName, lastName, email);
+                """.formatted(firstName, lastName);
 
         return mockMvcTester.post()
                 .uri("/api/admin/customers")

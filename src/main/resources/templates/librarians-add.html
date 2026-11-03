@@ -13,8 +13,8 @@
 
     <form id="librarianForm">
         <div class="mb-3">
-            <label for="username">Username:</label>
-            <input class="form-control" id="username" name="username" required type="text">
+            <label for="email">Email:</label>
+            <input class="form-control" id="email" name="email" required type="text">
         </div>
         <div class="mb-3">
             <label for="password">Password:</label>
@@ -30,7 +30,7 @@
 
             const data = new FormData(this);
             const json = {
-                username: data.get('username'),
+                email: data.get('email'),
                 password: data.get('password')
             };
 
@@ -43,7 +43,7 @@
             const msg = document.getElementById('message');
             if (response.ok) {
                 msg.className = 'alert alert-success';
-                msg.textContent = 'Librarian added: ' + (await response.json()).username;
+                msg.textContent = 'Librarian added: ' + (await response.json()).email;
                 this.reset();
             } else {
                 const errorData = await response.json();

@@ -37,15 +37,17 @@ public class AdminCustomerController {
     }
 
     @Operation(summary = "Create a new customer",
-            description = "Creates a new \"offline\" customer without a user account")
+            description = "Creates a new \"offline\" customer without a user account or email.")
     @PostMapping("/api/admin/customers")
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerResponse createCustomer(@Valid @RequestBody CustomerRequest customerRequest) {
-        return customerService.addCustomer(customerRequest);
+    public CustomerResponse createCustomer(@Valid @RequestBody CustomerCreateRequest request) {
+        return customerService.addCustomer(request);
     }
 
+    @Operation(summary = "Update a customer",
+            description = "An email can be changed, but not added or removed: a customer gets one by registering online.")
     @PutMapping("/api/admin/customers/{id}")
-    public CustomerResponse updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest customerRequest) {
-        return customerService.updateCustomer(id, customerRequest);
+    public CustomerResponse updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerUpdateRequest request) {
+        return customerService.updateCustomer(id, request);
     }
 }

@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
   "activationCode": "ABCD-1234",
-  "username": "customer1",
+  "email": "customer1@example.com",
   "password": "customer123"
 }
 
@@ -17,7 +17,7 @@ Content-Type: application/json
 POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
-username = admin &
+email = admin@example.com &
 password = change-me
 
 ###
@@ -26,7 +26,7 @@ password = change-me
 POST http://localhost:8080/api/login
 Content-Type: application/x-www-form-urlencoded
 
-username = customer1 &
+email = customer1@example.com &
 password = customer123
 
 ###
@@ -46,6 +46,6 @@ POST http://localhost:8080/api/register
 Content-Type: application/json
 
 {
-  "username": "customer2",
+  "email": "customer2@example.com",
   "password": "password123"
 }

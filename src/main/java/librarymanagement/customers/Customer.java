@@ -18,8 +18,6 @@ public class Customer {
 
     private String lastName;
 
-    private String email;
-
     private String activationCodeHash;
 
     private Instant activationCodeExpiresAt;
@@ -56,14 +54,6 @@ public class Customer {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getActivationCodeHash() {

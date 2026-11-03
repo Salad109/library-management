@@ -31,7 +31,7 @@ public class UserController {
         return userService.registerCustomer(customerRegistrationRequest);
     }
 
-    @Operation(summary = "Get current username and role", description = "Both are absent when not logged in.")
+    @Operation(summary = "Get current email and role", description = "Both are absent when not logged in.")
     @GetMapping("/api/whoami")
     public WhoAmIResponse whoAmI() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -41,7 +41,7 @@ public class UserController {
         return new WhoAmIResponse(auth.getName(), Role.of(auth));
     }
 
-    @Operation(summary = "User login", description = "Authenticate with username and password using form data",
+    @Operation(summary = "User login", description = "Authenticate with email and password using form data",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
                     mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
                     schema = @Schema(implementation = LoginForm.class))))
@@ -59,6 +59,6 @@ public class UserController {
     }
 
     // Documents the form Spring Security reads
-    record LoginForm(@NotBlank String username, @NotBlank String password) {
+    record LoginForm(@NotBlank String email, @NotBlank String password) {
     }
 }

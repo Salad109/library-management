@@ -50,7 +50,7 @@ class DeskControllerTest extends IntegrationTest {
         int unreservedCopyId = ControllerTestUtils.extractIdFromResponseArray(secondCopyResult);
 
         // Register and login the customer
-        CustomerAccount customer = customerAccount("joe", "Joe", "Mama");
+        CustomerAccount customer = customerAccount("joe@example.com", "Joe", "Mama");
         long customerId = customer.customerId();
         MockHttpSession customerSession = customer.session();
 
@@ -144,7 +144,7 @@ class DeskControllerTest extends IntegrationTest {
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create customer
-        long customerId = customerAccount("jane", "Jane", "Mama").customerId();
+        long customerId = customerAccount("jane@example.com", "Jane", "Mama").customerId();
         // Checkout the copy first
         String checkoutJson = """
                 {
@@ -207,7 +207,7 @@ class DeskControllerTest extends IntegrationTest {
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Register customer
-        long customerId = customerAccount("baby joe", "Joe Jr", "Mama").customerId();
+        long customerId = customerAccount("babyjoe@example.com", "Joe Jr", "Mama").customerId();
         // Try to return copy that was never borrowed
         String returnJson = """
                 {

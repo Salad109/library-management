@@ -43,10 +43,10 @@ public class UserService {
 
     @Transactional
     public UserResponse addLibrarian(LibrarianCreateRequest request) {
-        User user = newUser(request.username(), request.password(), Role.ROLE_LIBRARIAN);
+        User user = newUser(request.email(), request.password(), Role.ROLE_LIBRARIAN);
 
         User savedUser = userRepository.save(user);
-        log.info("Librarian added with username: {}", savedUser.getUsername());
+        log.info("Librarian added with email: {}", savedUser.getEmail());
         return UserResponse.from(savedUser);
     }
 
@@ -77,40 +77,40 @@ public class UserService {
     public UserResponse registerCustomer(CustomerRegistrationRequest request) {
         Customer customer = customerRepository.findByActivationCodeHash(ActivationCodes.hash(request.activationCode()))
                 .orElseThrow(() -> {
-                    log.warn("Customer registration for username {} failed: unknown activation code", request.username());
+                    log.warn("Customer registration for email {} failed: unknown activation code", request.email());
                     return new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.ACTIVATION_CODE_INVALID);
                 });
         if (customer.getActivationCodeExpiresAt().isBefore(Instant.now())) {
-            log.warn("Customer registration for username {} failed: activation code expired for customer ID: {}",
-                    request.username(), customer.getId());
+            log.warn("Customer registration for email {} failed: activation code expired for customer ID: {}",
+                    request.email(), customer.getId());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.ACTIVATION_CODE_INVALID);
         }
 
-        User user = newUser(request.username(), request.password(), Role.ROLE_CUSTOMER);
+        User user = newUser(request.email(), request.password(), Role.ROLE_CUSTOMER);
         user.setCustomer(customer);
         customer.setActivationCodeHash(null);
         customer.setActivationCodeExpiresAt(null);
         customerRepository.save(customer);
 
         User savedUser = userRepository.save(user);
-        log.info("Customer registered with username: {}, customer ID: {}", savedUser.getUsername(), customer.getId());
+        log.info("Customer registered with email: {}, customer ID: {}", savedUser.getEmail(), customer.getId());
         return UserResponse.from(savedUser);
     }
 
-    private User newUser(String username, String password, Role role) {
+    private User newUser(String email, String password, Role role) {
         // BCrypt hashes at most 72 bytes
         if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
             log.warn("Password for new user exceeds 72 bytes");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.USER_PASSWORD_TOO_LONG);
         }
 
-        if (userRepository.findByUsername(username).isPresent()) {
-            log.warn("Duplicate user found with username: {}", username);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.USER_DUPLICATE + username);
+        if (userRepository.existsByEmail(email)) {
+            log.warn("Duplicate user found with email: {}", email);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.USER_EMAIL_DUPLICATE + email);
         }
 
         User user = new User();
-        user.setUsername(username);
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(role);
         return user;

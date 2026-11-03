@@ -6,6 +6,6 @@ POST http://localhost:8080/api/admin/librarians
 Content-Type: application/json
 
 {
-  "username": "librarian2",
+  "email": "librarian2@example.com",
   "password": "secret123"
 }

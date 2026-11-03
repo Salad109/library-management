@@ -4,5 +4,5 @@ logging:
 library:
   admin:
     # IntegrationTest.librarianSession() runs LibrarianBootstrap with these
-    username: librarian
+    email: librarian@example.com
     password: password123

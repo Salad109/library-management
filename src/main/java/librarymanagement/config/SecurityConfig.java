@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/admin/login")
+                        .usernameParameter("email")
                         .successHandler(this::staffSuccessHandler)
                         .failureHandler(this::staffFailureHandler)
                 )
@@ -88,6 +89,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/login")
+                        .usernameParameter("email")
                         .successHandler(this::apiSuccessHandler)
                         .failureHandler(this::apiFailureHandler)
                 )

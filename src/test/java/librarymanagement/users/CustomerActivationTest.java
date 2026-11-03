@@ -5,6 +5,7 @@ import librarymanagement.utils.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -51,7 +52,66 @@ class CustomerActivationTest extends IntegrationTest {
         String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
         String typed = " " + code.replace("-", "").toLowerCase(Locale.ROOT) + " ";
 
-        assertThat(register(typed, "joe", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
+        assertThat(register(typed, "joe@example.com", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
+    }
+
+    @Test
+    void testRegisterStoresEmailOnCustomer() {
+        MockHttpSession librarianSession = librarianSession();
+        long customerId = createCustomer(librarianSession, "Joe", "Mama");
+
+        assertThat(register(activationCode(librarianSession, customerId), "joe@example.com", CUSTOMER_PASSWORD))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertThat(mockMvcTester.get().uri("/api/admin/customers/{id}", customerId).session(librarianSession))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("email")
+                .isEqualTo("joe@example.com");
+    }
+
+    @Test
+    void testRegisterWithoutEmail() {
+        MockHttpSession librarianSession = librarianSession();
+        String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
+
+        MvcTestResult result = mockMvcTester.post()
+                .uri("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"activationCode": "%s", "password": "%s"}
+                        """.formatted(code, CUSTOMER_PASSWORD))
+                .exchange();
+
+        assertFieldError(result, "email", Messages.USER_EMAIL_VALIDATION_MESSAGE);
+        assertThat(userRepository.existsByRole(Role.ROLE_CUSTOMER)).isFalse();
+    }
+
+    @Test
+    void testRegisterWithInvalidEmail() {
+        MockHttpSession librarianSession = librarianSession();
+        String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
+
+        assertFieldError(register(code, "not-an-email", CUSTOMER_PASSWORD),
+                "email", Messages.USER_EMAIL_VALIDATION_MESSAGE);
+        assertFieldError(register(code, "a".repeat(146) + "@x.io", CUSTOMER_PASSWORD),
+                "email", Messages.USER_EMAIL_LENGTH_VALIDATION_MESSAGE);
+    }
+
+    @Test
+    void testRegisterWithDuplicateEmailKeepsTheCode() {
+        MockHttpSession librarianSession = librarianSession();
+        String firstCode = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
+        String secondCode = activationCode(librarianSession, createCustomer(librarianSession, "Ann", "Other"));
+        assertThat(register(firstCode, "same@example.com", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
+
+        assertThat(register(secondCode, "same@example.com", CUSTOMER_PASSWORD))
+                .hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.USER_EMAIL_DUPLICATE + "same@example.com");
+
+        assertThat(register(secondCode, "ann@example.com", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
     }
 
     @Test
@@ -59,10 +119,10 @@ class CustomerActivationTest extends IntegrationTest {
         MockHttpSession librarianSession = librarianSession();
         activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
 
-        MvcTestResult result = register("0000-0000", "joe", CUSTOMER_PASSWORD);
+        MvcTestResult result = register("0000-0000", "joe@example.com", CUSTOMER_PASSWORD);
 
         assertInvalidCode(result);
-        assertThat(userRepository.findByUsername("joe")).isEmpty();
+        assertThat(userRepository.findByEmail("joe@example.com")).isEmpty();
     }
 
     @Test
@@ -73,17 +133,17 @@ class CustomerActivationTest extends IntegrationTest {
         jdbcTemplate.update("UPDATE customers SET activation_code_expires_at = now() - interval '1 minute' WHERE id = ?",
                 customerId);
 
-        assertInvalidCode(register(code, "joe", CUSTOMER_PASSWORD));
-        assertThat(userRepository.findByUsername("joe")).isEmpty();
+        assertInvalidCode(register(code, "joe@example.com", CUSTOMER_PASSWORD));
+        assertThat(userRepository.findByEmail("joe@example.com")).isEmpty();
     }
 
     @Test
     void testCodeWorksOnce() {
         MockHttpSession librarianSession = librarianSession();
         String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
-        assertThat(register(code, "joe", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
+        assertThat(register(code, "joe@example.com", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
 
-        assertInvalidCode(register(code, "joe2", CUSTOMER_PASSWORD));
+        assertInvalidCode(register(code, "joe2@example.com", CUSTOMER_PASSWORD));
     }
 
     @Test
@@ -91,10 +151,10 @@ class CustomerActivationTest extends IntegrationTest {
         MockHttpSession librarianSession = librarianSession();
         String code = activationCode(librarianSession, createCustomer(librarianSession, "Joe", "Mama"));
 
-        // Username taken by the librarian, code preserved
-        assertThat(register(code, librarianUsername, CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CONFLICT);
+        // Email taken by the librarian, code preserved
+        assertThat(register(code, librarianEmail, CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CONFLICT);
 
-        assertThat(register(code, "joe", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
+        assertThat(register(code, "joe@example.com", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
     }
 
     @Test
@@ -104,13 +164,13 @@ class CustomerActivationTest extends IntegrationTest {
         String oldCode = activationCode(librarianSession, customerId);
         String newCode = activationCode(librarianSession, customerId);
 
-        assertInvalidCode(register(oldCode, "joe", CUSTOMER_PASSWORD));
-        assertThat(register(newCode, "joe", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
+        assertInvalidCode(register(oldCode, "joe@example.com", CUSTOMER_PASSWORD));
+        assertThat(register(newCode, "joe@example.com", CUSTOMER_PASSWORD)).hasStatus(HttpStatus.CREATED);
     }
 
     @Test
     void testCannotGenerateCodeForCustomerWithAccount() {
-        long customerId = customerAccount("joe", "Joe", "Mama").customerId();
+        long customerId = customerAccount("joe@example.com", "Joe", "Mama").customerId();
 
         MvcTestResult result = generateCode(librarianSession(), customerId);
 
@@ -130,7 +190,7 @@ class CustomerActivationTest extends IntegrationTest {
     void testCustomerCannotGenerateCode() {
         MockHttpSession librarianSession = librarianSession();
         long otherCustomerId = createCustomer(librarianSession, "Other", "Customer");
-        MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
+        MockHttpSession customerSession = customerAccount("joe@example.com", "Joe", "Mama").session();
 
         assertThat(generateCode(customerSession, otherCustomerId)).hasStatus(HttpStatus.FORBIDDEN);
     }

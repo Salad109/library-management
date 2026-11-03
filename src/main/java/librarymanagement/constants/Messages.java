@@ -34,21 +34,20 @@ public class Messages {
     public static final String COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE = "Maximum quantity cannot exceed 100";
     // Customer
     public static final String CUSTOMER_NOT_FOUND = "Customer not found with ID: ";
-    public static final String CUSTOMER_EMAIL_DUPLICATE = "Email already exists: ";
+    public static final String CUSTOMER_EMAIL_REQUIRED = "A customer with an account must have an email";
+    public static final String CUSTOMER_EMAIL_NEEDS_ACCOUNT = "A customer without an account cannot have an email";
     public static final String CUSTOMER_HAS_ACCOUNT = "Customer already has an account. Customer ID: ";
     public static final String CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE = "First name cannot be blank";
     public static final String CUSTOMER_LASTNAME_VALIDATION_MESSAGE = "Last name cannot be blank";
     public static final String CUSTOMER_FIRSTNAME_LENGTH_VALIDATION_MESSAGE = "First name cannot exceed 100 characters";
     public static final String CUSTOMER_LASTNAME_LENGTH_VALIDATION_MESSAGE = "Last name cannot exceed 100 characters";
-    public static final String CUSTOMER_EMAIL_LENGTH_VALIDATION_MESSAGE = "Email cannot exceed 150 characters";
-    public static final String CUSTOMER_EMAIL_VALIDATION_MESSAGE = "Email must be a valid email address";
-    public static final String CUSTOMER_EMAIL_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
     // User
-    public static final String USERNAME_NOT_FOUND = "User not found: ";
-    public static final String USER_DUPLICATE = "User already exists with username: ";
-    public static final String USER_USERNAME_VALIDATION_MESSAGE = "Username cannot be blank";
+    public static final String USER_NOT_FOUND = "User not found: ";
+    public static final String USER_EMAIL_DUPLICATE = "Email already exists: ";
+    public static final String USER_EMAIL_LENGTH_VALIDATION_MESSAGE = "Email cannot exceed 150 characters";
+    public static final String USER_EMAIL_VALIDATION_MESSAGE = "Email must be a valid email address";
+    public static final String USER_EMAIL_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
     public static final String USER_PASSWORD_VALIDATION_MESSAGE = "Password cannot be blank";
-    public static final String USER_USERNAME_LENGTH_VALIDATION_MESSAGE = "Username cannot exceed 50 characters";
     public static final String USER_PASSWORD_TOO_LONG = "Password cannot exceed 72 bytes";
     public static final String ACTIVATION_CODE_INVALID = "Activation code is invalid or expired";
     public static final String ACTIVATION_CODE_VALIDATION_MESSAGE = "Activation code cannot be blank";

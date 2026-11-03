@@ -22,16 +22,16 @@ public class LibrarianBootstrap implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(LibrarianBootstrap.class);
     private final UserService userService;
     private final Validator validator;
-    private final String username;
+    private final String email;
     private final String password;
 
     public LibrarianBootstrap(UserService userService,
                               Validator validator,
-                              @Value("${library.admin.username:}") String username,
+                              @Value("${library.admin.email:}") String email,
                               @Value("${library.admin.password:}") String password) {
         this.userService = userService;
         this.validator = validator;
-        this.username = username;
+        this.email = email;
         this.password = password;
     }
 
@@ -42,14 +42,14 @@ public class LibrarianBootstrap implements ApplicationRunner {
             return;
         }
 
-        LibrarianCreateRequest request = new LibrarianCreateRequest(username, password);
+        LibrarianCreateRequest request = new LibrarianCreateRequest(email, password);
         Set<ConstraintViolation<LibrarianCreateRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             String messages = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "));
-            throw new IllegalStateException("Invalid LIBRARY_ADMIN_USERNAME / LIBRARY_ADMIN_PASSWORD: " + messages);
+            throw new IllegalStateException("Invalid LIBRARY_ADMIN_EMAIL / LIBRARY_ADMIN_PASSWORD: " + messages);
         }
 
         userService.addLibrarian(request);
-        log.info("Created initial librarian: {}", request.username());
+        log.info("Created initial librarian: {}", request.email());
     }
 }

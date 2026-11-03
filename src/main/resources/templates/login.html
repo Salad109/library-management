@@ -11,13 +11,13 @@
         <h5>This page is for employees only!</h5>
 
         <div class="alert alert-danger" th:if="${param.error}">
-            Wrong username or password
+            Wrong email or password
         </div>
 
         <form method="post" th:action="@{/admin/login}">
             <div class="mb-3">
-                <label for="username">Username</label>
-                <input class="form-control" id="username" name="username" required type="text">
+                <label for="email">Email</label>
+                <input class="form-control" id="email" name="email" required type="text">
             </div>
 
             <div class="mb-3">

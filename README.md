@@ -51,7 +51,7 @@ cp .env.example .env
 # POSTGRES_USER=library_admin
 # POSTGRES_PASSWORD=secret123
 # POSTGRES_DB=library_db
-# LIBRARY_ADMIN_USERNAME=admin
+# LIBRARY_ADMIN_EMAIL=admin@example.com
 # LIBRARY_ADMIN_PASSWORD=change-me
 
 # Start all services

@@ -8,12 +8,12 @@
     { href: '/admin/librarians/add', label: 'Add Librarian' },
   ]
 
-  let username = $state('')
+  let email = $state('')
 
   whoAmI().then((response) => {
     const me = response.data
     if (me.role === Role.ROLE_LIBRARIAN) {
-      username = me.username ?? ''
+      email = me.email ?? ''
     } else {
       location.href = '/login.html'
     }
@@ -32,6 +32,6 @@
       <li><a class:menu-active={location.pathname === link.href} href={link.href}>{link.label}</a></li>
     {/each}
   </ul>
-  <span class="mr-4">{username}</span>
+  <span class="mr-4">{email}</span>
   <button class="btn btn-outline btn-sm" onclick={signOut}>Logout</button>
 </nav>

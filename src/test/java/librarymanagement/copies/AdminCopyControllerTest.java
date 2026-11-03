@@ -144,7 +144,7 @@ class AdminCopyControllerTest extends IntegrationTest {
                 .hasStatus(HttpStatus.CREATED);
         int copyId = ControllerTestUtils.extractIdFromResponseArray(DataBuilder.createTestCopy(mockMvcTester, isbn, 2));
         int customerId = ControllerTestUtils.extractIdFromResponse(
-                DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama", "joe@example.com"));
+                DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama"));
         assertThat(mockMvcTester.post()
                 .uri("/api/desk/checkout")
                 .contentType(MediaType.APPLICATION_JSON)

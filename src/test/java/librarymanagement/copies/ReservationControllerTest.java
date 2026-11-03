@@ -25,7 +25,7 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Test
     void testMyReservations() {
-        MockHttpSession session = customerAccount("jane", "Jane", "Mama").session();
+        MockHttpSession session = customerAccount("jane@example.com", "Jane", "Mama").session();
 
         MvcTestResult result = mockMvcTester.get()
                 .uri("/api/reservations/mine")
@@ -51,7 +51,7 @@ class ReservationControllerTest extends IntegrationTest {
         int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create a customer and make a reservation
-        MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
+        MockHttpSession customerSession = customerAccount("joe@example.com", "Joe", "Mama").session();
 
         String reservationJson = """
                 {
@@ -83,7 +83,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, CopyService.MAX_ACTIVE_RESERVATIONS + 1))
                 .hasStatus(HttpStatus.CREATED);
 
-        MockHttpSession customerSession = customerAccount("hoarder", "Joe", "Mama").session();
+        MockHttpSession customerSession = customerAccount("hoarder@example.com", "Joe", "Mama").session();
 
         String reservationJson = """
                 {
@@ -143,7 +143,7 @@ class ReservationControllerTest extends IntegrationTest {
         // Log both customers in first, so only the reservations race
         MockHttpSession[] sessions = new MockHttpSession[2];
         for (int i = 0; i < 2; i++) {
-            sessions[i] = customerAccount("racer" + i, "Racer", "No" + i).session();
+            sessions[i] = customerAccount("racer" + i + "@example.com", "Racer", "No" + i).session();
         }
 
         String reservationJson = """
@@ -204,8 +204,8 @@ class ReservationControllerTest extends IntegrationTest {
                 """.formatted(isbn);
 
         // Log both customers in first, so only the reservations race
-        MockHttpSession sessionA = customerAccount("customerACon", "Joe", "Mama").session();
-        MockHttpSession sessionB = customerAccount("customerBCon", "Jane", "Mama").session();
+        MockHttpSession sessionA = customerAccount("customerACon@example.com", "Joe", "Mama").session();
+        MockHttpSession sessionB = customerAccount("customerBCon@example.com", "Jane", "Mama").session();
 
         // Setup latches to coordinate customer threads
         CountDownLatch startLatch = new CountDownLatch(1);
@@ -286,7 +286,7 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Test
     void testCreateInvalidReservations() {
-        MockHttpSession session = customerAccount("joe", "Joe", "Mama").session();
+        MockHttpSession session = customerAccount("joe@example.com", "Joe", "Mama").session();
 
         String nullIsbnReservationJson = """
                 {
@@ -333,7 +333,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Customer A reserves a book
-        CustomerAccount customerA = customerAccount("customerA", "Joe", "Mama");
+        CustomerAccount customerA = customerAccount("customerA@example.com", "Joe", "Mama");
         long customerAId = customerA.customerId();
         MockHttpSession sessionA = customerA.session();
 
@@ -354,7 +354,7 @@ class ReservationControllerTest extends IntegrationTest {
         int reservedCopyId = ControllerTestUtils.extractIdFromResponse(reservationResult);
 
         // Customer B tries to delete Customer A's reservation
-        MockHttpSession sessionB = customerAccount("customerB", "Evil Joe", "Mama").session();
+        MockHttpSession sessionB = customerAccount("customerB@example.com", "Evil Joe", "Mama").session();
 
         // Invalid delete request by Customer B
         MvcTestResult deleteResult = mockMvcTester.delete()
@@ -402,7 +402,7 @@ class ReservationControllerTest extends IntegrationTest {
         assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
 
         // Create a customer and make a reservation
-        MockHttpSession customerSession = customerAccount("joe", "Joe", "Mama").session();
+        MockHttpSession customerSession = customerAccount("joe@example.com", "Joe", "Mama").session();
 
         String reservationJson = """
                 {
@@ -443,7 +443,7 @@ class ReservationControllerTest extends IntegrationTest {
         int nonReservedCopyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
 
         // Create a customer
-        MockHttpSession session = customerAccount("joe jr", "Joe", "Mama Jr").session();
+        MockHttpSession session = customerAccount("joejr@example.com", "Joe", "Mama Jr").session();
 
         // Invalid requests
         int nonExistentReservationCopyId = 999;

@@ -42,5 +42,5 @@ logging:
 library:
   admin:
     # First librarian, created at startup only if no librarian exist
-    username: ${LIBRARY_ADMIN_USERNAME:}
+    email: ${LIBRARY_ADMIN_EMAIL:}
     password: ${LIBRARY_ADMIN_PASSWORD:}

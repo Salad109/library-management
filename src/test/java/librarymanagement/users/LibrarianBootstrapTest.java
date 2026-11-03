@@ -28,7 +28,7 @@ class LibrarianBootstrapTest extends IntegrationTest {
     void testCreatesLibrarianWhenNoneExists() {
         librarianBootstrap.run(new DefaultApplicationArguments());
 
-        assertThat(userRepository.findByUsername(librarianUsername))
+        assertThat(userRepository.findByEmail(librarianEmail))
                 .hasValueSatisfying(user -> assertThat(user.getRole()).isEqualTo(Role.ROLE_LIBRARIAN));
     }
 
@@ -42,11 +42,11 @@ class LibrarianBootstrapTest extends IntegrationTest {
 
     @Test
     void testDoesNothingWhenAnotherLibrarianExists() {
-        userService.addLibrarian(new LibrarianCreateRequest("someoneElse", librarianPassword));
+        userService.addLibrarian(new LibrarianCreateRequest("someone.else@example.com", librarianPassword));
 
         librarianBootstrap.run(new DefaultApplicationArguments());
 
-        assertThat(userRepository.findByUsername(librarianUsername)).isEmpty();
+        assertThat(userRepository.findByEmail(librarianEmail)).isEmpty();
     }
 
     @Test
@@ -55,13 +55,13 @@ class LibrarianBootstrapTest extends IntegrationTest {
 
         assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(Messages.USER_USERNAME_VALIDATION_MESSAGE)
+                .hasMessageContaining(Messages.USER_EMAIL_VALIDATION_MESSAGE)
                 .hasMessageContaining(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
     }
 
     @Test
     void testIgnoresMissingCredentialsWhenLibrarianExists() {
-        userService.addLibrarian(new LibrarianCreateRequest("someoneElse", librarianPassword));
+        userService.addLibrarian(new LibrarianCreateRequest("someone.else@example.com", librarianPassword));
 
         new LibrarianBootstrap(userService, validator, "", "").run(new DefaultApplicationArguments());
 

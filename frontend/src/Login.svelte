@@ -1,7 +1,7 @@
 <script lang="ts">
   import { login, Role } from './api'
 
-  let username = $state('')
+  let email = $state('')
   let password = $state('')
   let error = $state('')
   let loggedInAs = $state('')
@@ -10,12 +10,12 @@
     event.preventDefault()
     error = ''
     try {
-      const response = await login({ body: { username: username, password: password } })
+      const response = await login({ body: { email: email, password: password } })
       const me = response.data
       if (me.role === Role.ROLE_LIBRARIAN) {
         location.href = '/admin'
       } else {
-        loggedInAs = me.username
+        loggedInAs = me.email
       }
     } catch (e) {
       error = (e as Error).message
@@ -35,8 +35,8 @@
 
     <form onsubmit={submit}>
       <div class="mb-3">
-        <label class="label mb-1" for="username">Username</label>
-        <input class="input w-full" id="username" bind:value={username} required autocomplete="username" />
+        <label class="label mb-1" for="email">Email</label>
+        <input class="input w-full" id="email" type="email" bind:value={email} required autocomplete="username" />
       </div>
 
       <div class="mb-3">

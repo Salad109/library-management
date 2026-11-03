@@ -40,8 +40,8 @@ public abstract class IntegrationTest {
     /**
      * The account librarianSession() creates from library.admin.* in application-test.yml.
      */
-    @Value("${library.admin.username}")
-    protected String librarianUsername;
+    @Value("${library.admin.email}")
+    protected String librarianEmail;
 
     @Value("${library.admin.password}")
     protected String librarianPassword;
@@ -70,22 +70,22 @@ public abstract class IntegrationTest {
      */
     protected MockHttpSession librarianSession() {
         librarianBootstrap.run(new DefaultApplicationArguments());
-        return login("/admin/login", librarianUsername, librarianPassword, HttpStatus.FOUND);
+        return login("/admin/login", librarianEmail, librarianPassword, HttpStatus.FOUND);
     }
 
     /**
      * The library card flow: a librarian creates the customer and an activation code, the customer registers with it
      * and logs in through the API login.
      */
-    protected CustomerAccount customerAccount(String username, String firstName, String lastName) {
+    protected CustomerAccount customerAccount(String email, String firstName, String lastName) {
         MockHttpSession librarianSession = librarianSession();
         long customerId = createCustomer(librarianSession, firstName, lastName);
         String code = activationCode(librarianSession, customerId);
 
-        MvcTestResult registration = register(code, username, CUSTOMER_PASSWORD);
+        MvcTestResult registration = register(code, email, CUSTOMER_PASSWORD);
         assertThat(registration).hasStatus(HttpStatus.CREATED);
 
-        return new CustomerAccount(customerId, login("/api/login", username, CUSTOMER_PASSWORD, HttpStatus.OK));
+        return new CustomerAccount(customerId, login("/api/login", email, CUSTOMER_PASSWORD, HttpStatus.OK));
     }
 
     /**
@@ -113,13 +113,13 @@ public abstract class IntegrationTest {
         return readJson(result).get("activationCode").asString();
     }
 
-    protected MvcTestResult register(String activationCode, String username, String password) {
+    protected MvcTestResult register(String activationCode, String email, String password) {
         return mvc.post()
                 .uri("/api/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"activationCode": "%s", "username": "%s", "password": "%s"}
-                        """.formatted(activationCode, username, password))
+                        {"activationCode": "%s", "email": "%s", "password": "%s"}
+                        """.formatted(activationCode, email, password))
                 .exchange();
     }
 
@@ -139,11 +139,11 @@ public abstract class IntegrationTest {
         return new ObjectMapper().readTree(result.getResponse().getContentAsByteArray());
     }
 
-    private MockHttpSession login(String uri, String username, String password, HttpStatus expectedStatus) {
+    protected MockHttpSession login(String uri, String email, String password, HttpStatus expectedStatus) {
         MvcTestResult result = mvc.post()
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("username=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
+                .content("email=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
                         + "&password=" + URLEncoder.encode(password, StandardCharsets.UTF_8))
                 .exchange();
         assertThat(result).hasStatus(expectedStatus);

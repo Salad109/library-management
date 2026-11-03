@@ -54,6 +54,8 @@
       },
       "put" : {
         "tags" : [ "Admin Customer Operations" ],
+        "summary" : "Update a customer",
+        "description" : "An email can be changed, but not added or removed: a customer gets one by registering online.",
         "operationId" : "updateCustomer",
         "parameters" : [ {
           "name" : "id",
@@ -68,7 +70,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/CustomerRequest"
+                "$ref" : "#/components/schemas/CustomerUpdateRequest"
               }
             }
           },
@@ -216,7 +218,7 @@
       "post" : {
         "tags" : [ "Authentication" ],
         "summary" : "User login",
-        "description" : "Authenticate with username and password using form data",
+        "description" : "Authenticate with email and password using form data",
         "operationId" : "login",
         "requestBody" : {
           "content" : {
@@ -420,13 +422,13 @@
       "post" : {
         "tags" : [ "Admin Customer Operations" ],
         "summary" : "Create a new customer",
-        "description" : "Creates a new \"offline\" customer without a user account",
+        "description" : "Creates a new \"offline\" customer without a user account or email.",
         "operationId" : "createCustomer",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/CustomerRequest"
+                "$ref" : "#/components/schemas/CustomerCreateRequest"
               }
             }
           },
@@ -616,7 +618,7 @@
     "/api/whoami" : {
       "get" : {
         "tags" : [ "Authentication" ],
-        "summary" : "Get current username and role",
+        "summary" : "Get current email and role",
         "description" : "Both are absent when not logged in.",
         "operationId" : "whoAmI",
         "responses" : {
@@ -948,7 +950,7 @@
   },
   "components" : {
     "schemas" : {
-      "CustomerRequest" : {
+      "CustomerUpdateRequest" : {
         "type" : "object",
         "properties" : {
           "firstName" : {
@@ -1093,7 +1095,7 @@
             "$ref" : "#/components/schemas/BookSummaryResponse"
           },
           "customer" : {
-            "$ref" : "#/components/schemas/CustomerResponse"
+            "$ref" : "#/components/schemas/CustomerSummaryResponse"
           },
           "status" : {
             "$ref" : "#/components/schemas/CopyStatus"
@@ -1105,6 +1107,22 @@
         "type" : "string",
         "enum" : [ "AVAILABLE", "RESERVED", "BORROWED", "LOST" ]
       },
+      "CustomerSummaryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "firstName", "id", "lastName" ]
+      },
       "CustomerRegistrationRequest" : {
         "type" : "object",
         "properties" : {
@@ -1112,17 +1130,18 @@
             "type" : "string",
             "minLength" : 1
           },
-          "username" : {
+          "email" : {
             "type" : "string",
-            "maxLength" : 50,
-            "minLength" : 0
+            "maxLength" : 150,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
           },
           "password" : {
             "type" : "string",
             "minLength" : 1
           }
         },
-        "required" : [ "activationCode", "password", "username" ]
+        "required" : [ "activationCode", "email", "password" ]
       },
       "Role" : {
         "type" : "string",
@@ -1135,7 +1154,7 @@
             "type" : "integer",
             "format" : "int64"
           },
-          "username" : {
+          "email" : {
             "type" : "string"
           },
           "role" : {
@@ -1145,12 +1164,12 @@
             "$ref" : "#/components/schemas/CustomerResponse"
           }
         },
-        "required" : [ "id", "role", "username" ]
+        "required" : [ "email", "id", "role" ]
       },
       "LoginForm" : {
         "type" : "object",
         "properties" : {
-          "username" : {
+          "email" : {
             "type" : "string",
             "minLength" : 1
           },
@@ -1159,19 +1178,19 @@
             "minLength" : 1
           }
         },
-        "required" : [ "password", "username" ]
+        "required" : [ "email", "password" ]
       },
       "LoginResponse" : {
         "type" : "object",
         "properties" : {
-          "username" : {
+          "email" : {
             "type" : "string"
           },
           "role" : {
             "$ref" : "#/components/schemas/Role"
           }
         },
-        "required" : [ "role", "username" ]
+        "required" : [ "email", "role" ]
       },
       "CopyReturnRequest" : {
         "type" : "object",
@@ -1214,17 +1233,34 @@
       "LibrarianCreateRequest" : {
         "type" : "object",
         "properties" : {
-          "username" : {
+          "email" : {
             "type" : "string",
-            "maxLength" : 50,
-            "minLength" : 0
+            "maxLength" : 150,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
           },
           "password" : {
             "type" : "string",
             "minLength" : 1
           }
         },
-        "required" : [ "password", "username" ]
+        "required" : [ "email", "password" ]
+      },
+      "CustomerCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "firstName", "lastName" ]
       },
       "ActivationCodeResponse" : {
         "type" : "object",
@@ -1287,7 +1323,7 @@
       "WhoAmIResponse" : {
         "type" : "object",
         "properties" : {
-          "username" : {
+          "email" : {
             "type" : "string"
           },
           "role" : {

@@ -3,13 +3,13 @@ package librarymanagement.users;
 import jakarta.validation.constraints.NotNull;
 import librarymanagement.customers.CustomerResponse;
 
-public record UserResponse(@NotNull Long id, @NotNull String username, @NotNull Role role, CustomerResponse customer) {
+public record UserResponse(@NotNull Long id, @NotNull String email, @NotNull Role role, CustomerResponse customer) {
 
     public static UserResponse from(User user) {
         return new UserResponse(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 user.getRole(),
-                user.getCustomer() != null ? CustomerResponse.from(user.getCustomer()) : null);
+                user.getCustomer() != null ? CustomerResponse.from(user.getCustomer(), user.getEmail()) : null);
     }
 }

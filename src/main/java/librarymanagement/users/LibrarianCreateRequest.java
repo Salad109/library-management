@@ -1,17 +1,18 @@
 package librarymanagement.users;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import librarymanagement.constants.Messages;
 
 public record LibrarianCreateRequest(
-        @NotBlank(message = Messages.USER_USERNAME_VALIDATION_MESSAGE)
-        @Size(max = 50, message = Messages.USER_USERNAME_LENGTH_VALIDATION_MESSAGE) String username,
+        @NotNull(message = Messages.USER_EMAIL_VALIDATION_MESSAGE)
+        @Pattern(regexp = Messages.USER_EMAIL_REGEX, message = Messages.USER_EMAIL_VALIDATION_MESSAGE)
+        @Size(max = 150, message = Messages.USER_EMAIL_LENGTH_VALIDATION_MESSAGE) String email,
         @NotBlank(message = Messages.USER_PASSWORD_VALIDATION_MESSAGE) String password) {
 
     public LibrarianCreateRequest {
-        if (username != null) {
-            username = username.trim();
-        }
+        email = User.normalizeEmail(email);
     }
 }

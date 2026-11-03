@@ -18,16 +18,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    // Spring Security's "username" login is the email
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> {
-            log.warn("User not found with username: {}", username);
-            return new UsernameNotFoundException(Messages.USERNAME_NOT_FOUND + username);
+        String email = User.normalizeEmail(username);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            log.warn("User not found with email: {}", email);
+            return new UsernameNotFoundException(Messages.USER_NOT_FOUND + email);
         });
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole().name().replace("ROLE_", ""))
-                .build();
+        return new AuthenticatedUser(user);
     }
 }
