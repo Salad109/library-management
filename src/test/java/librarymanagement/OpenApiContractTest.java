@@ -21,7 +21,7 @@ class OpenApiContractTest extends IntegrationTest {
 
     @Test
     void committedSpecMatchesTheApi() throws IOException {
-        MvcTestResult result = mockMvcTester.get().uri("/v3/api-docs").session(librarianSession()).exchange();
+        MvcTestResult result = mockMvcTester.get().uri("/v3/api-docs").exchange();
         assertThat(result).hasStatusOk();
 
         String actual = result.getResponse().getContentAsString();

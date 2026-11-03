@@ -286,9 +286,19 @@ class UserControllerTest extends IntegrationTest {
 
     @Test
     void testAnonymousPageStillRedirectsToLogin() {
-        assertThat(mockMvcTester.get().uri("/swagger-ui/index.html").accept(MediaType.TEXT_HTML))
+        assertThat(mockMvcTester.get().uri("/").accept(MediaType.TEXT_HTML))
                 .hasStatus(HttpStatus.FOUND)
                 .hasRedirectedUrl("/login");
+    }
+
+    @Test
+    void testAnonymousCanOpenApiDocs() {
+        assertThat(mockMvcTester.get().uri("/swagger-ui/index.html").accept(MediaType.TEXT_HTML)).hasStatusOk();
+        assertThat(mockMvcTester.get().uri("/swagger-ui/swagger-ui-bundle.js")).hasStatusOk();
+        assertThat(mockMvcTester.get().uri("/v3/api-docs/swagger-config")).hasStatusOk();
+        assertThat(mockMvcTester.get().uri("/swagger-ui.html").accept(MediaType.TEXT_HTML))
+                .hasStatus(HttpStatus.FOUND)
+                .hasRedirectedUrl("/swagger-ui/index.html");
     }
 
     @Test
