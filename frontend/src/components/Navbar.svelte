@@ -3,9 +3,9 @@
 
   const links = [
     { href: '/books.html', label: 'Books' },
-    { href: '/admin/copies/browse', label: 'Copies' },
-    { href: '/admin/customers/browse', label: 'Customers' },
-    { href: '/admin/librarians/add', label: 'Add Librarian' },
+    { href: '/copies.html', label: 'Copies' },
+    { href: '/customers.html', label: 'Customers' },
+    { href: '/librarians.html', label: 'Add Librarian' },
   ]
 
   let email = $state('')
@@ -26,7 +26,7 @@
 </script>
 
 <nav class="navbar bg-base-200 mb-6 px-4">
-  <a class="btn btn-ghost text-lg" href="/admin">Library Admin</a>
+  <a class="btn btn-ghost text-lg" href="/books.html">Library Admin</a>
   <ul class="menu menu-horizontal flex-1">
     {#each links as link (link.href)}
       <li><a class:menu-active={location.pathname === link.href} href={link.href}>{link.label}</a></li>

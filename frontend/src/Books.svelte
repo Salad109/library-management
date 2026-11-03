@@ -140,7 +140,6 @@
             <td>{authorNames(book)}</td>
             <td>{book.availableCopies}</td>
             <td>
-              <a class="btn btn-sm btn-primary" href="/api/books/{book.isbn}" target="_blank">View</a>
               <button class="btn btn-sm btn-warning" onclick={() => openEdit(book)}>Edit</button>
               <button class="btn btn-sm btn-error" onclick={() => remove(book)}>Delete</button>
             </td>

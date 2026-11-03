@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     outDir: '../target/classes/static',
     emptyOutDir: true,
-    rolldownOptions: { input: ['login.html', 'books.html'] },
+    rolldownOptions: { input: ['login.html', 'books.html', 'copies.html', 'customers.html', 'librarians.html'] },
   },
   server: { proxy: { '/api': 'http://localhost:8080' } },
 })

@@ -13,7 +13,7 @@
       const response = await login({ body: { email: email, password: password } })
       const me = response.data
       if (me.role === Role.ROLE_LIBRARIAN) {
-        location.href = '/admin'
+        location.href = '/books.html'
       } else {
         loggedInAs = me.email
       }
