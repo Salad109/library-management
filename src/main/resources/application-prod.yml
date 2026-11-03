@@ -2,3 +2,6 @@ logging:
   structured:
     format:
       console: logstash
+management:
+  server:
+    port: 8081

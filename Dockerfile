@@ -6,5 +6,7 @@ RUN ./mvnw package -DskipTests
 
 FROM eclipse-temurin:25-jre
 COPY --from=build /app/target/library-management-0.0.1-SNAPSHOT.jar app.jar
+RUN useradd --system --no-create-home app
+USER app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

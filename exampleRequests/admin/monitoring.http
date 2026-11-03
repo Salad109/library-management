@@ -1,5 +1,5 @@
 # Monitoring
-# Login as librarian first
+# Only when running the app outside Docker
 
 ###
 GET http://localhost:8080/actuator

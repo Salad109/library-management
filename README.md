@@ -59,9 +59,8 @@ docker compose up
 ```
 
 The application runs on `http://localhost:8080`. API documentation is available via Swagger. Monitoring dashboard is
-available via Grafana and Prometheus. Log in to the staff panel at `http://localhost:8080/login` with the
-`LIBRARY_ADMIN_*` account, which is created on first startup if no librarian exists yet. Further librarians are added
-from the panel.
+available via Grafana. Log in to the staff panel at `http://localhost:8080/login` with the `LIBRARY_ADMIN_*` account,
+which is created on first startup if no librarian exists yet. Further librarians are added from the panel.
 
 Customers are created by librarians. To use the customer API, a customer gets a one-time activation code from the staff
 panel's customer pages and registers with it at `POST /api/register`.
