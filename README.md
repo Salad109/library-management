@@ -14,7 +14,7 @@ reservations, and librarian workflow management.
 - Customer management with offline and online account separation
 - Role-based access control (Librarian vs Customer vs Public)
 - Optimistic locking and retry mechanisms to prevent concurrency issues
-- Authentication and authorization with Spring Security and password hashing
+- Authentication and authorization with Spring Security, password hashing and CSRF protection
 - Comprehensive integration and unit testing
 - Application monitoring with Prometheus and Grafana
 - Detailed API documentation with Swagger
@@ -22,7 +22,7 @@ reservations, and librarian workflow management.
 - Caching book catalog with Caffeine
 - Logs in JSON format with MDC, collected in Loki
 - CI with GitHub Actions
-- Frontend for staff operations using Thymeleaf and Bootstrap
+- Staff frontend in Svelte, with an API client generated from the OpenAPI spec
 
 ## Tech Stack
 
@@ -39,7 +39,7 @@ reservations, and librarian workflow management.
 - JUnit 6 + MockMvc for testing
 - Flyway for database migrations
 - Testcontainers for integration tests
-- Thymeleaf + Bootstrap for staff frontend
+- Svelte 5 + TypeScript + daisyUI for the staff frontend
 - Maven
 
 ## Starting Guide
@@ -59,8 +59,8 @@ docker compose up
 ```
 
 The application runs on `http://localhost:8080`. API documentation is available via Swagger. Monitoring dashboard is
-available via Grafana. Log in to the staff panel at `http://localhost:8080/login` with the `LIBRARY_ADMIN_*` account,
-which is created on first startup if no librarian exists yet. Further librarians are added from the panel.
+available via Grafana. Log in to the staff panel at `http://localhost:8080` with the `LIBRARY_ADMIN_*` account, which is
+created on first startup if no librarian exists yet. Further librarians are added from the panel.
 
 Customers are created by librarians. To use the customer API, a customer gets a one-time activation code from the staff
 panel's customer pages and registers with it at `POST /api/register`.
@@ -99,10 +99,12 @@ The `exampleRequests` directory contains ready-to-use HTTP requests:
 ```
 exampleRequests/
 ├── admin/
+│   ├── book-batch.http   # Bulk sample books
 │   ├── books.http        # Book CRUD operations
 │   ├── copies.http       # Copy management
 │   ├── customers.http    # Customer management
-│   └── librarians.http   # Librarian accounts
+│   ├── librarians.http   # Librarian accounts
+│   └── monitoring.http   # Actuator endpoints (app outside Docker)
 ├── customer/
 │   └── reservations.http # Customer self-service
 ├── librarian/
@@ -148,7 +150,8 @@ exampleRequests/
 - [x] Flyway migrations
 - [x] PostgreSQL testcontainers for integration tests
 - [x] Closed registration: librarians are created by librarians, customers register with an activation code
-- [ ] Enhance admin panel with HTMX
+- [x] Staff panel rewritten in Svelte over the REST API
+- [x] CSRF protection
 - [ ] Separate frontend for customers
 
 ## Gallery

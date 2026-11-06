@@ -23,11 +23,15 @@ GET http://localhost:8080/api/admin/customers/1
 
 ### Generate an activation code for the customer to register online with (valid 48h, replaces any older code)
 POST http://localhost:8080/api/admin/customers/1/activation-code
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 
 ###
 
 ### Update customer information
 PUT http://localhost:8080/api/admin/customers/1
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -39,6 +43,8 @@ Content-Type: application/json
 
 ### Try to update with invalid email format
 PUT http://localhost:8080/api/admin/customers/1
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -51,6 +57,8 @@ Content-Type: application/json
 
 ### Try to update with missing required fields
 PUT http://localhost:8080/api/admin/customers/1
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -66,6 +74,8 @@ GET http://localhost:8080/api/admin/customers/999
 
 ### Try to update non-existent customer
 PUT http://localhost:8080/api/admin/customers/999
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {

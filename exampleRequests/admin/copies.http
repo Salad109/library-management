@@ -36,6 +36,8 @@ GET http://localhost:8080/api/admin/copies?customerLastName=mama
 
 ### Create copies of a book
 POST http://localhost:8080/api/admin/copies
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -47,6 +49,8 @@ Content-Type: application/json
 
 ### Create copies of another book
 POST http://localhost:8080/api/admin/copies
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -57,6 +61,8 @@ Content-Type: application/json
 
 ### Try to create copies for non-existent book
 POST http://localhost:8080/api/admin/copies
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -68,6 +74,8 @@ Content-Type: application/json
 
 ### Try to create copies with invalid quantity
 POST http://localhost:8080/api/admin/copies
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {

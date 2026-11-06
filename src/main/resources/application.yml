@@ -25,6 +25,11 @@ spring:
       pageable:
         default-page-size: 20
         max-page-size: 100
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: lax
 springdoc:
   default-produces-media-type: application/json
   writer-with-default-pretty-printer: true
@@ -33,6 +38,8 @@ springdoc:
   swagger-ui:
     enabled: true
     operations-sorter: alpha
+    csrf:
+      enabled: true
 management:
   endpoints:
     web:

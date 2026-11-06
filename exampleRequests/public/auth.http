@@ -1,8 +1,11 @@
 # Authentication
+# Writes send a made-up CSRF token as both cookie and header: the server only checks that they match
 
 ### Register a customer
 # Needs an activation code from a librarian (admin/customers.http)
 POST http://localhost:8080/api/register
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -14,7 +17,9 @@ Content-Type: application/json
 ###
 
 ### Login as librarian (credentials from .env.example)
-POST http://localhost:8080/admin/login
+POST http://localhost:8080/api/login
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/x-www-form-urlencoded
 
 email = admin@example.com &
@@ -24,6 +29,8 @@ password = change-me
 
 ### Login as customer
 POST http://localhost:8080/api/login
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/x-www-form-urlencoded
 
 email = customer1@example.com &
@@ -38,11 +45,15 @@ GET http://localhost:8080/api/whoami
 
 ### Logout
 POST http://localhost:8080/api/logout
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 
 ###
 
 ### Invalid registration - missing activation code
 POST http://localhost:8080/api/register
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {

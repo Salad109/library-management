@@ -213,7 +213,7 @@ class AdminCustomerControllerTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("email=joe@example.com&password=" + CUSTOMER_PASSWORD))
                 .hasStatus(HttpStatus.UNAUTHORIZED);
-        login("/api/login", "new.joe@example.com", CUSTOMER_PASSWORD, HttpStatus.OK);
+        login("new.joe@example.com", CUSTOMER_PASSWORD);
     }
 
     @Test

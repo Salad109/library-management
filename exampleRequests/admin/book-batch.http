@@ -4,6 +4,8 @@
 
 ### 1. The Great Gatsby
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -17,6 +19,8 @@ Content-Type: application/json
 
 ### 2. To Kill a Mockingbird
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -30,6 +34,8 @@ Content-Type: application/json
 
 ### 3. Pride and Prejudice
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -43,6 +49,8 @@ Content-Type: application/json
 
 ### 4. The Catcher in the Rye
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -56,6 +64,8 @@ Content-Type: application/json
 
 ### 5. Lord of the Flies
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -69,6 +79,8 @@ Content-Type: application/json
 
 ### 6. Jane Eyre
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -82,6 +94,8 @@ Content-Type: application/json
 
 ### 7. Wuthering Heights
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -95,6 +109,8 @@ Content-Type: application/json
 
 ### 8. Sense and Sensibility
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -108,6 +124,8 @@ Content-Type: application/json
 
 ### 9. Emma
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -121,6 +139,8 @@ Content-Type: application/json
 
 ### 10. Of Mice and Men
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -134,6 +154,8 @@ Content-Type: application/json
 
 ### 11. The Grapes of Wrath
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -147,6 +169,8 @@ Content-Type: application/json
 
 ### 12. Brave New World
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -160,6 +184,8 @@ Content-Type: application/json
 
 ### 13. Animal Farm
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -173,6 +199,8 @@ Content-Type: application/json
 
 ### 14. Fahrenheit 451
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -186,6 +214,8 @@ Content-Type: application/json
 
 ### 15. The Hobbit
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -199,6 +229,8 @@ Content-Type: application/json
 
 ### 16. The Fellowship of the Ring
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -212,6 +244,8 @@ Content-Type: application/json
 
 ### 17. The Two Towers
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -225,6 +259,8 @@ Content-Type: application/json
 
 ### 18. The Return of the King
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -238,6 +274,8 @@ Content-Type: application/json
 
 ### 19. Dune
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -251,6 +289,8 @@ Content-Type: application/json
 
 ### 20. Foundation
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -264,6 +304,8 @@ Content-Type: application/json
 
 ### 21. I, Robot
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -277,6 +319,8 @@ Content-Type: application/json
 
 ### 22. The Martian Chronicles
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -290,6 +334,8 @@ Content-Type: application/json
 
 ### 23. Slaughterhouse-Five
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -303,6 +349,8 @@ Content-Type: application/json
 
 ### 24. Catch-22
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -316,6 +364,8 @@ Content-Type: application/json
 
 ### 25. The Bell Jar
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -329,6 +379,8 @@ Content-Type: application/json
 
 ### 26. One Flew Over the Cuckoo's Nest
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -342,6 +394,8 @@ Content-Type: application/json
 
 ### 27. The Color Purple
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -355,6 +409,8 @@ Content-Type: application/json
 
 ### 28. Beloved
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -368,6 +424,8 @@ Content-Type: application/json
 
 ### 29. The Handmaid's Tale
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -381,6 +439,8 @@ Content-Type: application/json
 
 ### 30. The Kite Runner
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -394,6 +454,8 @@ Content-Type: application/json
 
 ### 31. A Thousand Splendid Suns
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -407,6 +469,8 @@ Content-Type: application/json
 
 ### 32. Life of Pi
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -420,6 +484,8 @@ Content-Type: application/json
 
 ### 33. The Road
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -433,6 +499,8 @@ Content-Type: application/json
 
 ### 34. No Country for Old Men
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -446,6 +514,8 @@ Content-Type: application/json
 
 ### 35. The Book Thief
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -459,6 +529,8 @@ Content-Type: application/json
 
 ### 36. The Curious Incident of the Dog in the Night-Time
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -472,6 +544,8 @@ Content-Type: application/json
 
 ### 37. Never Let Me Go
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -485,6 +559,8 @@ Content-Type: application/json
 
 ### 38. The Remains of the Day
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -498,6 +574,8 @@ Content-Type: application/json
 
 ### 39. Atonement
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -511,6 +589,8 @@ Content-Type: application/json
 
 ### 40. The Da Vinci Code
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -524,6 +604,8 @@ Content-Type: application/json
 
 ### 41. Angels & Demons
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -537,6 +619,8 @@ Content-Type: application/json
 
 ### 42. The Girl with the Dragon Tattoo
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -550,6 +634,8 @@ Content-Type: application/json
 
 ### 43. Gone Girl
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -563,6 +649,8 @@ Content-Type: application/json
 
 ### 44. The Girl on the Train
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -576,6 +664,8 @@ Content-Type: application/json
 
 ### 45. Big Little Lies
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -589,6 +679,8 @@ Content-Type: application/json
 
 ### 46. Good Omens (Multiple Authors Example)
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -603,6 +695,8 @@ Content-Type: application/json
 
 ### 47. The Talisman (Multiple Authors Example)
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -617,6 +711,8 @@ Content-Type: application/json
 
 ### 48. The Expanse: Leviathan Wakes (Multiple Authors Example)
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -630,6 +726,8 @@ Content-Type: application/json
 
 ### 49. The Name of the Wind
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -643,6 +741,8 @@ Content-Type: application/json
 
 ### 50. The Way of Kings
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -656,6 +756,8 @@ Content-Type: application/json
 
 ### 51. Words of Radiance
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -669,6 +771,8 @@ Content-Type: application/json
 
 ### 52. Oathbringer
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -682,6 +786,8 @@ Content-Type: application/json
 
 ### 53. The Final Empire
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -695,6 +801,8 @@ Content-Type: application/json
 
 ### 54. The Well of Ascension
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -708,6 +816,8 @@ Content-Type: application/json
 
 ### 55. The Hero of Ages
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -721,6 +831,8 @@ Content-Type: application/json
 
 ### 56. The Wise Man's Fear
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -734,6 +846,8 @@ Content-Type: application/json
 
 ### 57. A Game of Thrones
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -747,6 +861,8 @@ Content-Type: application/json
 
 ### 58. A Clash of Kings
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -760,6 +876,8 @@ Content-Type: application/json
 
 ### 59. A Storm of Swords
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -773,6 +891,8 @@ Content-Type: application/json
 
 ### 60. A Feast for Crows
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -786,6 +906,8 @@ Content-Type: application/json
 
 ### 61. A Dance with Dragons
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -799,6 +921,8 @@ Content-Type: application/json
 
 ### 62. Harry Potter and the Philosopher's Stone
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -812,6 +936,8 @@ Content-Type: application/json
 
 ### 63. Harry Potter and the Chamber of Secrets
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -825,6 +951,8 @@ Content-Type: application/json
 
 ### 64. Harry Potter and the Prisoner of Azkaban
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -838,6 +966,8 @@ Content-Type: application/json
 
 ### 65. Harry Potter and the Goblet of Fire
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -851,6 +981,8 @@ Content-Type: application/json
 
 ### 66. Harry Potter and the Order of the Phoenix
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -864,6 +996,8 @@ Content-Type: application/json
 
 ### 67. Harry Potter and the Half-Blood Prince
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -877,6 +1011,8 @@ Content-Type: application/json
 
 ### 68. Harry Potter and the Deathly Hallows
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -890,6 +1026,8 @@ Content-Type: application/json
 
 ### 69. The Chronicles of Narnia: The Lion, the Witch and the Wardrobe
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -903,6 +1041,8 @@ Content-Type: application/json
 
 ### 70. Prince Caspian
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -916,6 +1056,8 @@ Content-Type: application/json
 
 ### 71. The Voyage of the Dawn Treader
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -929,6 +1071,8 @@ Content-Type: application/json
 
 ### 72. The Silver Chair
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -942,6 +1086,8 @@ Content-Type: application/json
 
 ### 73. The Horse and His Boy
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -955,6 +1101,8 @@ Content-Type: application/json
 
 ### 74. The Magician's Nephew
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -968,6 +1116,8 @@ Content-Type: application/json
 
 ### 75. The Last Battle
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -981,6 +1131,8 @@ Content-Type: application/json
 
 ### 76. The Stand
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -994,6 +1146,8 @@ Content-Type: application/json
 
 ### 77. It
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1007,6 +1161,8 @@ Content-Type: application/json
 
 ### 78. The Shining
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1020,6 +1176,8 @@ Content-Type: application/json
 
 ### 79. Carrie
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1033,6 +1191,8 @@ Content-Type: application/json
 
 ### 80. Pet Sematary
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1046,6 +1206,8 @@ Content-Type: application/json
 
 ### 81. Misery
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1059,6 +1221,8 @@ Content-Type: application/json
 
 ### 82. The Green Mile
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1072,6 +1236,8 @@ Content-Type: application/json
 
 ### 83. Salem's Lot
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1085,6 +1251,8 @@ Content-Type: application/json
 
 ### 84. Doctor Sleep
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1098,6 +1266,8 @@ Content-Type: application/json
 
 ### 85. The Dark Tower: The Gunslinger
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1111,6 +1281,8 @@ Content-Type: application/json
 
 ### 86. American Gods
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1124,6 +1296,8 @@ Content-Type: application/json
 
 ### 87. The Sandman: Preludes & Nocturnes
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1137,6 +1311,8 @@ Content-Type: application/json
 
 ### 88. Coraline
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1150,6 +1326,8 @@ Content-Type: application/json
 
 ### 89. The Graveyard Book
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1163,6 +1341,8 @@ Content-Type: application/json
 
 ### 90. Neverwhere
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1176,6 +1356,8 @@ Content-Type: application/json
 
 ### 91. The Ocean at the End of the Lane
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1189,6 +1371,8 @@ Content-Type: application/json
 
 ### 92. The Colour of Magic
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1202,6 +1386,8 @@ Content-Type: application/json
 
 ### 93. The Light Fantastic
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1215,6 +1401,8 @@ Content-Type: application/json
 
 ### 94. Mort
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1228,6 +1416,8 @@ Content-Type: application/json
 
 ### 95. Guards! Guards!
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1241,6 +1431,8 @@ Content-Type: application/json
 
 ### 96. Small Gods
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1254,6 +1446,8 @@ Content-Type: application/json
 
 ### 97. The Hitchhiker's Guide to the Galaxy
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1267,6 +1461,8 @@ Content-Type: application/json
 
 ### 98. The Restaurant at the End of the Universe
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1280,6 +1476,8 @@ Content-Type: application/json
 
 ### 99. Life, the Universe and Everything
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1293,6 +1491,8 @@ Content-Type: application/json
 
 ### 100. So Long, and Thanks for All the Fish
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1306,6 +1506,8 @@ Content-Type: application/json
 
 ### 101. Mostly Harmless
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1319,6 +1521,8 @@ Content-Type: application/json
 
 ### 102. Ender's Game
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1332,6 +1536,8 @@ Content-Type: application/json
 
 ### 103. Speaker for the Dead
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1345,6 +1551,8 @@ Content-Type: application/json
 
 ### 104. Xenocide
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1358,6 +1566,8 @@ Content-Type: application/json
 
 ### 105. Children of the Mind
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1371,6 +1581,8 @@ Content-Type: application/json
 
 ### 106. Neuromancer
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1384,6 +1596,8 @@ Content-Type: application/json
 
 ### 107. Count Zero
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1397,6 +1611,8 @@ Content-Type: application/json
 
 ### 108. Mona Lisa Overdrive
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1410,6 +1626,8 @@ Content-Type: application/json
 
 ### 109. Snow Crash
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1423,6 +1641,8 @@ Content-Type: application/json
 
 ### 110. The Diamond Age
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1436,6 +1656,8 @@ Content-Type: application/json
 
 ### 111. Cryptonomicon
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1449,6 +1671,8 @@ Content-Type: application/json
 
 ### 112. The Time Machine
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1462,6 +1686,8 @@ Content-Type: application/json
 
 ### 113. The War of the Worlds
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1475,6 +1701,8 @@ Content-Type: application/json
 
 ### 114. The Invisible Man
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1488,6 +1716,8 @@ Content-Type: application/json
 
 ### 115. Frankenstein
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1501,6 +1731,8 @@ Content-Type: application/json
 
 ### 116. Dracula
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1514,6 +1746,8 @@ Content-Type: application/json
 
 ### 117. The Strange Case of Dr. Jekyll and Mr. Hyde
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1527,6 +1761,8 @@ Content-Type: application/json
 
 ### 118. Treasure Island
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1540,6 +1776,8 @@ Content-Type: application/json
 
 ### 119. Robinson Crusoe
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1553,6 +1791,8 @@ Content-Type: application/json
 
 ### 120. Gulliver's Travels
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1566,6 +1806,8 @@ Content-Type: application/json
 
 ### 121. Don Quixote
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1579,6 +1821,8 @@ Content-Type: application/json
 
 ### 122. The Count of Monte Cristo
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1592,6 +1836,8 @@ Content-Type: application/json
 
 ### 123. The Three Musketeers
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1605,6 +1851,8 @@ Content-Type: application/json
 
 ### 124. Les Misérables
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1618,6 +1866,8 @@ Content-Type: application/json
 
 ### 125. The Hunchback of Notre-Dame
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1631,6 +1881,8 @@ Content-Type: application/json
 
 ### 126. Crime and Punishment
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1644,6 +1896,8 @@ Content-Type: application/json
 
 ### 127. The Brothers Karamazov
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1657,6 +1911,8 @@ Content-Type: application/json
 
 ### 128. War and Peace
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1670,6 +1926,8 @@ Content-Type: application/json
 
 ### 129. Anna Karenina
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1683,6 +1941,8 @@ Content-Type: application/json
 
 ### 130. The Death of Ivan Ilyich
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1696,6 +1956,8 @@ Content-Type: application/json
 
 ### 131. One Hundred Years of Solitude
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1709,6 +1971,8 @@ Content-Type: application/json
 
 ### 132. Love in the Time of Cholera
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1722,6 +1986,8 @@ Content-Type: application/json
 
 ### 133. The Metamorphosis
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1735,6 +2001,8 @@ Content-Type: application/json
 
 ### 134. The Trial
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1748,6 +2016,8 @@ Content-Type: application/json
 
 ### 135. The Stranger
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1761,6 +2031,8 @@ Content-Type: application/json
 
 ### 136. The Plague
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1774,6 +2046,8 @@ Content-Type: application/json
 
 ### 137. Moby-Dick
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1787,6 +2061,8 @@ Content-Type: application/json
 
 ### 138. The Adventures of Huckleberry Finn
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1800,6 +2076,8 @@ Content-Type: application/json
 
 ### 139. The Adventures of Tom Sawyer
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1813,6 +2091,8 @@ Content-Type: application/json
 
 ### 140. A Connecticut Yankee in King Arthur's Court
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1826,6 +2106,8 @@ Content-Type: application/json
 
 ### 141. The Scarlet Letter
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1839,6 +2121,8 @@ Content-Type: application/json
 
 ### 142. The House of the Seven Gables
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1852,6 +2136,8 @@ Content-Type: application/json
 
 ### 143. The Call of the Wild
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1865,6 +2151,8 @@ Content-Type: application/json
 
 ### 144. White Fang
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1878,6 +2166,8 @@ Content-Type: application/json
 
 ### 145. The Sea-Wolf
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1891,6 +2181,8 @@ Content-Type: application/json
 
 ### 146. Martin Eden
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1904,6 +2196,8 @@ Content-Type: application/json
 
 ### 147. The Iron Heel
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1917,6 +2211,8 @@ Content-Type: application/json
 
 ### 148. The Jungle
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1930,6 +2226,8 @@ Content-Type: application/json
 
 ### 149. Sister Carrie
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -1943,6 +2241,8 @@ Content-Type: application/json
 
 ### 150. An American Tragedy
 POST http://localhost:8080/api/admin/books
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {

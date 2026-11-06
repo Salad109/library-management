@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestContainersConfig.class)
+@Import({TestContainersConfig.class, CsrfTestConfig.class})
 public abstract class IntegrationTest {
 
     protected static final String CUSTOMER_PASSWORD = "password123";
@@ -66,16 +66,16 @@ public abstract class IntegrationTest {
     }
 
     /**
-     * Creates the librarian through the real startup bootstrap and logs in through the staff login.
+     * Creates the librarian through the real startup bootstrap and logs in.
      */
     protected MockHttpSession librarianSession() {
         librarianBootstrap.run(new DefaultApplicationArguments());
-        return login("/admin/login", librarianEmail, librarianPassword, HttpStatus.FOUND);
+        return login(librarianEmail, librarianPassword);
     }
 
     /**
      * The library card flow: a librarian creates the customer and an activation code, the customer registers with it
-     * and logs in through the API login.
+     * and logs in.
      */
     protected CustomerAccount customerAccount(String email, String firstName, String lastName) {
         MockHttpSession librarianSession = librarianSession();
@@ -85,7 +85,7 @@ public abstract class IntegrationTest {
         MvcTestResult registration = register(code, email, CUSTOMER_PASSWORD);
         assertThat(registration).hasStatus(HttpStatus.CREATED);
 
-        return new CustomerAccount(customerId, login("/api/login", email, CUSTOMER_PASSWORD, HttpStatus.OK));
+        return new CustomerAccount(customerId, login(email, CUSTOMER_PASSWORD));
     }
 
     /**
@@ -139,14 +139,14 @@ public abstract class IntegrationTest {
         return new ObjectMapper().readTree(result.getResponse().getContentAsByteArray());
     }
 
-    protected MockHttpSession login(String uri, String email, String password, HttpStatus expectedStatus) {
+    protected MockHttpSession login(String email, String password) {
         MvcTestResult result = mvc.post()
-                .uri(uri)
+                .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("email=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
                         + "&password=" + URLEncoder.encode(password, StandardCharsets.UTF_8))
                 .exchange();
-        assertThat(result).hasStatus(expectedStatus);
+        assertThat(result).hasStatus(HttpStatus.OK);
 
         MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
         assertThat(session).isNotNull();

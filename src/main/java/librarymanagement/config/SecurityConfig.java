@@ -8,14 +8,13 @@ import librarymanagement.users.Role;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,8 +26,6 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
-
-import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
 
 @Configuration
 @EnableWebSecurity
@@ -51,32 +48,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain staffChain(HttpSecurity http) {
-        return http
-                .securityMatcher("/admin/**", "/login")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
-                        .anyRequest().hasRole("LIBRARIAN")
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/admin/login")
-                        .usernameParameter("email")
-                        .successHandler(this::staffSuccessHandler)
-                        .failureHandler(this::staffFailureHandler)
-                )
-                .logout(logout -> logout.logoutUrl("/admin/logout").logoutSuccessUrl("/login"))
-                .csrf(AbstractHttpConfigurer::disable)
-                .build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain apiChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/*.html", "/assets/**", "/favicon.ico",
+                        .requestMatchers("/", "/*.html", "/assets/**", "/favicon.ico",
                                 "/actuator/**",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                                 "/api/register",
@@ -89,42 +64,35 @@ public class SecurityConfig {
                         .anyRequest().hasRole("LIBRARIAN")
                 )
                 .formLogin(form -> form
+                        .loginPage("/login.html")
                         .loginProcessingUrl("/api/login")
                         .usernameParameter("email")
-                        .successHandler(this::apiSuccessHandler)
-                        .failureHandler(this::apiFailureHandler)
+                        .successHandler(this::loginSuccessHandler)
+                        .failureHandler(this::loginFailureHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 )
                 .exceptionHandling(errors -> errors
-                        .defaultAuthenticationEntryPointFor(this::apiEntryPoint, pathPattern("/api/**"))
+                        .authenticationEntryPoint(this::authenticationEntryPoint)
                         .accessDeniedHandler(this::accessDeniedHandler)
                 )
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(CsrfConfigurer::spa)
                 .build();
     }
 
-    private void staffSuccessHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException {
-        response.sendRedirect("/admin");
-    }
-
-    private void staffFailureHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException {
-        response.sendRedirect("/login?error=true");
-    }
-
-    private void apiSuccessHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException {
+    private void loginSuccessHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         jsonMapper.writeValue(response.getOutputStream(), new LoginResponse(auth.getName(), Role.of(auth)));
     }
 
-    private void apiFailureHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
+    private void loginFailureHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
         exceptionResolver.resolveException(request, response, null,
                 new ResponseStatusException(HttpStatus.UNAUTHORIZED, Messages.SECURITY_LOGIN_FAILURE));
     }
 
-    private void apiEntryPoint(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
+    private void authenticationEntryPoint(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
         exceptionResolver.resolveException(request, response, null,
                 new ResponseStatusException(HttpStatus.UNAUTHORIZED, Messages.SECURITY_LOGIN_REQUIRED));
     }

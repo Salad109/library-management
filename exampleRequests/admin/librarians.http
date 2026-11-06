@@ -3,6 +3,8 @@
 
 ### Create a librarian
 POST http://localhost:8080/api/admin/librarians
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {

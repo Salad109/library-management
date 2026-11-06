@@ -3,6 +3,8 @@
 
 ### Checkout reserved copy to customer
 POST http://localhost:8080/api/desk/checkout
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -14,6 +16,8 @@ Content-Type: application/json
 
 ### Return a copy
 POST http://localhost:8080/api/desk/return
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -25,6 +29,8 @@ Content-Type: application/json
 
 ### Mark copy as lost
 POST http://localhost:8080/api/desk/mark-lost
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -35,6 +41,8 @@ Content-Type: application/json
 
 ### Try to checkout non-existent copy
 POST http://localhost:8080/api/desk/checkout
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {

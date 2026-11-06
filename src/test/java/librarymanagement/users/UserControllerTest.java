@@ -53,28 +53,8 @@ class UserControllerTest extends IntegrationTest {
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
 
-        MvcTestResult staffLogin = mockMvcTester.post()
-                .uri("/admin/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=evil@example.com&password=password123")
-                .exchange();
-        assertThat(staffLogin).hasStatus(HttpStatus.FOUND);
-        assertThat(mockMvcTester.get().uri("/admin").session(sessionOf(staffLogin))).hasStatus(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    void testLoginLibrarian() {
-        librarianSession();
-
-        MvcTestResult loginResult = mockMvcTester.post()
-                .uri("/admin/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=" + librarianEmail + "&password=" + librarianPassword)
-                .exchange();
-
-        assertThat(loginResult)
-                .hasStatus(HttpStatus.FOUND)
-                .hasRedirectedUrl("/admin");
+        MockHttpSession session = login("evil@example.com", "password123");
+        assertThat(mockMvcTester.get().uri("/api/admin/customers").session(session)).hasStatus(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -93,7 +73,7 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testLibrarianLoginThroughApiLogin() {
+    void testLoginLibrarian() {
         librarianSession();
 
         MvcTestResult loginResult = mockMvcTester.post()
@@ -185,12 +165,8 @@ class UserControllerTest extends IntegrationTest {
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
         assertThat(result).bodyJson().doesNotHavePath("password");
 
-        MvcTestResult loginResult = mockMvcTester.post()
-                .uri("/admin/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=librarian2@example.com&password=secret123")
-                .exchange();
-        assertThat(loginResult).hasStatus(HttpStatus.FOUND).hasRedirectedUrl("/admin");
+        MockHttpSession newLibrarianSession = login("librarian2@example.com", "secret123");
+        assertThat(mockMvcTester.get().uri("/api/admin/customers").session(newLibrarianSession)).hasStatusOk();
     }
 
     @Test
@@ -239,20 +215,7 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testAdminLoginFailure() {
-        MvcTestResult loginResult = mockMvcTester.post()
-                .uri("/admin/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=baduser@example.com&password=badpass")
-                .exchange();
-
-        assertThat(loginResult)
-                .hasStatus(HttpStatus.FOUND)
-                .hasRedirectedUrl("/login?error=true");
-    }
-
-    @Test
-    void testCustomerLoginFailure() {
+    void testLoginFailure() {
         MvcTestResult loginResult = mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -264,7 +227,7 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testApiLogout() {
+    void testLogout() {
         MockHttpSession session = customerAccount("joe@example.com", "Joe", "Mama").session();
 
         MvcTestResult result = mockMvcTester.post().uri("/api/logout").session(session).exchange();
@@ -275,20 +238,19 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testStaffLogout() {
-        MockHttpSession session = librarianSession();
-
-        MvcTestResult result = mockMvcTester.post().uri("/admin/logout").session(session).exchange();
-
-        assertThat(result).hasStatus(HttpStatus.FOUND).hasRedirectedUrl("/login");
-        assertThat(session.isInvalid()).isTrue();
+    void testRootRedirectsToLoginPage() {
+        assertThat(mockMvcTester.get().uri("/").accept(MediaType.TEXT_HTML))
+                .hasStatus(HttpStatus.FOUND)
+                .hasRedirectedUrl("/login.html");
     }
 
     @Test
-    void testAnonymousPageStillRedirectsToLogin() {
-        assertThat(mockMvcTester.get().uri("/").accept(MediaType.TEXT_HTML))
-                .hasStatus(HttpStatus.FOUND)
-                .hasRedirectedUrl("/login");
+    void testAnonymousPageFromBrowserIsNotRedirected() {
+        // Spring generates its own login page at /login unless told otherwise
+        MvcTestResult result = mockMvcTester.get().uri("/login").accept(MediaType.TEXT_HTML).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_REQUIRED);
     }
 
     @Test

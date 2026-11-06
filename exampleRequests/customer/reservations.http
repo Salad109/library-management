@@ -8,6 +8,8 @@ GET http://localhost:8080/api/reservations/mine
 
 ### Reserve a book (need to create book first via admin)
 POST http://localhost:8080/api/reservations
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -18,6 +20,8 @@ Content-Type: application/json
 
 ### Reserve another book
 POST http://localhost:8080/api/reservations
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -28,11 +32,15 @@ Content-Type: application/json
 
 ### Cancel specific reservation
 DELETE http://localhost:8080/api/reservations/1
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 
 ###
 
 ### Try to reserve with invalid ISBN format
 POST http://localhost:8080/api/reservations
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
@@ -43,6 +51,8 @@ Content-Type: application/json
 
 ### Try to reserve non-existent book
 POST http://localhost:8080/api/reservations
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
 Content-Type: application/json
 
 {
