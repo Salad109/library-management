@@ -481,7 +481,7 @@
       "get" : {
         "tags" : [ "Admin Copy Operations" ],
         "summary" : "Get copies, optionally filtered",
-        "description" : "At most one filter. title and customerLastName match case-insensitive substrings; blank filters are ignored.",
+        "description" : "Filters combine. title and customerLastName match case-insensitive substrings; blank filters are ignored.",
         "operationId" : "getCopies",
         "parameters" : [ {
           "name" : "isbn",

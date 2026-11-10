@@ -1,11 +1,8 @@
 package librarymanagement.customers;
 
 import jakarta.persistence.*;
-import librarymanagement.copies.Copy;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "customers")
@@ -22,14 +19,10 @@ public class Customer {
 
     private Instant activationCodeExpiresAt;
 
-    @OneToMany(mappedBy = "customer")
-    private Set<Copy> copies;
-
     @Version
     private Long version;
 
     public Customer() {
-        copies = new LinkedHashSet<>();
     }
 
     public Long getId() {
@@ -70,26 +63,6 @@ public class Customer {
 
     public void setActivationCodeExpiresAt(Instant activationCodeExpiresAt) {
         this.activationCodeExpiresAt = activationCodeExpiresAt;
-    }
-
-    public Set<Copy> getCopies() {
-        return copies;
-    }
-
-    public void setCopies(Set<Copy> copies) {
-        for (Copy copy : this.copies) {
-            copy.setCustomer(null);
-        }
-        this.copies.clear();
-
-        if (copies != null) {
-            for (Copy copy : copies) {
-                copy.setCustomer(this);
-            }
-            this.copies = new LinkedHashSet<>(copies);
-        } else {
-            this.copies = new LinkedHashSet<>();
-        }
     }
 
 }

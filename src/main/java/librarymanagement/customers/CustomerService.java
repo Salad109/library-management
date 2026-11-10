@@ -24,8 +24,8 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
-        return customerRepository.findAllResponses(pageable);
+    public Page<CustomerResponse> getCustomers(String lastName, Pageable pageable) {
+        return customerRepository.findResponses(lastName, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -33,11 +33,6 @@ public class CustomerService {
         Customer customer = getCustomerOrThrow(id);
         String email = userRepository.findByCustomerId(id).map(User::getEmail).orElse(null);
         return CustomerResponse.from(customer, email);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CustomerResponse> getCustomersByLastName(String lastName, Pageable pageable) {
-        return customerRepository.findResponsesByLastName(lastName, pageable);
     }
 
     @Transactional

@@ -20,26 +20,6 @@ class BookControllerTest extends IntegrationTest {
 
     @Test
     @WithMockUser(roles = "LIBRARIAN")
-    void testGetBook() {
-        String isbn = "123456789X";
-        assertThat(DataBuilder.createTestBook(
-                mockMvcTester,
-                isbn,
-                "Test Book",
-                "Test Author")
-        ).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult result = mockMvcTester.get().uri("/api/books/" + isbn).exchange();
-
-        assertThat(result)
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("isbn")
-                .isEqualTo(isbn);
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
     void testGetBookAfterCopiesAdded() {
         String isbn = TestISBNGenerator.next();
         assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, "Test Book", "Test Author"))
@@ -52,11 +32,16 @@ class BookControllerTest extends IntegrationTest {
         assertThat(result).hasStatus(HttpStatus.OK);
         assertThat(result).bodyJson().extractingPath("availableCopies").isEqualTo(3);
         assertThat(result).bodyJson().extractingPath("authors[0].name").isEqualTo("Test Author");
+        assertThat(mockMvcTester.get().uri("/api/books"))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("content[0].availableCopies")
+                .isEqualTo(3);
     }
 
     @Test
     void testGetNonExistentBook() {
-        String isbn = "987654321X"; // Nonexistent ISBN
+        String isbn = "987654321X";
 
         assertThat(mockMvcTester.get().uri("/api/books/" + isbn))
                 .hasStatus(HttpStatus.NOT_FOUND)
@@ -68,26 +53,13 @@ class BookControllerTest extends IntegrationTest {
     @Test
     @WithMockUser(roles = "LIBRARIAN")
     void searchBook() {
-        String isbn = TestISBNGenerator.next();
-        String title = "1984";
-        // Create the book first
-        assertThat(DataBuilder.createTestBook(mockMvcTester, isbn, title, "Jorjor Wel"))
+        assertThat(DataBuilder.createTestBook(mockMvcTester, TestISBNGenerator.next(), "1984", "Jorjor Wel"))
                 .hasStatus(HttpStatus.CREATED);
 
-        // Search by title
         assertThat(mockMvcTester.get().uri("/api/books/search?q=1984"))
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("page.totalElements")
                 .isEqualTo(1);
-    }
-
-    @Test
-    void testGetAllBooks() {
-        assertThat(mockMvcTester.get().uri("/api/books"))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("content")
-                .isNotNull();
     }
 }

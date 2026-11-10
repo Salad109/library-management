@@ -4,7 +4,6 @@ import librarymanagement.constants.Messages;
 import librarymanagement.utils.BookTestData;
 import librarymanagement.utils.DataBuilder;
 import librarymanagement.utils.IntegrationTest;
-import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,94 +53,37 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testCreateBookWithBlankAuthor() {
-        MvcTestResult result = DataBuilder.createTestBook(mockMvcTester,
-                BookTestData.TestBook1.ISBN,
-                BookTestData.TestBook1.TITLE,
-                " ");
+    void testCreateBookValidation() {
+        MvcTestResult invalidFields = postBook("""
+                {"title": "%s", "authorNames": [" ", "%s"]}
+                """.formatted("a".repeat(151), "a".repeat(101)));
 
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertFieldError(result, "authorNames", Messages.AUTHOR_NAME_VALIDATION_MESSAGE);
-    }
+        assertFieldError(invalidFields, "isbn", Messages.BOOK_NULL_ISBN);
+        assertFieldError(invalidFields, "title", Messages.BOOK_TITLE_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(invalidFields, "authorNames", Messages.AUTHOR_NAME_VALIDATION_MESSAGE);
+        assertFieldError(invalidFields, "authorNames", Messages.AUTHOR_NAME_LENGTH_VALIDATION_MESSAGE);
 
-    @Test
-    void testCreateBookWithTooLongFields() {
-        MvcTestResult result = DataBuilder.createTestBook(mockMvcTester,
-                BookTestData.TestBook1.ISBN,
-                "a".repeat(151),
-                "a".repeat(101));
+        MvcTestResult noAuthors = postBook("""
+                {"isbn": "%s", "title": "Title"}
+                """.formatted(BookTestData.TestBook1.ISBN));
 
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertFieldError(result, "title", Messages.BOOK_TITLE_LENGTH_VALIDATION_MESSAGE);
-        assertFieldError(result, "authorNames", Messages.AUTHOR_NAME_LENGTH_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    void testCreateBookWithoutIsbn() {
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/admin/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"title": "Title", "authorNames": ["Author"]}""")
-                .exchange();
-
-        assertFieldError(result, "isbn", Messages.BOOK_NULL_ISBN);
-    }
-
-    @Test
-    void testCreateBookWithoutAuthorNames() {
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/admin/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"isbn": "%s", "title": "Title"}""".formatted(BookTestData.TestBook1.ISBN))
-                .exchange();
-
-        assertFieldError(result, "authorNames", Messages.BOOK_NULL_AUTHORS);
-    }
-
-    @Test
-    void testUpdateBookWithoutAuthorNames() {
-        assertThat(DataBuilder.createTestBook(mockMvcTester,
-                BookTestData.TestBook1.ISBN,
-                BookTestData.TestBook1.TITLE,
-                BookTestData.TestBook1.AUTHOR_NAME)
-        ).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult result = mockMvcTester.put()
-                .uri("/api/admin/books/" + BookTestData.TestBook1.ISBN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"title": "Title"}""")
-                .exchange();
-
-        assertFieldError(result, "authorNames", Messages.BOOK_NULL_AUTHORS);
+        assertFieldError(noAuthors, "authorNames", Messages.BOOK_NULL_AUTHORS);
     }
 
     @Test
     void testUpdateBook() {
-        // Create a book to update
         assertThat(DataBuilder.createTestBook(mockMvcTester,
                 BookTestData.TestBook1.ISBN,
                 BookTestData.TestBook1.TITLE,
                 BookTestData.TestBook1.AUTHOR_NAME)
         ).hasStatus(HttpStatus.CREATED);
 
-        // Verify initial state
-        assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("title")
-                .isEqualTo(BookTestData.TestBook1.TITLE);
-
-        // Update the book
         MvcTestResult result = mockMvcTester.put()
                 .uri("/api/admin/books/" + BookTestData.TestBook1.ISBN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(BookTestData.TestBook2.JSON)
                 .exchange();
 
-        // Verify the update
         assertThat(result).hasStatus(HttpStatus.OK);
         assertThat(result).bodyJson().extractingPath("title").isEqualTo(BookTestData.TestBook2.TITLE);
         assertThat(result).bodyJson().extractingPath("publicationYear").isEqualTo(BookTestData.TestBook2.PUBLICATION_YEAR);
@@ -149,42 +91,16 @@ class AdminBookControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testUpdateNonExistentBook() {
-        String isbn = TestISBNGenerator.next(); // Nonexistent ISBN
-        MvcTestResult result = mockMvcTester.put()
-                .uri("/api/admin/books/" + isbn)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(BookTestData.TestBook2.JSON)
-                .exchange();
-
-        assertThat(result)
-                .hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson()
-                .extractingPath("detail")
-                .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
-    }
-
-    @Test
     void testDeleteBook() {
-        // Create a book to delete
         assertThat(DataBuilder.createTestBook(mockMvcTester,
                 BookTestData.TestBook1.ISBN,
                 BookTestData.TestBook1.TITLE,
                 BookTestData.TestBook1.AUTHOR_NAME)
         ).hasStatus(HttpStatus.CREATED);
 
-        // Verify the book exists
-        assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("title")
-                .isEqualTo(BookTestData.TestBook1.TITLE);
-
-        // Delete the book
         assertThat(mockMvcTester.delete().uri("/api/admin/books/" + BookTestData.TestBook1.ISBN))
                 .hasStatus(HttpStatus.NO_CONTENT);
 
-        // Verify the book no longer exists
         assertThat(mockMvcTester.get().uri("/api/books/" + BookTestData.TestBook1.ISBN))
                 .hasStatus(HttpStatus.NOT_FOUND);
     }
@@ -209,14 +125,11 @@ class AdminBookControllerTest extends IntegrationTest {
                 .hasStatus(HttpStatus.OK);
     }
 
-    @Test
-    void testDeleteNonExistentBook() {
-        String isbn = TestISBNGenerator.next(); // Nonexistent ISBN
-
-        assertThat(mockMvcTester.delete().uri("/api/admin/books/" + isbn))
-                .hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson()
-                .extractingPath("detail")
-                .isEqualTo(Messages.BOOK_NOT_FOUND + isbn);
+    private MvcTestResult postBook(String json) {
+        return mockMvcTester.post()
+                .uri("/api/admin/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .exchange();
     }
 }

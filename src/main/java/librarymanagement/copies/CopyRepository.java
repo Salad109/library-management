@@ -18,8 +18,16 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
 
     long countByCustomerIdAndStatus(Long customerId, CopyStatus status);
 
-    @Query("SELECT c.id FROM Copy c ORDER BY c.id")
-    Page<Long> findAllIds(Pageable pageable);
+    // Null filters are ignored. The casts stop Postgres from reading a null string as bytea.
+    @Query("""
+            SELECT c.id FROM Copy c JOIN c.book b LEFT JOIN c.customer cu
+            WHERE (:isbn IS NULL OR b.isbn = :isbn)
+            AND (:title IS NULL OR b.title ILIKE CONCAT('%', CAST(:title AS String), '%'))
+            AND (:customerId IS NULL OR cu.id = :customerId)
+            AND (:customerLastName IS NULL OR cu.lastName ILIKE CONCAT('%', CAST(:customerLastName AS String), '%'))
+            ORDER BY c.id
+            """)
+    Page<Long> findIds(String isbn, String title, Long customerId, String customerLastName, Pageable pageable);
 
     @Query("SELECT DISTINCT c FROM Copy c " +
             "LEFT JOIN FETCH c.book b " +
@@ -27,16 +35,4 @@ public interface CopyRepository extends JpaRepository<Copy, Long> {
             "LEFT JOIN FETCH c.customer " +
             "WHERE c.id IN :ids ORDER BY c.id")
     List<Copy> findByIdsWithAllRelations(List<Long> ids);
-
-    @Query("SELECT c.id FROM Copy c WHERE c.book.isbn = :isbn ORDER BY c.id")
-    Page<Long> findIdsByBookIsbn(String isbn, Pageable pageable);
-
-    @Query("SELECT c.id FROM Copy c WHERE c.customer.id = :customerId ORDER BY c.id")
-    Page<Long> findIdsByCustomerId(Long customerId, Pageable pageable);
-
-    @Query("SELECT c.id FROM Copy c WHERE c.book.title ILIKE CONCAT('%', :title, '%') ORDER BY c.id")
-    Page<Long> findIdsByBookTitle(String title, Pageable pageable);
-
-    @Query("SELECT c.id FROM Copy c WHERE c.customer.lastName ILIKE CONCAT('%', :lastName, '%') ORDER BY c.id")
-    Page<Long> findIdsByCustomerLastName(String lastName, Pageable pageable);
 }

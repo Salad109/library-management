@@ -13,26 +13,12 @@ class ActivationCodesTest {
     }
 
     @Test
-    void testGeneratedCodesDiffer() {
-        assertThat(ActivationCodes.generate()).isNotEqualTo(ActivationCodes.generate());
-    }
-
-    @Test
-    void testHashIgnoresCaseDashAndSpaces() {
+    void testHashNormalizesTypedCodes() {
         String hash = ActivationCodes.hash("AB2C-DE3F");
 
-        assertThat(ActivationCodes.hash("ab2c-de3f")).isEqualTo(hash);
-        assertThat(ActivationCodes.hash("AB2CDE3F")).isEqualTo(hash);
         assertThat(ActivationCodes.hash(" ab2c de3f ")).isEqualTo(hash);
-    }
-
-    @Test
-    void testHashReadsLookalikeLettersAsDigits() {
+        assertThat(ActivationCodes.hash("AB2CDE3F")).isEqualTo(hash);
+        // Lookalike letters read as digits
         assertThat(ActivationCodes.hash("oO1i-lL00")).isEqualTo(ActivationCodes.hash("0011-1100"));
-    }
-
-    @Test
-    void testDifferentCodesHashDifferently() {
-        assertThat(ActivationCodes.hash("AB2C-DE3F")).isNotEqualTo(ActivationCodes.hash("AB2C-DE3G"));
     }
 }

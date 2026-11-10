@@ -1,5 +1,6 @@
 package librarymanagement.copies;
 
+import librarymanagement.constants.Messages;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
 import librarymanagement.utils.IntegrationTest;
@@ -17,254 +18,93 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DeskControllerTest extends IntegrationTest {
 
     @Autowired
-    MockMvcTester mockMvcTester;
+    private MockMvcTester mockMvcTester;
 
     /**
-     * 1. Register and login the librarian.
-     * 2. Create a book and two copies of it.
-     * 3. Register and login the customer.
-     * 4. Customer reserves one copy.
-     * 5. Librarian checks out the reserved copy to the customer.
-     * 6. Librarian checks out the unreserved copy to the customer.
+     * 1. Log in the librarian, create a book and two copies of it.
+     * 2. Register and log in the customer.
+     * 3. Customer reserves the first copy.
+     * 4. Librarian checks out the reserved copy, then the unreserved one.
+     * 5. Librarian returns the reserved copy.
+     * 6. Returning it again fails.
      */
     @Test
-    void testCheckout() throws Exception {
-        // Register and login the librarian
+    void testCheckoutAndReturn() throws Exception {
         MockHttpSession librarianSession = librarianSession();
-
-        // Create book
-        String isbn = TestISBNGenerator.next();
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Checkout Book", "Checkout Author");
-        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
-
-        // Create a copy to be reserved and checked out
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
-        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
-
-        int reservedCopyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
-
-        // Create another copy for unreserved checkout
-        MvcTestResult secondCopyResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
-        assertThat(secondCopyResult).hasStatus(HttpStatus.CREATED);
-
-        int unreservedCopyId = ControllerTestUtils.extractIdFromResponseArray(secondCopyResult);
-
-        // Register and login the customer
+        String isbn = createBook(librarianSession);
+        int reservedCopyId = createCopy(librarianSession, isbn);
+        int availableCopyId = createCopy(librarianSession, isbn);
         CustomerAccount customer = customerAccount("joe@example.com", "Joe", "Mama");
         long customerId = customer.customerId();
-        MockHttpSession customerSession = customer.session();
 
-        // Customer reserves a copy
-        String reservationJson = """
-                {
-                    "bookIsbn": "%s"
-                }
-                """.formatted(isbn);
-
-        MvcTestResult reservationResult = mockMvcTester.post()
-                .uri("/api/reservations")
-                .session(customerSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(reservationJson)
-                .exchange();
-
-        assertThat(reservationResult).hasStatus(HttpStatus.CREATED);
-
-        // Customer logs out
-        MvcTestResult customerLogoutResult = mockMvcTester.post().uri("/api/logout")
-                .session(customerSession)
-                .exchange();
-        assertThat(customerLogoutResult).hasStatus(HttpStatus.NO_CONTENT);
-
-        // Librarian checks out the reserved copy
-        String reservedCheckoutJson = """
-                {
-                    "copyId": %d,
-                    "customerId": %d
-                }
-                """.formatted(reservedCopyId, customerId);
-
-        MvcTestResult reservedCheckoutResult = mockMvcTester.post()
-                .uri("/api/desk/checkout")
-                .session(librarianSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(reservedCheckoutJson)
-                .exchange();
-
-        assertThat(reservedCheckoutResult)
-                .hasStatus(HttpStatus.OK)
+        assertThat(reserve(customer.session(), isbn))
+                .hasStatus(HttpStatus.CREATED)
                 .bodyJson()
                 .extractingPath("id")
-                .asNumber()
                 .isEqualTo(reservedCopyId);
 
-        // Librarian checks out an unreserved copy
-        String unreservedCheckoutJson = """
-                {
-                    "copyId": %d,
-                    "customerId": %d
-                }
-                """.formatted(unreservedCopyId, customerId);
-
-        MvcTestResult unreservedCheckoutResult = mockMvcTester.post()
-                .uri("/api/desk/checkout")
-                .session(librarianSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(unreservedCheckoutJson)
-                .exchange();
-
-        assertThat(unreservedCheckoutResult)
+        // Reserved and available copies can both be checked out
+        assertThat(desk(librarianSession, "checkout", reservedCopyId, customerId))
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
-                .extractingPath("id")
-                .asNumber()
-                .isEqualTo(unreservedCopyId);
-    }
-
-    /**
-     * 1. Register and login the librarian.
-     * 2. Create a book and a copy of it.
-     * 3. Register and login the customer.
-     * 4. Librarian checks out the copy to the customer.
-     * 5. Customer returns the copy.
-     */
-    @Test
-    void testReturnCopy() throws Exception {
-        // Register and login the librarian
-        MockHttpSession librarianSession = librarianSession();
-
-        // Create book and copy
-        String isbn = TestISBNGenerator.next();
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Return Book", "Return Author");
-        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
-        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
-
-        int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
-
-        // Create customer
-        long customerId = customerAccount("jane@example.com", "Jane", "Mama").customerId();
-        // Checkout the copy first
-        String checkoutJson = """
-                {
-                    "copyId": %d,
-                    "customerId": %d
-                }
-                """.formatted(copyId, customerId);
-
-        MvcTestResult checkoutResult = mockMvcTester.post()
-                .uri("/api/desk/checkout")
-                .session(librarianSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(checkoutJson)
-                .exchange();
-
-        assertThat(checkoutResult).hasStatus(HttpStatus.OK);
-
-        // Return the copy
-        String returnJson = """
-                {
-                    "copyId": %d,
-                    "customerId": %d
-                }
-                """.formatted(copyId, customerId);
-
-        MvcTestResult returnResult = mockMvcTester.post()
-                .uri("/api/desk/return")
-                .session(librarianSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(returnJson)
-                .exchange();
-
-        assertThat(returnResult)
+                .extractingPath("status")
+                .isEqualTo("BORROWED");
+        assertThat(desk(librarianSession, "checkout", availableCopyId, customerId))
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
-                .extractingPath("id")
-                .asNumber()
-                .isEqualTo(copyId);
-    }
+                .extractingPath("status")
+                .isEqualTo("BORROWED");
 
-    /**
-     * 1. Register and login the librarian.
-     * 2. Create a book and a copy of it.
-     * 3. Register the customer.
-     * 4. Try to return the copy that was never borrowed.
-     */
-    @Test
-    void testReturnNotBorrowedCopy() throws Exception {
-        // Register and login the librarian
-        MockHttpSession librarianSession = librarianSession();
-
-        // Create book and copy
-        String isbn = TestISBNGenerator.next();
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Not Borrowed Book", "Not Borrowed Author");
-        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
-        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
-
-        int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
-
-        // Register customer
-        long customerId = customerAccount("babyjoe@example.com", "Joe Jr", "Mama").customerId();
-        // Try to return copy that was never borrowed
-        String returnJson = """
-                {
-                    "copyId": %d,
-                    "customerId": %d
-                }
-                """.formatted(copyId, customerId);
-
-        MvcTestResult returnResult = mockMvcTester.post()
-                .uri("/api/desk/return")
-                .session(librarianSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(returnJson)
-                .exchange();
-
-        assertThat(returnResult).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(desk(librarianSession, "return", reservedCopyId, customerId))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("status")
+                .isEqualTo("AVAILABLE");
+        assertThat(desk(librarianSession, "return", reservedCopyId, customerId))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.COPY_NOT_BORROWED + "AVAILABLE");
     }
 
     @Test
     void testMarkLost() throws Exception {
-        // Register and login the librarian
         MockHttpSession librarianSession = librarianSession();
+        int copyId = createCopy(librarianSession, createBook(librarianSession));
 
-        // Create book and copy
-        String isbn = TestISBNGenerator.next();
-        MvcTestResult bookCreationResult = DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Lost Book", "Lost Author");
-        assertThat(bookCreationResult).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult copyCreationResult = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
-        assertThat(copyCreationResult).hasStatus(HttpStatus.CREATED);
-
-        int copyId = ControllerTestUtils.extractIdFromResponseArray(copyCreationResult);
-
-        // Mark copy as lost
-        String markLostJson = """
-                {
-                    "copyId": %d
-                }
-                """.formatted(copyId);
-
-        MvcTestResult markLostResult = mockMvcTester.post()
+        MvcTestResult result = mockMvcTester.post()
                 .uri("/api/desk/mark-lost")
                 .session(librarianSession)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(markLostJson)
+                .content("""
+                        {"copyId": %d}
+                        """.formatted(copyId))
                 .exchange();
 
-        assertThat(markLostResult)
-                .hasStatus(HttpStatus.OK);
-        assertThat(markLostResult)
-                .bodyJson()
-                .extractingPath("id")
-                .asNumber()
-                .isEqualTo(copyId);
-        assertThat(markLostResult)
-                .bodyJson()
-                .extractingPath("status")
-                .isEqualTo("LOST");
+        assertThat(result).hasStatus(HttpStatus.OK).bodyJson().extractingPath("status").isEqualTo("LOST");
+    }
+
+    private String createBook(MockHttpSession librarianSession) {
+        String isbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, librarianSession, isbn, "Desk Book", "Desk Author"))
+                .hasStatus(HttpStatus.CREATED);
+        return isbn;
+    }
+
+    private int createCopy(MockHttpSession librarianSession, String isbn) throws Exception {
+        MvcTestResult result = DataBuilder.createTestCopy(mockMvcTester, librarianSession, isbn, 1);
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        return ControllerTestUtils.extractIdFromResponseArray(result);
+    }
+
+    private MvcTestResult desk(MockHttpSession librarianSession, String action, int copyId, long customerId) {
+        return mockMvcTester.post()
+                .uri("/api/desk/" + action)
+                .session(librarianSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"copyId": %d, "customerId": %d}
+                        """.formatted(copyId, customerId))
+                .exchange();
     }
 }

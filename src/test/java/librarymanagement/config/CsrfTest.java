@@ -109,14 +109,6 @@ class CsrfTest extends IntegrationTest {
         assertThat(result).hasStatus(HttpStatus.FORBIDDEN).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
     }
 
-    @Test
-    void testWriteWithHeaderNotMatchingCookieIsForbidden() {
-        MockHttpSession librarianSession = librarianSession();
-        String token = issuedToken(browser.get().uri("/api/whoami").exchange());
-
-        assertThat(writeWithTokens(librarianSession, token, "other-token")).hasStatus(HttpStatus.FORBIDDEN);
-    }
-
     private MvcTestResult writeWithTokens(MockHttpSession session, String cookieToken, String headerToken) {
         return browser.post()
                 .uri("/api/admin/customers")

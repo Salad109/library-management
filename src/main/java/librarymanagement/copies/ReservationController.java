@@ -28,7 +28,7 @@ public class ReservationController {
     @GetMapping("/api/reservations/mine")
     public Page<CopyResponse> getMyReservations(@AuthenticationPrincipal AuthenticatedUser user,
                                                 @ParameterObject Pageable pageable) {
-        return copyService.getCopiesByCustomerId(user.getCustomerId(), pageable);
+        return copyService.getCopies(null, null, user.getCustomerId(), null, pageable);
     }
 
     @Operation(summary = "Reserve a copy of a book",

@@ -25,10 +25,7 @@ public class AdminCustomerController {
             description = "lastName matches a case-insensitive substring.")
     @GetMapping("/api/admin/customers")
     public Page<CustomerResponse> getCustomers(@RequestParam(required = false) String lastName, @ParameterObject Pageable pageable) {
-        if (lastName != null) {
-            return customerService.getCustomersByLastName(lastName, pageable);
-        }
-        return customerService.getAllCustomers(pageable);
+        return customerService.getCustomers(lastName, pageable);
     }
 
     @GetMapping("/api/admin/customers/{id}")

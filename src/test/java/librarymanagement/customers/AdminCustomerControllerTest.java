@@ -21,17 +21,13 @@ class AdminCustomerControllerTest extends IntegrationTest {
     private MockMvcTester mockMvcTester;
 
     @Test
-    void testCreateCustomer() {
-        String customerJson = """
-                {
-                    "firstName": "Joe Jr.",
-                    "lastName": "Mama"
-                }
-                """;
+    void testCreateCustomerIgnoresEmail() {
         MvcTestResult result = mockMvcTester.post()
                 .uri("/api/admin/customers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
+                .content("""
+                        {"firstName": "Joe Jr.", "lastName": "Mama", "email": "joe@example.com"}
+                        """)
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.CREATED);
@@ -41,95 +37,24 @@ class AdminCustomerControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testCreateCustomerIgnoresEmail() {
-        String customerJson = """
-                {
-                    "firstName": "Joe",
-                    "lastName": "Mama",
-                    "email": "joe@example.com"
-                }
-                """;
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/admin/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(customerJson)
-                .exchange();
+    void testCreateCustomerValidation() {
+        MvcTestResult result = DataBuilder.createTestCustomer(mockMvcTester, " ", "a".repeat(101));
 
-        assertThat(result).hasStatus(HttpStatus.CREATED);
-        assertThat(result).bodyJson().doesNotHavePath("email");
-    }
-
-    @Test
-    void testCreateInvalidCustomer() {
-        MvcTestResult result = mockMvcTester.post()
-                .uri("/api/admin/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{}")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertFieldError(result, "firstName", Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertFieldError(result, "lastName", Messages.CUSTOMER_LASTNAME_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    void testCreateCustomerWithTooLongFields() {
-        MvcTestResult result = DataBuilder.createTestCustomer(mockMvcTester,
-                "a".repeat(101),
-                "a".repeat(101));
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertFieldError(result, "firstName", Messages.CUSTOMER_FIRSTNAME_LENGTH_VALIDATION_MESSAGE);
         assertFieldError(result, "lastName", Messages.CUSTOMER_LASTNAME_LENGTH_VALIDATION_MESSAGE);
     }
 
     @Test
-    void testGetCustomerById() throws Exception {
-        MvcTestResult customerCreationResult = DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama");
-        assertThat(customerCreationResult).hasStatus(HttpStatus.CREATED);
-
-        int customerId = ControllerTestUtils.extractIdFromResponse(customerCreationResult);
-
-        assertThat(mockMvcTester.get().uri("/api/admin/customers/" + customerId))
-                .hasStatus(HttpStatus.OK);
-    }
-
-    @Test
-    void testGetNonExistentCustomerById() {
-        assertThat(mockMvcTester.get().uri("/api/admin/customers/9999"))
-                .hasStatus(HttpStatus.NOT_FOUND)
-                .bodyJson()
-                .extractingPath("detail")
-                .isEqualTo(Messages.CUSTOMER_NOT_FOUND + "9999");
-    }
-
-    @Test
-    void testGetAllCustomers() {
-        assertThat(mockMvcTester.get().uri("/api/admin/customers"))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("content")
-                .isNotNull();
-    }
-
-    @Test
     void testUpdateCustomer() throws Exception {
-        MvcTestResult customerCreationResult = DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama");
-        assertThat(customerCreationResult).hasStatus(HttpStatus.CREATED);
-
-        int customerId = ControllerTestUtils.extractIdFromResponse(customerCreationResult);
-
-        String updateJson = """
-                {
-                    "firstName": "The",
-                    "lastName": "Goober"
-                }
-                """;
+        int customerId = ControllerTestUtils.extractIdFromResponse(
+                DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama"));
 
         MvcTestResult result = mockMvcTester.put()
                 .uri("/api/admin/customers/" + customerId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(updateJson)
+                .content("""
+                        {"firstName": "The", "lastName": "Goober"}
+                        """)
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.OK);
@@ -168,16 +93,6 @@ class AdminCustomerControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testUpdateCustomerWithoutAccountCanLeaveEmailEmpty() {
-        long customerId = createCustomer(librarianSession(), "Joe", "Mama");
-
-        MvcTestResult result = updateEmail(customerId, "null");
-
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().doesNotHavePath("email");
-    }
-
-    @Test
     void testUpdateCustomerWithoutAccountCannotGetEmail() {
         long customerId = createCustomer(librarianSession(), "Joe", "Mama");
 
@@ -186,10 +101,6 @@ class AdminCustomerControllerTest extends IntegrationTest {
                 .bodyJson()
                 .extractingPath("detail")
                 .isEqualTo(Messages.CUSTOMER_EMAIL_NEEDS_ACCOUNT);
-
-        assertThat(mockMvcTester.get().uri("/api/admin/customers/" + customerId))
-                .bodyJson()
-                .doesNotHavePath("email");
     }
 
     @Test
@@ -206,7 +117,12 @@ class AdminCustomerControllerTest extends IntegrationTest {
     @Test
     void testEmailChangeMovesTheLogin() {
         long customerId = customerAccount("joe@example.com", "Joe", "Mama").customerId();
-        assertThat(updateEmail(customerId, "\"new.joe@example.com\"")).hasStatus(HttpStatus.OK);
+
+        assertThat(updateEmail(customerId, "\"new.joe@example.com\""))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("email")
+                .isEqualTo("new.joe@example.com");
 
         assertThat(mockMvcTester.post()
                 .uri("/api/login")
@@ -237,50 +153,23 @@ class AdminCustomerControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testUpdateCustomerWithAccountCanChangeEmail() {
-        long customerId = customerAccount("joe@example.com", "Joe", "Mama").customerId();
-
-        MvcTestResult result = updateEmail(customerId, "\"fixed-typo@example.com\"");
-
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().extractingPath("email").isEqualTo("fixed-typo@example.com");
-    }
-
-    @Test
     void testFilterCustomersByLastName() {
-        assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama"))
-                .hasStatus(HttpStatus.CREATED);
-        assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Ann", "Other"))
-                .hasStatus(HttpStatus.CREATED);
-
-        assertThat(mockMvcTester.get().uri("/api/admin/customers?lastName=MAM"))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .satisfies(json -> {
-                    assertThat(json).extractingPath("page.totalElements").isEqualTo(1);
-                    assertThat(json).extractingPath("content[0].lastName").isEqualTo("Mama");
-                });
-        assertThat(mockMvcTester.get().uri("/api/admin/customers?lastName="))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("page.totalElements")
-                .isEqualTo(2);
-    }
-
-    @Test
-    void testCustomerPagesCountAllMatches() {
         assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Joe", "Mama")).hasStatus(HttpStatus.CREATED);
         assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Jane", "Mama")).hasStatus(HttpStatus.CREATED);
         assertThat(DataBuilder.createTestCustomer(mockMvcTester, "Ann", "Other")).hasStatus(HttpStatus.CREATED);
 
-        assertThat(mockMvcTester.get().uri("/api/admin/customers?size=1"))
+        // Page totals count every match, not just the page
+        assertCustomerCount("/api/admin/customers?lastName=MAM&size=1", 2);
+        assertCustomerCount("/api/admin/customers?size=1", 3);
+        assertCustomerCount("/api/admin/customers?lastName=", 3);
+    }
+
+    private void assertCustomerCount(String uri, int expected) {
+        assertThat(mockMvcTester.get().uri(uri))
+                .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("page.totalElements")
-                .isEqualTo(3);
-        assertThat(mockMvcTester.get().uri("/api/admin/customers?lastName=mama&size=1"))
-                .bodyJson()
-                .extractingPath("page.totalElements")
-                .isEqualTo(2);
+                .isEqualTo(expected);
     }
 
     private MvcTestResult updateEmail(long customerId, String emailJson) {

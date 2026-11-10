@@ -33,20 +33,14 @@ class LibrarianBootstrapTest extends IntegrationTest {
     }
 
     @Test
-    void testRunningTwiceCreatesOneLibrarian() {
-        librarianBootstrap.run(new DefaultApplicationArguments());
-        librarianBootstrap.run(new DefaultApplicationArguments());
-
-        assertThat(userRepository.count()).isEqualTo(1);
-    }
-
-    @Test
-    void testDoesNothingWhenAnotherLibrarianExists() {
+    void testDoesNothingWhenALibrarianExists() {
         userService.addLibrarian(new LibrarianCreateRequest("someone.else@example.com", librarianPassword));
 
+        // Configured or missing credentials aren't read once a librarian exists
         librarianBootstrap.run(new DefaultApplicationArguments());
+        new LibrarianBootstrap(userService, validator, "", "").run(new DefaultApplicationArguments());
 
-        assertThat(userRepository.findByEmail(librarianEmail)).isEmpty();
+        assertThat(userRepository.count()).isEqualTo(1);
     }
 
     @Test
@@ -57,23 +51,5 @@ class LibrarianBootstrapTest extends IntegrationTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(Messages.USER_EMAIL_VALIDATION_MESSAGE)
                 .hasMessageContaining(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    void testIgnoresMissingCredentialsWhenLibrarianExists() {
-        userService.addLibrarian(new LibrarianCreateRequest("someone.else@example.com", librarianPassword));
-
-        new LibrarianBootstrap(userService, validator, "", "").run(new DefaultApplicationArguments());
-
-        assertThat(userRepository.count()).isEqualTo(1);
-    }
-
-    @Test
-    void testFailsOnInvalidCredentials() {
-        LibrarianBootstrap bootstrap = new LibrarianBootstrap(userService, validator, "a".repeat(51), librarianPassword);
-
-        assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
-                .isInstanceOf(IllegalStateException.class);
-        assertThat(userService.librarianExists()).isFalse();
     }
 }

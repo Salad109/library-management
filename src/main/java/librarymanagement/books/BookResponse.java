@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import librarymanagement.authors.AuthorResponse;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record BookResponse(
         @NotNull String isbn,
@@ -21,11 +20,5 @@ public record BookResponse(
                 book.getAuthors().stream().map(AuthorResponse::from).toList(),
                 book.getPublicationYear(),
                 book.getAvailableCopies());
-    }
-
-    public String formattedAuthors() {
-        return authors.stream()
-                .map(AuthorResponse::name)
-                .collect(Collectors.joining(", "));
     }
 }

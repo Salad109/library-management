@@ -123,6 +123,17 @@ public abstract class IntegrationTest {
                 .exchange();
     }
 
+    protected MvcTestResult reserve(MockHttpSession customerSession, String isbn) {
+        return mvc.post()
+                .uri("/api/reservations")
+                .session(customerSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"bookIsbn": "%s"}
+                        """.formatted(isbn))
+                .exchange();
+    }
+
     /**
      * A 400 whose ProblemDetail errors member has the message for the field.
      */

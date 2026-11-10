@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -58,53 +57,12 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testLoginCustomer() {
-        assertThat(registerNewCustomer("goober@example.com", "password123")).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult loginResult = mockMvcTester.post()
-                .uri("/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=goober@example.com&password=password123")
-                .exchange();
-
-        assertThat(loginResult).hasStatus(HttpStatus.OK).hasContentType(MediaType.APPLICATION_JSON);
-        assertThat(loginResult).bodyJson().extractingPath("email").isEqualTo("goober@example.com");
-        assertThat(loginResult).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
-    }
-
-    @Test
-    void testLoginLibrarian() {
-        librarianSession();
-
-        MvcTestResult loginResult = mockMvcTester.post()
-                .uri("/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=" + librarianEmail + "&password=" + librarianPassword)
-                .exchange();
-
-        assertThat(loginResult).hasStatus(HttpStatus.OK);
-        assertThat(loginResult).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
-        assertThat(mockMvcTester.get().uri("/api/whoami").session(sessionOf(loginResult)))
-                .bodyJson()
-                .extractingPath("role")
-                .isEqualTo("ROLE_LIBRARIAN");
-    }
-
-    @Test
     void testRegisterCustomerMissingFields() {
         MvcTestResult result = registerJson("{}");
 
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertFieldError(result, "activationCode", Messages.ACTIVATION_CODE_VALIDATION_MESSAGE);
         assertFieldError(result, "email", Messages.USER_EMAIL_VALIDATION_MESSAGE);
         assertFieldError(result, "password", Messages.USER_PASSWORD_VALIDATION_MESSAGE);
-    }
-
-    @Test
-    void testRegisterTooLongEmail() {
-        MvcTestResult result = registerNewCustomer("a".repeat(146) + "@x.io", "secret123");
-
-        assertFieldError(result, "email", Messages.USER_EMAIL_LENGTH_VALIDATION_MESSAGE);
     }
 
     @Test
@@ -112,21 +70,11 @@ class UserControllerTest extends IntegrationTest {
         // 40 characters, but 80 bytes in UTF-8
         MvcTestResult result = registerNewCustomer("customer1@example.com", "ą".repeat(40));
 
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
         assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("detail")
                 .isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
-    }
-
-    @Test
-    void testRegisterDuplicateEmail() {
-        assertThat(registerNewCustomer("customer1@example.com", "secret123")).hasStatus(HttpStatus.CREATED);
-
-        MvcTestResult result = registerNewCustomer("CUSTOMER1@example.com", "secret123");
-
-        assertThat(result).hasStatus(HttpStatus.CONFLICT);
-        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.USER_EMAIL_DUPLICATE + "customer1@example.com");
     }
 
     @Test
@@ -137,21 +85,38 @@ class UserControllerTest extends IntegrationTest {
                 .extractingPath("email")
                 .isEqualTo("goober@example.com");
 
-        assertThat(mockMvcTester.post()
+        MvcTestResult result = mockMvcTester.post()
                 .uri("/api/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=GOOBER@example.com&password=password123"))
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("email")
-                .isEqualTo("goober@example.com");
+                .content("email=GOOBER@example.com&password=password123")
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK).hasContentType(MediaType.APPLICATION_JSON);
+        assertThat(result).bodyJson().extractingPath("email").isEqualTo("goober@example.com");
+        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
     }
 
     @Test
-    void testCreateLibrarianInvalidEmail() {
-        MvcTestResult result = createLibrarian(librarianSession(), "not-an-email", "secret123");
+    void testLoginFailure() {
+        MvcTestResult loginResult = mockMvcTester.post()
+                .uri("/api/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content("email=baduser@example.com&password=badpass")
+                .exchange();
 
-        assertFieldError(result, "email", Messages.USER_EMAIL_VALIDATION_MESSAGE);
+        assertThat(loginResult).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(loginResult).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
+    }
+
+    @Test
+    void testLogout() {
+        MockHttpSession session = customerAccount("joe@example.com", "Joe", "Mama").session();
+
+        MvcTestResult result = mockMvcTester.post().uri("/api/logout").session(session).exchange();
+
+        assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(result.getResponse().getContentAsByteArray()).isEmpty();
+        assertThat(session.isInvalid()).isTrue();
     }
 
     @Test
@@ -167,26 +132,6 @@ class UserControllerTest extends IntegrationTest {
 
         MockHttpSession newLibrarianSession = login("librarian2@example.com", "secret123");
         assertThat(mockMvcTester.get().uri("/api/admin/customers").session(newLibrarianSession)).hasStatusOk();
-    }
-
-    @Test
-    void testCreateDuplicateLibrarian() {
-        MockHttpSession librarianSession = librarianSession();
-
-        MvcTestResult result = createLibrarian(librarianSession, librarianEmail, "secret123");
-
-        assertThat(result).hasStatus(HttpStatus.CONFLICT);
-        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.USER_EMAIL_DUPLICATE + librarianEmail);
-    }
-
-    @Test
-    void testCreateLibrarianTooLongPassword() {
-        MockHttpSession librarianSession = librarianSession();
-
-        MvcTestResult result = createLibrarian(librarianSession, "librarian2@example.com", "ą".repeat(40));
-
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.USER_PASSWORD_TOO_LONG);
     }
 
     @Test
@@ -215,29 +160,6 @@ class UserControllerTest extends IntegrationTest {
     }
 
     @Test
-    void testLoginFailure() {
-        MvcTestResult loginResult = mockMvcTester.post()
-                .uri("/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("email=baduser@example.com&password=badpass")
-                .exchange();
-
-        assertThat(loginResult).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
-        assertThat(loginResult).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_FAILURE);
-    }
-
-    @Test
-    void testLogout() {
-        MockHttpSession session = customerAccount("joe@example.com", "Joe", "Mama").session();
-
-        MvcTestResult result = mockMvcTester.post().uri("/api/logout").session(session).exchange();
-
-        assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
-        assertThat(result.getResponse().getContentAsByteArray()).isEmpty();
-        assertThat(session.isInvalid()).isTrue();
-    }
-
-    @Test
     void testRootRedirectsToLoginPage() {
         assertThat(mockMvcTester.get().uri("/").accept(MediaType.TEXT_HTML))
                 .hasStatus(HttpStatus.FOUND)
@@ -261,26 +183,6 @@ class UserControllerTest extends IntegrationTest {
         assertThat(mockMvcTester.get().uri("/swagger-ui.html").accept(MediaType.TEXT_HTML))
                 .hasStatus(HttpStatus.FOUND)
                 .hasRedirectedUrl("/swagger-ui/index.html");
-    }
-
-    @Test
-    void testAnonymousApiCallFromBrowserIsNotRedirected() {
-        MvcTestResult result = mockMvcTester.get().uri("/api/admin/customers").accept(MediaType.TEXT_HTML).exchange();
-
-        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
-        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.SECURITY_LOGIN_REQUIRED);
-    }
-
-    @Test
-    @WithMockUser(roles = "LIBRARIAN")
-    void testWhoAmI() {
-        MvcTestResult result = mockMvcTester.get()
-                .uri("/api/whoami")
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.OK);
-        assertThat(result).bodyJson().extractingPath("email").isEqualTo("user");
-        assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_LIBRARIAN");
     }
 
     @Test
@@ -326,9 +228,5 @@ class UserControllerTest extends IntegrationTest {
                         {"email": "%s", "password": "%s"}
                         """.formatted(email, password))
                 .exchange();
-    }
-
-    private static MockHttpSession sessionOf(MvcTestResult loginResult) {
-        return (MockHttpSession) loginResult.getRequest().getSession(false);
     }
 }

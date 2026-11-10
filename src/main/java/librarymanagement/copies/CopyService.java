@@ -35,34 +35,16 @@ public class CopyService {
         this.customerService = customerService;
     }
 
+    // Null filters are ignored
     @Transactional(readOnly = true)
-    public Page<CopyResponse> getAllCopies(Pageable pageable) {
-        return loadPage(copyRepository.findAllIds(pageable));
+    public Page<CopyResponse> getCopies(String isbn, String title, Long customerId, String customerLastName,
+                                        Pageable pageable) {
+        return loadPage(copyRepository.findIds(isbn, title, customerId, customerLastName, pageable));
     }
 
     @Transactional(readOnly = true)
     public CopyResponse getCopyById(Long id) {
         return CopyResponse.from(getCopyOrThrow(id));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CopyResponse> getCopiesByBookIsbn(String isbn, Pageable pageable) {
-        return loadPage(copyRepository.findIdsByBookIsbn(isbn, pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CopyResponse> getCopiesByCustomerId(Long customerId, Pageable pageable) {
-        return loadPage(copyRepository.findIdsByCustomerId(customerId, pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CopyResponse> getCopiesByBookTitle(String title, Pageable pageable) {
-        return loadPage(copyRepository.findIdsByBookTitle(title, pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CopyResponse> getCopiesByCustomerLastName(String lastName, Pageable pageable) {
-        return loadPage(copyRepository.findIdsByCustomerLastName(lastName, pageable));
     }
 
     @Transactional
@@ -87,24 +69,9 @@ public class CopyService {
 
     @Transactional
     public CopyResponse returnCopy(Long copyId, Long customerId) {
-        Copy existingCopy = getCopyOrThrow(copyId);
-        if (existingCopy.getStatus() != CopyStatus.BORROWED) {
-            log.warn("Copy with ID: {} is not borrowed, current status: {}", copyId, existingCopy.getStatus());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_NOT_BORROWED + existingCopy.getStatus());
-        }
-
-        Customer customer = customerService.getCustomerOrThrow(customerId);
-        if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
-            log.warn("Copy with ID: {} is reserved for another customer, current customer ID: {}", copyId, existingCopy.getCustomer().getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
-        }
-
-        existingCopy.setCustomer(null);
-        existingCopy.setStatus(CopyStatus.AVAILABLE);
-
-        Copy savedCopy = save(existingCopy);
-        log.info("Copy with ID: {} returned successfully", savedCopy.getId());
-        return CopyResponse.from(savedCopy);
+        Copy copy = release(copyId, customerId, CopyStatus.BORROWED, Messages.COPY_NOT_BORROWED);
+        log.info("Copy with ID: {} returned", copyId);
+        return CopyResponse.from(copy);
     }
 
     @Transactional
@@ -148,66 +115,50 @@ public class CopyService {
 
     @Transactional
     public void cancelReservation(Long copyId, Long customerId) {
-        Copy existingCopy = getCopyOrThrow(copyId);
-        if (existingCopy.getStatus() != CopyStatus.RESERVED) {
-            log.warn("Copy with ID: {} is not reserved, current status: {}", copyId, existingCopy.getStatus());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_NOT_RESERVED + existingCopy.getStatus());
-        }
-
-        Customer customer = customerService.getCustomerOrThrow(customerId);
-        if (existingCopy.getCustomer() != null && !existingCopy.getCustomer().equals(customer)) {
-            log.warn("Copy with ID: {} is reserved for customer ID: {}, not for customer ID: {}", copyId, existingCopy.getCustomer().getId(), customerId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + existingCopy.getCustomer().getId());
-        }
-
-        existingCopy.setCustomer(null);
-        existingCopy.setStatus(CopyStatus.AVAILABLE);
-
-        Copy savedCopy = save(existingCopy);
-        log.info("Cancelled reservation for copy with ID: {}", savedCopy.getId());
+        release(copyId, customerId, CopyStatus.RESERVED, Messages.COPY_NOT_RESERVED);
+        log.info("Cancelled reservation for copy with ID: {}", copyId);
     }
 
+    // Available copies go to anyone, reserved ones only to the customer who reserved them
     @Transactional
     public CopyResponse checkout(Long copyId, Long customerId) {
         Copy copy = getCopyOrThrow(copyId);
         Customer customer = customerService.getCustomerOrThrow(customerId);
-
-        // Reserved copy checkout
-        if (copy.getStatus() == CopyStatus.RESERVED) {
-            return CopyResponse.from(checkoutReservedCopy(copy, customer));
+        if (copy.getStatus() != CopyStatus.AVAILABLE && copy.getStatus() != CopyStatus.RESERVED) {
+            log.warn("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
         }
-
-        // Direct checkout
-        if (copy.getStatus() == CopyStatus.AVAILABLE) {
-            return CopyResponse.from(checkoutAvailableCopy(copy, customer));
-        }
-
-        log.info("Copy with ID: {} is not available for checkout, current status: {}", copyId, copy.getStatus());
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_UNAVAILABLE_FOR_CHECKOUT + copy.getStatus());
-    }
-
-    private Copy checkoutReservedCopy(Copy copy, Customer customer) {
-        if (!copy.getCustomer().getId().equals(customer.getId())) {
-            log.info("Copy with ID: {} is reserved for another customer ID: {}, cannot checkout", copy.getId(), copy.getCustomer().getId());
+        if (copy.getStatus() == CopyStatus.RESERVED && !copy.getCustomer().getId().equals(customerId)) {
+            log.warn("Copy with ID: {} is reserved for customer ID: {}, not {}", copyId, copy.getCustomer().getId(), customerId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_RESERVED_FOR_ANOTHER_CUSTOMER + copy.getCustomer().getId());
         }
-        copy.setStatus(CopyStatus.BORROWED);
-        Copy savedCopy = save(copy);
-        log.info("Reserved copy with ID: {} checked out successfully for customer ID: {}", savedCopy.getId(), customer.getId());
-        return savedCopy;
-    }
 
-    private Copy checkoutAvailableCopy(Copy copy, Customer customer) {
         copy.setCustomer(customer);
         copy.setStatus(CopyStatus.BORROWED);
-
         Copy savedCopy = save(copy);
-
-        log.info("Available copy with ID: {} checked out successfully for customer ID: {}", savedCopy.getId(), customer.getId());
-        return savedCopy;
+        log.info("Copy with ID: {} checked out to customer ID: {}", copyId, customerId);
+        return CopyResponse.from(savedCopy);
     }
 
     // Helpers
+
+    // Makes a borrowed or reserved copy available again; only its own customer can release it
+    private Copy release(Long copyId, Long customerId, CopyStatus expectedStatus, String wrongStatusMessage) {
+        Copy copy = getCopyOrThrow(copyId);
+        if (copy.getStatus() != expectedStatus) {
+            log.warn("Copy with ID: {} is not {}, current status: {}", copyId, expectedStatus, copy.getStatus());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, wrongStatusMessage + copy.getStatus());
+        }
+        Long ownerId = copy.getCustomer().getId();
+        if (!ownerId.equals(customerId)) {
+            log.warn("Copy with ID: {} belongs to customer ID: {}, not {}", copyId, ownerId, customerId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + ownerId);
+        }
+
+        copy.setCustomer(null);
+        copy.setStatus(CopyStatus.AVAILABLE);
+        return save(copy);
+    }
 
     public Copy getCopyOrThrow(Long id) {
         return copyRepository.findById(id).orElseThrow(() -> {

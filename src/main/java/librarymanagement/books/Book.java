@@ -7,7 +7,6 @@ import org.hibernate.annotations.Formula;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "books")
@@ -19,6 +18,7 @@ public class Book {
 
     @BatchSize(size = 20)
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(joinColumns = @JoinColumn(name = "books_isbn"))
     private Set<Author> authors;
 
     private Integer publicationYear;
@@ -38,12 +38,6 @@ public class Book {
         this.title = title;
         this.authors = (authors != null) ? new LinkedHashSet<>(authors) : new LinkedHashSet<>();
         this.publicationYear = publicationYear;
-    }
-
-    public String getFormattedAuthors() {
-        return authors.stream()
-                .map(Author::getName)
-                .collect(Collectors.joining(", "));
     }
 
     @Override
@@ -70,17 +64,8 @@ public class Book {
     }
 
     public void setAuthors(Set<Author> authors) {
-        for (Author author : this.authors) {
-            author.getBooks().remove(this);
-        }
         this.authors.clear();
-
-        if (authors != null) {
-            for (Author author : authors) {
-                author.getBooks().add(this);
-                this.authors.add(author);
-            }
-        }
+        this.authors.addAll(authors);
     }
 
     public Integer getPublicationYear() {

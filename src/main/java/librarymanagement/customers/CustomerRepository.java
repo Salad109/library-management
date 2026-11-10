@@ -12,18 +12,12 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByActivationCodeHash(String activationCodeHash);
 
+    // Null lastName matches everyone
     @Query("""
             SELECT new librarymanagement.customers.CustomerResponse(c.id, c.firstName, c.lastName, u.email)
             FROM Customer c LEFT JOIN User u ON u.customer = c
+            WHERE :lastName IS NULL OR c.lastName ILIKE CONCAT('%', :lastName, '%')
             ORDER BY c.lastName, c.firstName
             """)
-    Page<CustomerResponse> findAllResponses(Pageable pageable);
-
-    @Query("""
-            SELECT new librarymanagement.customers.CustomerResponse(c.id, c.firstName, c.lastName, u.email)
-            FROM Customer c LEFT JOIN User u ON u.customer = c
-            WHERE c.lastName ILIKE CONCAT('%', :lastName, '%')
-            ORDER BY c.lastName, c.firstName
-            """)
-    Page<CustomerResponse> findResponsesByLastName(String lastName, Pageable pageable);
+    Page<CustomerResponse> findResponses(String lastName, Pageable pageable);
 }
