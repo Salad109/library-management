@@ -68,7 +68,16 @@ panel's customer pages and registers with it at `POST /api/register`.
 ## Monitoring
 
 Grafana at `http://localhost:3000` (admin/admin) comes with the "Library Dashboard", including metrics from Prometheus
-and logs from Loki. Run `exampleRequests/complete-workflow.http` to generate some data.
+and logs from Loki.
+
+To generate some data, start the simulator. `simulator/simulate.py` acts as a few visitors, readers and librarians using
+the API.
+
+```bash
+docker compose --profile simulator up -d                      # ~1 RPS
+SIMULATOR_SPEED=10 docker compose --profile simulator up -d   # ~10 RPS
+python3 simulator/simulate.py                                 # or from the host
+```
 
 ## API Overview
 
@@ -99,7 +108,6 @@ The `exampleRequests` directory contains ready-to-use HTTP requests:
 ```
 exampleRequests/
 ├── admin/
-│   ├── book-batch.http   # Bulk sample books
 │   ├── books.http        # Book CRUD operations
 │   ├── copies.http       # Copy management
 │   ├── customers.http    # Customer management

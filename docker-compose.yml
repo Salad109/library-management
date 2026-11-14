@@ -63,6 +63,20 @@ services:
       - prometheus
       - loki
 
+  # Simulated users. Opt-in: docker compose --profile simulator up -d
+  simulator:
+    image: python:3.14-alpine
+    profiles: [simulator]
+    env_file: .env
+    environment:
+      - SIMULATOR_BASE_URL=http://library-management-app:8080
+      - SIMULATOR_SPEED=${SIMULATOR_SPEED:-1}
+    volumes:
+      - ./simulator:/simulator:ro
+    command: python /simulator/simulate.py
+    depends_on:
+      - library-management-app
+
 volumes:
   db_data:
   grafana_data:
