@@ -174,5 +174,5 @@ Copy checkout form
 ![](https://github.com/user-attachments/assets/44070f8f-1ade-4554-8b98-d986bacba02f)
 Customer browsing page
 ![](https://github.com/user-attachments/assets/e55750aa-2dd4-4edf-8680-38cef5afc4cc)
-Grafana dashboard during high load simulation using the config in `grafana/dashboards/dashboard.json`.
-![](https://github.com/user-attachments/assets/4735967b-be79-4f21-970d-33bcfbd1bebf)
+Grafana dashboard during usage simulation using the config in `grafana/dashboards/dashboard.json`.
+![](https://github.com/user-attachments/assets/abed6bb5-de0f-4652-b8ec-bd8f4085be06)
