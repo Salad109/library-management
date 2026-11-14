@@ -12,11 +12,11 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByActivationCodeHash(String activationCodeHash);
 
-    // Null lastName matches everyone
+    // Null lastName matches everyone. The cast stops Postgres from reading a null string as bytea.
     @Query("""
             SELECT new librarymanagement.customers.CustomerResponse(c.id, c.firstName, c.lastName, u.email)
             FROM Customer c LEFT JOIN User u ON u.customer = c
-            WHERE :lastName IS NULL OR c.lastName ILIKE CONCAT('%', :lastName, '%')
+            WHERE :lastName IS NULL OR c.lastName ILIKE CONCAT('%', CAST(:lastName AS String), '%')
             ORDER BY c.lastName, c.firstName
             """)
     Page<CustomerResponse> findResponses(String lastName, Pageable pageable);
