@@ -58,16 +58,16 @@ class AdminBookControllerTest extends IntegrationTest {
                 {"title": "%s", "authorNames": [" ", "%s"]}
                 """.formatted("a".repeat(151), "a".repeat(101)));
 
-        assertFieldError(invalidFields, "isbn", Messages.BOOK_NULL_ISBN);
-        assertFieldError(invalidFields, "title", Messages.BOOK_TITLE_LENGTH_VALIDATION_MESSAGE);
-        assertFieldError(invalidFields, "authorNames", Messages.AUTHOR_NAME_VALIDATION_MESSAGE);
-        assertFieldError(invalidFields, "authorNames", Messages.AUTHOR_NAME_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(invalidFields, "isbn", "must not be null");
+        assertFieldError(invalidFields, "title", "size must be between 0 and 150");
+        assertFieldError(invalidFields, "authorNames", "must not be blank");
+        assertFieldError(invalidFields, "authorNames", "size must be between 0 and 100");
 
         MvcTestResult noAuthors = postBook("""
                 {"isbn": "%s", "title": "Title"}
                 """.formatted(BookTestData.TestBook1.ISBN));
 
-        assertFieldError(noAuthors, "authorNames", Messages.BOOK_NULL_AUTHORS);
+        assertFieldError(noAuthors, "authorNames", "must not be null");
     }
 
     @Test

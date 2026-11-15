@@ -60,9 +60,9 @@ class UserControllerTest extends IntegrationTest {
     void testRegisterCustomerMissingFields() {
         MvcTestResult result = registerJson("{}");
 
-        assertFieldError(result, "activationCode", Messages.ACTIVATION_CODE_VALIDATION_MESSAGE);
-        assertFieldError(result, "email", Messages.USER_EMAIL_VALIDATION_MESSAGE);
-        assertFieldError(result, "password", Messages.USER_PASSWORD_VALIDATION_MESSAGE);
+        assertFieldError(result, "activationCode", "must not be blank");
+        assertFieldError(result, "email", "must not be null");
+        assertFieldError(result, "password", "must not be blank");
     }
 
     @Test

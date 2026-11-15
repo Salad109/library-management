@@ -4,14 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import librarymanagement.constants.Messages;
 
 public record CustomerRegistrationRequest(
-        @NotBlank(message = Messages.ACTIVATION_CODE_VALIDATION_MESSAGE) String activationCode,
-        @NotNull(message = Messages.USER_EMAIL_VALIDATION_MESSAGE)
-        @Pattern(regexp = Messages.USER_EMAIL_REGEX, message = Messages.USER_EMAIL_VALIDATION_MESSAGE)
-        @Size(max = 150, message = Messages.USER_EMAIL_LENGTH_VALIDATION_MESSAGE) String email,
-        @NotBlank(message = Messages.USER_PASSWORD_VALIDATION_MESSAGE) String password) {
+        @NotBlank String activationCode,
+        @NotNull @Pattern(regexp = User.EMAIL_REGEX, message = User.EMAIL_INVALID) @Size(max = 150) String email,
+        @NotBlank String password) {
 
     public CustomerRegistrationRequest {
         email = User.normalizeEmail(email);

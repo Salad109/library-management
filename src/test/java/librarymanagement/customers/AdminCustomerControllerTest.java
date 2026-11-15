@@ -1,6 +1,7 @@
 package librarymanagement.customers;
 
 import librarymanagement.constants.Messages;
+import librarymanagement.users.User;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
 import librarymanagement.utils.IntegrationTest;
@@ -40,8 +41,8 @@ class AdminCustomerControllerTest extends IntegrationTest {
     void testCreateCustomerValidation() {
         MvcTestResult result = DataBuilder.createTestCustomer(mockMvcTester, " ", "a".repeat(101));
 
-        assertFieldError(result, "firstName", Messages.CUSTOMER_FIRSTNAME_VALIDATION_MESSAGE);
-        assertFieldError(result, "lastName", Messages.CUSTOMER_LASTNAME_LENGTH_VALIDATION_MESSAGE);
+        assertFieldError(result, "firstName", "must not be blank");
+        assertFieldError(result, "lastName", "size must be between 0 and 100");
     }
 
     @Test
@@ -68,9 +69,9 @@ class AdminCustomerControllerTest extends IntegrationTest {
         long customerId = createCustomer(librarianSession(), "Joe", "Mama");
 
         assertFieldError(updateEmail(customerId, "\"not-an-email\""),
-                "email", Messages.USER_EMAIL_VALIDATION_MESSAGE);
+                "email", User.EMAIL_INVALID);
         assertFieldError(updateEmail(customerId, "\"" + "a".repeat(146) + "@x.io\""),
-                "email", Messages.USER_EMAIL_LENGTH_VALIDATION_MESSAGE);
+                "email", "size must be between 0 and 150");
     }
 
     @Test

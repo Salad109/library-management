@@ -11,6 +11,10 @@ import java.util.Set;
 @Entity
 @Table(name = "books")
 public class Book {
+    // For @Pattern on the request records
+    public static final String ISBN_REGEX = "^(?:\\d{9}[\\dX]|97[89]\\d{10})$";
+    public static final String ISBN_INVALID = "ISBN must be 10 digits (last can be X) or 13 digits starting with 978/979";
+
     @Id
     private String isbn;
 

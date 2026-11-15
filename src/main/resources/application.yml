@@ -20,6 +20,9 @@ spring:
     default-property-inclusion: non_null
     mapper:
       sort-properties-alphabetically: false
+  web:
+    locale: en
+    locale-resolver: fixed
   data:
     web:
       pageable:

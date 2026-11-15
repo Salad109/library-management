@@ -1,12 +1,13 @@
 package librarymanagement.copies;
 
-import librarymanagement.constants.Messages;
+import librarymanagement.books.Book;
 import librarymanagement.utils.ControllerTestUtils;
 import librarymanagement.utils.DataBuilder;
 import librarymanagement.utils.IntegrationTest;
 import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -46,13 +47,14 @@ class AdminCopyControllerTest extends IntegrationTest {
         MvcTestResult result = mockMvcTester.post()
                 .uri("/api/admin/copies")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT_LANGUAGE, "pl") // messages stay English
                 .content("""
                         {"bookIsbn": "invalid-isbn", "quantity": 101}
                         """)
                 .exchange();
 
-        assertFieldError(result, "bookIsbn", Messages.BOOK_ISBN_VALIDATION_MESSAGE);
-        assertFieldError(result, "quantity", Messages.COPY_MAXIMUM_QUANTITY_VALIDATION_MESSAGE);
+        assertFieldError(result, "bookIsbn", Book.ISBN_INVALID);
+        assertFieldError(result, "quantity", "must be less than or equal to 100");
     }
 
     @Test

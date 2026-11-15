@@ -8,6 +8,10 @@ import java.util.Locale;
 @Entity
 @Table(name = "users")
 public class User {
+    // For @Pattern on the request records
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
+    public static final String EMAIL_INVALID = "Email must be a valid email address";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

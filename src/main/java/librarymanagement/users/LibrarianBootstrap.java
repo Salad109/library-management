@@ -45,7 +45,9 @@ public class LibrarianBootstrap implements ApplicationRunner {
         LibrarianCreateRequest request = new LibrarianCreateRequest(email, password);
         Set<ConstraintViolation<LibrarianCreateRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
-            String messages = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "));
+            String messages = violations.stream()
+                    .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                    .collect(Collectors.joining(", "));
             throw new IllegalStateException("Invalid LIBRARY_ADMIN_EMAIL / LIBRARY_ADMIN_PASSWORD: " + messages);
         }
 

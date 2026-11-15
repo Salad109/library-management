@@ -1,7 +1,6 @@
 package librarymanagement.users;
 
 import jakarta.validation.Validator;
-import librarymanagement.constants.Messages;
 import librarymanagement.utils.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ class LibrarianBootstrapTest extends IntegrationTest {
 
         assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(Messages.USER_EMAIL_VALIDATION_MESSAGE)
-                .hasMessageContaining(Messages.USER_PASSWORD_VALIDATION_MESSAGE);
+                .hasMessageContaining("email: " + User.EMAIL_INVALID)
+                .hasMessageContaining("password: ");
     }
 }
