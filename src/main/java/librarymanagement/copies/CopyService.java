@@ -85,16 +85,14 @@ public class CopyService {
     public List<CopyResponse> addCopies(String isbn, int quantity) {
         Book book = bookService.getBookOrThrow(isbn);
 
-        List<Copy> copies = new ArrayList<>(quantity);
+        List<Copy> savedCopies = new ArrayList<>(quantity);
         for (int i = 0; i < quantity; i++) {
             Copy copy = new Copy();
             copy.setBook(book);
             copy.setStatus(CopyStatus.AVAILABLE);
-            copies.add(copy);
+            savedCopies.add(save(copy));
         }
 
-        List<Copy> savedCopies = copyRepository.saveAll(copies);
-        bookService.evictCachedBook(isbn);
         log.info("Added {} copies for book with ISBN: {}", savedCopies.size(), isbn);
         return savedCopies.stream()
                 .map(CopyResponse::from)
@@ -201,6 +199,7 @@ public class CopyService {
         });
     }
 
+    // Every copy write must go through here. It updates the book's availableCopies cache
     private Copy save(Copy copy) {
         Copy savedCopy = copyRepository.save(copy);
         bookService.evictCachedBook(savedCopy.getBook().getIsbn());
