@@ -30,8 +30,7 @@ class UserControllerTest extends IntegrationTest {
 
         assertThat(result).hasStatus(HttpStatus.CREATED);
         assertThat(result).bodyJson().extractingPath("role").isEqualTo("ROLE_CUSTOMER");
-        assertThat(result).bodyJson().extractingPath("customer.id").isEqualTo((int) customerId);
-        assertThat(result).bodyJson().extractingPath("customer.firstName").isEqualTo("Joe");
+        assertThat(result).bodyJson().extractingPath("customerId").isEqualTo((int) customerId);
         assertThat(result).bodyJson().doesNotHavePath("password");
     }
 

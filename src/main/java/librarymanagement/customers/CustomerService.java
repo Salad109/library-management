@@ -31,14 +31,12 @@ public class CustomerService {
     public Page<CustomerResponse> getCustomers(String lastName, Pageable pageable) {
         SortFields.requireAllowed(pageable, SORT_FIELDS);
         Pageable stablePageable = SortFields.withTiebreaker(pageable, "id");
-        return customerRepository.findResponses(lastName, stablePageable);
+        return customerRepository.findByLastNameContaining(lastName, stablePageable).map(CustomerResponse::from);
     }
 
     @Transactional(readOnly = true)
     public CustomerResponse getCustomerById(Long id) {
-        Customer customer = getCustomerOrThrow(id);
-        String email = userRepository.findByCustomerId(id).map(User::getEmail).orElse(null);
-        return CustomerResponse.from(customer, email);
+        return CustomerResponse.from(getCustomerOrThrow(id));
     }
 
     @Transactional
@@ -48,13 +46,13 @@ public class CustomerService {
         customer.setLastName(request.lastName());
         Customer savedCustomer = customerRepository.save(customer);
         log.info("Customer added with ID: {}", savedCustomer.getId());
-        return CustomerResponse.from(savedCustomer, null);
+        return CustomerResponse.from(savedCustomer);
     }
 
     @Transactional
     public CustomerResponse updateCustomer(Long id, CustomerUpdateRequest request) {
         Customer existingCustomer = getCustomerOrThrow(id);
-        User user = userRepository.findByCustomerId(id).orElse(null);
+        User user = existingCustomer.getUser();
         String email = request.email();
 
         if (user == null && email != null) {
@@ -78,7 +76,7 @@ public class CustomerService {
         existingCustomer.setLastName(request.lastName());
         Customer savedCustomer = customerRepository.save(existingCustomer);
         log.info("Customer updated with ID: {}", savedCustomer.getId());
-        return CustomerResponse.from(savedCustomer, email);
+        return CustomerResponse.from(savedCustomer);
     }
 
     // Helpers

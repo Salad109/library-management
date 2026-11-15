@@ -1166,8 +1166,9 @@
           "role" : {
             "$ref" : "#/components/schemas/Role"
           },
-          "customer" : {
-            "$ref" : "#/components/schemas/CustomerResponse"
+          "customerId" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         },
         "required" : [ "email", "id", "role" ]

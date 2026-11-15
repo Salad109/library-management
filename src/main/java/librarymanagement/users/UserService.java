@@ -56,7 +56,7 @@ public class UserService {
     @Transactional
     public ActivationCodeResponse generateActivationCode(Long customerId) {
         Customer customer = customerService.getCustomerOrThrow(customerId);
-        if (userRepository.existsByCustomerId(customerId)) {
+        if (customer.getUser() != null) {
             log.warn("Activation code requested for customer that already has an account, ID: {}", customerId);
             throw new ResponseStatusException(HttpStatus.CONFLICT, Messages.CUSTOMER_HAS_ACCOUNT + customerId);
         }
@@ -87,14 +87,15 @@ public class UserService {
         }
 
         User user = newUser(request.email(), request.password(), Role.ROLE_CUSTOMER);
-        user.setCustomer(customer);
+        User savedUser = userRepository.save(user);
+
+        customer.setUser(savedUser);
         customer.setActivationCodeHash(null);
         customer.setActivationCodeExpiresAt(null);
         customerRepository.save(customer);
 
-        User savedUser = userRepository.save(user);
         log.info("Customer registered with email: {}, customer ID: {}", savedUser.getEmail(), customer.getId());
-        return UserResponse.from(savedUser);
+        return UserResponse.from(savedUser, customer);
     }
 
     private User newUser(String email, String password, Role role) {

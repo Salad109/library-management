@@ -14,9 +14,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     // Null lastName matches everyone. The cast stops Postgres from reading a null string as bytea.
     @Query("""
-            SELECT new librarymanagement.customers.CustomerResponse(c.id, c.firstName, c.lastName, u.email)
-            FROM Customer c LEFT JOIN User u ON u.customer = c
+            SELECT c FROM Customer c
             WHERE :lastName IS NULL OR c.lastName ILIKE CONCAT('%', CAST(:lastName AS String), '%')
             """)
-    Page<CustomerResponse> findResponses(String lastName, Pageable pageable);
+    Page<Customer> findByLastNameContaining(String lastName, Pageable pageable);
+
+    Optional<Customer> findByUserId(Long userId);
 }

@@ -1,7 +1,6 @@
 package librarymanagement.users;
 
 import jakarta.persistence.*;
-import librarymanagement.customers.Customer;
 
 import java.util.Locale;
 
@@ -22,9 +21,6 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @OneToOne
-    private Customer customer;
 
     @Version
     private Long version;
@@ -69,13 +65,5 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 }

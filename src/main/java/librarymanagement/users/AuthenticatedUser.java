@@ -11,13 +11,9 @@ public class AuthenticatedUser extends org.springframework.security.core.userdet
 
     private final Long customerId;
 
-    public AuthenticatedUser(User user) {
+    public AuthenticatedUser(User user, Long customerId) {
         super(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
-        if (user.getCustomer() == null) {
-            this.customerId = null;
-        } else {
-            this.customerId = user.getCustomer().getId();
-        }
+        this.customerId = customerId;
     }
 
     public Long getCustomerId() {
