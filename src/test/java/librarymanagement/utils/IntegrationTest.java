@@ -21,6 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -60,7 +61,11 @@ public abstract class IntegrationTest {
 
     @BeforeEach
     void resetDatabaseAndCaches() {
-        jdbcTemplate.execute("TRUNCATE authors, books, books_authors, copies, customers, users RESTART IDENTITY CASCADE");
+        List<String> tables = jdbcTemplate.queryForList("""
+                SELECT tablename FROM pg_tables
+                WHERE schemaname = current_schema() AND tablename <> 'flyway_schema_history'
+                """, String.class);
+        jdbcTemplate.execute("TRUNCATE " + String.join(", ", tables) + " RESTART IDENTITY CASCADE");
         // Caches outlive the rows they were built from
         cacheManager.getCacheNames().forEach(name -> Objects.requireNonNull(cacheManager.getCache(name)).clear());
     }
