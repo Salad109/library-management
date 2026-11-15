@@ -2,7 +2,6 @@ package librarymanagement.books;
 
 import jakarta.persistence.*;
 import librarymanagement.authors.Author;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Formula;
 
 import java.util.LinkedHashSet;
@@ -20,7 +19,6 @@ public class Book {
 
     private String title;
 
-    @BatchSize(size = 20)
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(joinColumns = @JoinColumn(name = "books_isbn"))
     private Set<Author> authors;

@@ -132,7 +132,7 @@ public class BookService {
     // Helpers
 
     public Book getBookOrThrow(String isbn) {
-        return bookRepository.findByIsbnWithAuthors(isbn).orElseThrow(() -> {
+        return bookRepository.findById(isbn).orElseThrow(() -> {
             log.warn("Book not found with ISBN: {}", isbn);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
         });
