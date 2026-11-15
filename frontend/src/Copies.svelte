@@ -1,6 +1,7 @@
 <script lang="ts">
   import { checkout, CopyStatus, createCopies, getCopies, markLost, returnCopy } from './api'
   import type { CopyResponse, GetCopiesData, PagedModelCopyResponse } from './api'
+  import FieldError from './components/FieldError.svelte'
   import Modal from './components/Modal.svelte'
   import Navbar from './components/Navbar.svelte'
   import Pagination from './components/Pagination.svelte'
@@ -23,7 +24,7 @@
   let notice = $state('')
 
   let dialog = $state<'checkout' | 'return' | 'add' | null>(null)
-  let formError = $state('')
+  let formError = $state<Error>()
   let customerId = $state<number | null>(null)
   let copyId = $state<number | null>(null)
   let isbn = $state('')
@@ -53,14 +54,14 @@
   }
 
   function openDesk(action: 'checkout' | 'return') {
-    formError = ''
+    formError = undefined
     customerId = null
     copyId = null
     dialog = action
   }
 
   function openAdd() {
-    formError = ''
+    formError = undefined
     isbn = ''
     quantity = 1
     dialog = 'add'
@@ -69,7 +70,7 @@
   // Runs a dialog's write, then closes the dialog and refetches; a failure stays in the dialog
   async function submit(event: SubmitEvent, write: () => Promise<unknown>, successMessage: string) {
     event.preventDefault()
-    formError = ''
+    formError = undefined
     notice = ''
     try {
       await write()
@@ -77,7 +78,7 @@
       dialog = null
       await load()
     } catch (e) {
-      formError = (e as Error).message
+      formError = e as Error
     }
   }
 
@@ -185,15 +186,17 @@
   <Modal title={dialog === 'checkout' ? 'Checkout Copy' : 'Return Copy'} onclose={() => (dialog = null)}>
     <form onsubmit={submitDesk}>
       {#if formError}
-        <div class="alert alert-error mb-4">{formError}</div>
+        <div class="alert alert-error mb-4">{formError.message}</div>
       {/if}
       <div class="mb-3">
         <label class="label mb-1" for="customerId">Customer ID</label>
         <input class="input w-full" id="customerId" type="number" bind:value={customerId} required />
+        <FieldError error={formError} field="customerId" />
       </div>
       <div class="mb-3">
         <label class="label mb-1" for="copyId">Copy ID</label>
         <input class="input w-full" id="copyId" type="number" bind:value={copyId} required />
+        <FieldError error={formError} field="copyId" />
       </div>
       <div class="modal-action">
         <button class="btn" type="button" onclick={() => (dialog = null)}>Cancel</button>
@@ -205,15 +208,17 @@
   <Modal title="Add Copies" onclose={() => (dialog = null)}>
     <form onsubmit={submitAdd}>
       {#if formError}
-        <div class="alert alert-error mb-4">{formError}</div>
+        <div class="alert alert-error mb-4">{formError.message}</div>
       {/if}
       <div class="mb-3">
         <label class="label mb-1" for="isbn">Book ISBN</label>
         <input class="input w-full" id="isbn" bind:value={isbn} required />
+        <FieldError error={formError} field="bookIsbn" />
       </div>
       <div class="mb-3">
         <label class="label mb-1" for="quantity">Quantity</label>
         <input class="input w-full" id="quantity" type="number" min="1" max="100" bind:value={quantity} required />
+        <FieldError error={formError} field="quantity" />
       </div>
       <div class="modal-action">
         <button class="btn" type="button" onclick={() => (dialog = null)}>Cancel</button>

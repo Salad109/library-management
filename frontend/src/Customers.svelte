@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createCustomer, generateActivationCode, getCustomers, updateCustomer } from './api'
   import type { ActivationCodeResponse, CustomerResponse, PagedModelCustomerResponse } from './api'
+  import FieldError from './components/FieldError.svelte'
   import Modal from './components/Modal.svelte'
   import Navbar from './components/Navbar.svelte'
   import Pagination from './components/Pagination.svelte'
@@ -17,7 +18,7 @@
 
   let formOpen = $state(false)
   let editing = $state(false)
-  let formError = $state('')
+  let formError = $state<Error>()
   let id = $state<number | null>(null)
   let firstName = $state('')
   let lastName = $state('')
@@ -41,7 +42,7 @@
 
   function openAdd() {
     editing = false
-    formError = ''
+    formError = undefined
     id = null
     firstName = ''
     lastName = ''
@@ -51,7 +52,7 @@
 
   function openEdit(customer: CustomerResponse) {
     editing = true
-    formError = ''
+    formError = undefined
     id = customer.id
     firstName = customer.firstName
     lastName = customer.lastName
@@ -61,7 +62,7 @@
 
   async function save(event: SubmitEvent) {
     event.preventDefault()
-    formError = ''
+    formError = undefined
     addedCustomer = undefined
     try {
       if (editing) {
@@ -76,7 +77,7 @@
       formOpen = false
       await load()
     } catch (e) {
-      formError = (e as Error).message
+      formError = e as Error
     }
   }
 
@@ -163,20 +164,23 @@
   <Modal title={editing ? 'Edit Customer' : 'Add Customer'} onclose={() => (formOpen = false)}>
     <form onsubmit={save}>
       {#if formError}
-        <div class="alert alert-error mb-4">{formError}</div>
+        <div class="alert alert-error mb-4">{formError.message}</div>
       {/if}
       <div class="mb-3">
         <label class="label mb-1" for="firstName">First name</label>
         <input class="input w-full" id="firstName" bind:value={firstName} required />
+        <FieldError error={formError} field="firstName" />
       </div>
       <div class="mb-3">
         <label class="label mb-1" for="lastName">Last name</label>
         <input class="input w-full" id="lastName" bind:value={lastName} required />
+        <FieldError error={formError} field="lastName" />
       </div>
       {#if email !== undefined}
         <div class="mb-3">
           <label class="label mb-1" for="email">Email</label>
           <input class="input w-full" id="email" bind:value={email} required />
+          <FieldError error={formError} field="email" />
         </div>
       {/if}
       <div class="modal-action">

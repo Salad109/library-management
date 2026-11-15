@@ -13,7 +13,21 @@ export type ProblemDetail = {
 
 export class ApiError extends Error {
   constructor(public problem: ProblemDetail) {
-    super(problem.errors?.map((error) => error.detail).join('; ') ?? problem.detail)
+    super(problem.detail)
+  }
+
+  // Validation messages for one field of the request body
+  fieldErrors(field: string): string[] {
+    const messages: string[] = []
+    if (this.problem.errors === undefined) {
+      return messages
+    }
+    for (const error of this.problem.errors) {
+      if (error.pointer === '#/' + field) {
+        messages.push(error.detail)
+      }
+    }
+    return messages
   }
 }
 

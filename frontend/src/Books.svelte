@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createBook, deleteBook, getAllBooks, searchBooks, updateBook } from './api'
   import type { BookResponse, PagedModelBookResponse } from './api'
+  import FieldError from './components/FieldError.svelte'
   import Modal from './components/Modal.svelte'
   import Navbar from './components/Navbar.svelte'
   import Pagination from './components/Pagination.svelte'
@@ -15,7 +16,7 @@
 
   let formOpen = $state(false)
   let editing = $state(false)
-  let formError = $state('')
+  let formError = $state<Error>()
   let isbn = $state('')
   let title = $state('')
   let year = $state<number | null>(null)
@@ -38,7 +39,7 @@
 
   function openAdd() {
     editing = false
-    formError = ''
+    formError = undefined
     isbn = ''
     title = ''
     year = null
@@ -48,7 +49,7 @@
 
   function openEdit(book: BookResponse) {
     editing = true
-    formError = ''
+    formError = undefined
     isbn = book.isbn
     title = book.title
     year = book.publicationYear ?? null
@@ -58,7 +59,7 @@
 
   async function save(event: SubmitEvent) {
     event.preventDefault()
-    formError = ''
+    formError = undefined
     notice = ''
     const publicationYear = year ?? undefined
     const names = authors.split(',').map((name) => name.trim())
@@ -77,7 +78,7 @@
       formOpen = false
       await load()
     } catch (e) {
-      formError = (e as Error).message
+      formError = e as Error
     }
   }
 
@@ -156,23 +157,27 @@
   <Modal title={editing ? 'Edit Book' : 'Add Book'} onclose={() => (formOpen = false)}>
     <form onsubmit={save}>
       {#if formError}
-        <div class="alert alert-error mb-4">{formError}</div>
+        <div class="alert alert-error mb-4">{formError.message}</div>
       {/if}
       <div class="mb-3">
         <label class="label mb-1" for="isbn">ISBN</label>
         <input class="input w-full" id="isbn" bind:value={isbn} disabled={editing} required />
+        <FieldError error={formError} field="isbn" />
       </div>
       <div class="mb-3">
         <label class="label mb-1" for="title">Title</label>
         <input class="input w-full" id="title" bind:value={title} required />
+        <FieldError error={formError} field="title" />
       </div>
       <div class="mb-3">
         <label class="label mb-1" for="year">Publication Year</label>
         <input class="input w-full" id="year" type="number" bind:value={year} />
+        <FieldError error={formError} field="publicationYear" />
       </div>
       <div class="mb-3">
         <label class="label mb-1" for="authors">Authors (comma-separated)</label>
         <input class="input w-full" id="authors" bind:value={authors} required />
+        <FieldError error={formError} field="authorNames" />
       </div>
       <div class="modal-action">
         <button class="btn" type="button" onclick={() => (formOpen = false)}>Cancel</button>
