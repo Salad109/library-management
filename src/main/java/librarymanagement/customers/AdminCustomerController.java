@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,8 @@ public class AdminCustomerController {
     @Operation(summary = "Get customers, optionally filtered by last name",
             description = "lastName matches a case-insensitive substring.")
     @GetMapping("/api/admin/customers")
-    public Page<CustomerResponse> getCustomers(@RequestParam(required = false) String lastName, @ParameterObject Pageable pageable) {
+    public Page<CustomerResponse> getCustomers(@RequestParam(required = false) String lastName,
+                                               @ParameterObject @SortDefault({"lastName", "firstName"}) Pageable pageable) {
         return customerService.getCustomers(lastName, pageable);
     }
 

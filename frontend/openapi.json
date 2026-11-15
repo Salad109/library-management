@@ -401,6 +401,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "default" : [ "lastName,ASC", "firstName,ASC" ],
             "items" : {
               "type" : "string"
             }
@@ -539,6 +540,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "default" : [ "id,ASC" ],
             "items" : {
               "type" : "string"
             }
@@ -668,6 +670,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "default" : [ "id,ASC" ],
             "items" : {
               "type" : "string"
             }
@@ -718,6 +721,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "default" : [ "title,ASC" ],
             "items" : {
               "type" : "string"
             }
@@ -803,6 +807,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "default" : [ "title,ASC" ],
             "items" : {
               "type" : "string"
             }
@@ -853,6 +858,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "default" : [ "name,ASC" ],
             "items" : {
               "type" : "string"
             }

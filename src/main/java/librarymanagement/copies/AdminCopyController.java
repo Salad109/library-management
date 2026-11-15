@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
@@ -32,7 +33,7 @@ public class AdminCopyController {
                                         @RequestParam(required = false) String title,
                                         @RequestParam(required = false) Long customerId,
                                         @RequestParam(required = false) String customerLastName,
-                                        @ParameterObject Pageable pageable) {
+                                        @ParameterObject @SortDefault("id") Pageable pageable) {
         return copyService.getCopies(blankToNull(isbn), blankToNull(title), customerId, blankToNull(customerLastName),
                 pageable);
     }

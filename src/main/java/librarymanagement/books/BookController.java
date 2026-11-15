@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +23,7 @@ public class BookController {
     }
 
     @GetMapping("/api/books")
-    public Page<BookResponse> getAllBooks(@ParameterObject Pageable pageable) {
+    public Page<BookResponse> getAllBooks(@ParameterObject @SortDefault("title") Pageable pageable) {
         return bookService.getAllBooks(pageable);
     }
 
@@ -34,7 +35,8 @@ public class BookController {
     @Operation(summary = "Search books by title or author name",
             description = "Simple search that looks for the term in both book titles and author names")
     @GetMapping("/api/books/search")
-    public Page<BookResponse> searchBooks(@RequestParam(required = false) String q, @ParameterObject Pageable pageable) {
+    public Page<BookResponse> searchBooks(@RequestParam(required = false) String q,
+                                          @ParameterObject @SortDefault("title") Pageable pageable) {
         return bookService.searchBooks(q, pageable);
     }
 }

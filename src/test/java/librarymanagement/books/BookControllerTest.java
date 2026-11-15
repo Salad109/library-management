@@ -62,4 +62,76 @@ class BookControllerTest extends IntegrationTest {
                 .extractingPath("page.totalElements")
                 .isEqualTo(1);
     }
+
+    /**
+     * 1. Create a book with the term in its title, one with it in its author, and one with neither.
+     * 2. The search finds the first two, ordered by title.
+     */
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void searchMatchesTitleOrAuthor() {
+        assertThat(DataBuilder.createTestBook(mockMvcTester, TestISBNGenerator.next(), "Zebra Kingdom", "Someone Else"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestBook(mockMvcTester, TestISBNGenerator.next(), "Carrie", "Stephen King"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestBook(mockMvcTester, TestISBNGenerator.next(), "Unrelated", "Nobody"))
+                .hasStatus(HttpStatus.CREATED);
+
+        MvcTestResult result = mockMvcTester.get().uri("/api/books/search?q=king").exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).bodyJson().extractingPath("page.totalElements").isEqualTo(2);
+        assertThat(result).bodyJson().extractingPath("content[0].title").isEqualTo("Carrie");
+        assertThat(result).bodyJson().extractingPath("content[1].title").isEqualTo("Zebra Kingdom");
+    }
+
+    /**
+     * 1. Create two books.
+     * 2. The list and the search are ordered by title unless a sort says otherwise.
+     * 3. Books that tie on the sorted field are ordered by ISBN.
+     * 4. A sort by a field that isn't allowed, no field at all, or ignoring case is rejected.
+     */
+    @Test
+    @WithMockUser(roles = "LIBRARIAN")
+    void testSortBooks() {
+        // Alpha is created first with the higher ISBN, so insertion order and ISBN order differ
+        String lowerIsbn = TestISBNGenerator.next();
+        String higherIsbn = TestISBNGenerator.next();
+        assertThat(DataBuilder.createTestBook(mockMvcTester, higherIsbn, "Alpha", "Some Author"))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(DataBuilder.createTestBook(mockMvcTester, lowerIsbn, "Beta", "Some Author"))
+                .hasStatus(HttpStatus.CREATED);
+
+        assertFirstTitle("/api/books", "Alpha");
+        assertFirstTitle("/api/books?sort=title,desc", "Beta");
+        assertFirstTitle("/api/books/search?q=a&sort=title,desc", "Beta");
+
+        // Both books have the same year
+        assertFirstTitle("/api/books?sort=publicationYear", "Beta");
+        assertFirstTitle("/api/books/search?q=a&sort=publicationYear", "Beta");
+
+        assertThat(mockMvcTester.get().uri("/api/books?sort=version"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.SORT_FIELD_UNSUPPORTED + "version");
+        assertThat(mockMvcTester.get().uri("/api/books?sort=desc"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.SORT_FIELD_MISSING);
+        assertThat(mockMvcTester.get().uri("/api/books/search?q=a&sort=publicationYear,ignorecase"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.SORT_IGNORE_CASE_UNSUPPORTED);
+    }
+
+    private void assertFirstTitle(String uri, String expected) {
+        assertThat(mockMvcTester.get().uri(uri))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("content[0].title")
+                .isEqualTo(expected);
+    }
 }

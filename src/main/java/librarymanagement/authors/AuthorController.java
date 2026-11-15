@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class AuthorController {
     }
 
     @GetMapping("/api/authors")
-    public Page<AuthorResponse> getAuthors(@ParameterObject Pageable pageable) {
+    public Page<AuthorResponse> getAuthors(@ParameterObject @SortDefault("name") Pageable pageable) {
         return authorService.getAllAuthors(pageable);
     }
 

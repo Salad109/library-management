@@ -1,5 +1,6 @@
 package librarymanagement.books;
 
+import librarymanagement.SortFields;
 import librarymanagement.authors.Author;
 import librarymanagement.authors.AuthorRepository;
 import librarymanagement.constants.Messages;
@@ -11,7 +12,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,12 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class BookService {
+    private static final Set<String> SORT_FIELDS = Set.of("title", "isbn", "publicationYear");
     private static final Logger log = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
@@ -39,7 +39,9 @@ public class BookService {
     @Cacheable(value = "book-pages", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
     @Transactional(readOnly = true)
     public Page<BookResponse> getAllBooks(Pageable pageable) {
-        return loadPage(bookRepository.findAllIsbns(pageable));
+        SortFields.requireAllowed(pageable, SORT_FIELDS);
+        Pageable stablePageable = SortFields.withTiebreaker(pageable, "isbn");
+        return bookRepository.findAll(stablePageable).map(BookResponse::from);
     }
 
     @Cacheable(value = "books", key = "#isbn")
@@ -50,17 +52,14 @@ public class BookService {
 
     @Transactional(readOnly = true)
     public Page<BookResponse> searchBooks(String searchTerm, Pageable pageable) {
+        SortFields.requireAllowed(pageable, SORT_FIELDS);
         if (searchTerm == null || searchTerm.isBlank()) {
             return Page.empty(pageable);
         }
 
         String cleanTerm = searchTerm.trim();
-        // Match by author only when no titles match
-        Page<String> isbns = bookRepository.findIsbnsByTitleContaining(cleanTerm, pageable);
-        if (isbns.getTotalElements() == 0) {
-            isbns = bookRepository.findIsbnsByAuthorContaining(cleanTerm, pageable);
-        }
-        return loadPage(isbns);
+        Pageable stablePageable = SortFields.withTiebreaker(pageable, "isbn");
+        return bookRepository.findByTitleOrAuthorContaining(cleanTerm, stablePageable).map(BookResponse::from);
     }
 
     @CachePut(value = "books", key = "#result.isbn")
@@ -137,16 +136,6 @@ public class BookService {
             log.warn("Book not found with ISBN: {}", isbn);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, Messages.BOOK_NOT_FOUND + isbn);
         });
-    }
-
-    private Page<BookResponse> loadPage(Page<String> isbnPage) {
-        if (isbnPage.isEmpty()) {
-            return Page.empty(isbnPage.getPageable());
-        }
-        List<BookResponse> books = bookRepository.findByIsbnsWithAuthors(isbnPage.getContent()).stream()
-                .map(BookResponse::from)
-                .toList();
-        return new PageImpl<>(books, isbnPage.getPageable(), isbnPage.getTotalElements());
     }
 
     private Set<Author> resolveAuthors(Set<String> authorNames) {

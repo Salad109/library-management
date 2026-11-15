@@ -1,5 +1,6 @@
 package librarymanagement.customers;
 
+import librarymanagement.SortFields;
 import librarymanagement.constants.Messages;
 import librarymanagement.users.User;
 import librarymanagement.users.UserRepository;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Set;
+
 @Service
 public class CustomerService {
+    private static final Set<String> SORT_FIELDS = Set.of("lastName", "firstName", "id");
     private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
@@ -25,7 +29,9 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public Page<CustomerResponse> getCustomers(String lastName, Pageable pageable) {
-        return customerRepository.findResponses(lastName, pageable);
+        SortFields.requireAllowed(pageable, SORT_FIELDS);
+        Pageable stablePageable = SortFields.withTiebreaker(pageable, "id");
+        return customerRepository.findResponses(lastName, stablePageable);
     }
 
     @Transactional(readOnly = true)

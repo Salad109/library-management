@@ -1,16 +1,21 @@
 package librarymanagement.copies;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
+import librarymanagement.SortFields;
 import librarymanagement.books.Book;
 import librarymanagement.books.BookService;
 import librarymanagement.constants.Messages;
 import librarymanagement.customers.Customer;
 import librarymanagement.customers.CustomerService;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -20,10 +25,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CopyService {
     public static final int MAX_ACTIVE_RESERVATIONS = 3;
+    private static final Set<String> SORT_FIELDS = Set.of("id", "status");
     private static final Logger log = LoggerFactory.getLogger(CopyService.class);
     private final CopyRepository copyRepository;
     private final BookService bookService;
@@ -35,11 +42,38 @@ public class CopyService {
         this.customerService = customerService;
     }
 
+    // Hibernate's ILIKE for the trigram indexes
+    private static Predicate containsIgnoreCase(CriteriaBuilder cb, Expression<String> field, String term) {
+        HibernateCriteriaBuilder hibernateBuilder = (HibernateCriteriaBuilder) cb;
+        return hibernateBuilder.ilike(field, "%" + term + "%");
+    }
+
     // Null filters are ignored
     @Transactional(readOnly = true)
     public Page<CopyResponse> getCopies(String isbn, String title, Long customerId, String customerLastName,
                                         Pageable pageable) {
-        return loadPage(copyRepository.findIds(isbn, title, customerId, customerLastName, pageable));
+        SortFields.requireAllowed(pageable, SORT_FIELDS);
+        Pageable stablePageable = SortFields.withTiebreaker(pageable, "id");
+
+        List<Specification<Copy>> filters = new ArrayList<>();
+        if (isbn != null) {
+            filters.add((copy, query, cb) ->
+                    cb.equal(copy.get("book").get("isbn"), isbn));
+        }
+        if (title != null) {
+            filters.add((copy, query, cb) ->
+                    containsIgnoreCase(cb, copy.join("book").get("title"), title));
+        }
+        if (customerId != null) {
+            filters.add((copy, query, cb) ->
+                    cb.equal(copy.get("customer").get("id"), customerId));
+        }
+        if (customerLastName != null) {
+            filters.add((copy, query, cb) ->
+                    containsIgnoreCase(cb, copy.join("customer").get("lastName"), customerLastName));
+        }
+
+        return copyRepository.findAll(Specification.allOf(filters), stablePageable).map(CopyResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -171,15 +205,5 @@ public class CopyService {
         Copy savedCopy = copyRepository.save(copy);
         bookService.evictCachedBook(savedCopy.getBook().getIsbn());
         return savedCopy;
-    }
-
-    private Page<CopyResponse> loadPage(Page<Long> idPage) {
-        if (idPage.isEmpty()) {
-            return Page.empty(idPage.getPageable());
-        }
-        List<CopyResponse> copies = copyRepository.findByIdsWithAllRelations(idPage.getContent()).stream()
-                .map(CopyResponse::from)
-                .toList();
-        return new PageImpl<>(copies, idPage.getPageable(), idPage.getTotalElements());
     }
 }

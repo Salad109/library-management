@@ -1,5 +1,6 @@
 package librarymanagement.authors;
 
+import librarymanagement.SortFields;
 import librarymanagement.constants.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Set;
+
 
 @Service
 public class AuthorService {
+    private static final Set<String> SORT_FIELDS = Set.of("name");
     private static final Logger log = LoggerFactory.getLogger(AuthorService.class);
     private final AuthorRepository authorRepository;
 
@@ -24,7 +28,8 @@ public class AuthorService {
     @Cacheable(value = "authors", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort.toString()")
     @Transactional(readOnly = true)
     public Page<AuthorResponse> getAllAuthors(Pageable pageable) {
-        return authorRepository.findAllByOrderByName(pageable).map(AuthorResponse::from);
+        SortFields.requireAllowed(pageable, SORT_FIELDS);
+        return authorRepository.findAll(pageable).map(AuthorResponse::from);
     }
 
     @Cacheable(value = "authors", key = "#name")

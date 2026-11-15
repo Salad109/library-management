@@ -96,6 +96,7 @@ class AdminCopyControllerTest extends IntegrationTest {
         assertCopyCount(1, "/api/admin/copies?customerLastName={name}", "mam");
         assertCopyCount(0, "/api/admin/copies?title={title}&customerLastName={name}", "filtered", "other");
         assertCopyCount(2, "/api/admin/copies?title={title}", " ");
+        assertCopyCount(2, "/api/admin/copies?isbn={isbn}&size=1", isbn);
     }
 
     private void assertCopyCount(int expected, String uri, Object... uriVariables) {

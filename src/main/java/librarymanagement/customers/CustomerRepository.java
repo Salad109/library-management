@@ -17,7 +17,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             SELECT new librarymanagement.customers.CustomerResponse(c.id, c.firstName, c.lastName, u.email)
             FROM Customer c LEFT JOIN User u ON u.customer = c
             WHERE :lastName IS NULL OR c.lastName ILIKE CONCAT('%', CAST(:lastName AS String), '%')
-            ORDER BY c.lastName, c.firstName
             """)
     Page<CustomerResponse> findResponses(String lastName, Pageable pageable);
 }

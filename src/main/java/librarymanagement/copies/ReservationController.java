@@ -7,6 +7,7 @@ import librarymanagement.users.AuthenticatedUser;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +28,7 @@ public class ReservationController {
             description = "Customers can view their reserved copies. Requires CUSTOMER role")
     @GetMapping("/api/reservations/mine")
     public Page<CopyResponse> getMyReservations(@AuthenticationPrincipal AuthenticatedUser user,
-                                                @ParameterObject Pageable pageable) {
+                                                @ParameterObject @SortDefault("id") Pageable pageable) {
         return copyService.getCopies(null, null, user.getCustomerId(), null, pageable);
     }
 

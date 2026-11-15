@@ -5,6 +5,10 @@ public class Messages {
     // Security
     public static final String SECURITY_LOGIN_FAILURE = "Login failed";
     public static final String SECURITY_LOGIN_REQUIRED = "You need to log in";
+    // Lists
+    public static final String SORT_FIELD_UNSUPPORTED = "Cannot sort by: ";
+    public static final String SORT_FIELD_MISSING = "Sort needs a field";
+    public static final String SORT_IGNORE_CASE_UNSUPPORTED = "Cannot sort ignoring case";
     // Book
     public static final String BOOK_NOT_FOUND = "Book not found with ISBN: ";
     public static final String BOOK_DUPLICATE = "A book with this ISBN already exists: ";
