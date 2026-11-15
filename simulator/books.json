@@ -1,152 +1,1204 @@
 [
-{"isbn": "9780743273565", "title": "The Great Gatsby", "publicationYear": 1925, "authorNames": ["F. Scott Fitzgerald"]},
-{"isbn": "9780061120084", "title": "To Kill a Mockingbird", "publicationYear": 1960, "authorNames": ["Harper Lee"]},
-{"isbn": "9780141439518", "title": "Pride and Prejudice", "publicationYear": 1813, "authorNames": ["Jane Austen"]},
-{"isbn": "9780316769174", "title": "The Catcher in the Rye", "publicationYear": 1951, "authorNames": ["J.D. Salinger"]},
-{"isbn": "9780571056866", "title": "Lord of the Flies", "publicationYear": 1954, "authorNames": ["William Golding"]},
-{"isbn": "9780141441146", "title": "Jane Eyre", "publicationYear": 1847, "authorNames": ["Charlotte Brontë"]},
-{"isbn": "9780141439556", "title": "Wuthering Heights", "publicationYear": 1847, "authorNames": ["Emily Brontë"]},
-{"isbn": "9780141439662", "title": "Sense and Sensibility", "publicationYear": 1811, "authorNames": ["Jane Austen"]},
-{"isbn": "9780141439587", "title": "Emma", "publicationYear": 1815, "authorNames": ["Jane Austen"]},
-{"isbn": "9780140177398", "title": "Of Mice and Men", "publicationYear": 1937, "authorNames": ["John Steinbeck"]},
-{"isbn": "9780143039433", "title": "The Grapes of Wrath", "publicationYear": 1939, "authorNames": ["John Steinbeck"]},
-{"isbn": "9780060850524", "title": "Brave New World", "publicationYear": 1932, "authorNames": ["Aldous Huxley"]},
-{"isbn": "9780451526342", "title": "Animal Farm", "publicationYear": 1945, "authorNames": ["George Orwell"]},
-{"isbn": "9781451673319", "title": "Fahrenheit 451", "publicationYear": 1953, "authorNames": ["Ray Bradbury"]},
-{"isbn": "9780547928227", "title": "The Hobbit", "publicationYear": 1937, "authorNames": ["J.R.R. Tolkien"]},
-{"isbn": "9780547928210", "title": "The Fellowship of the Ring", "publicationYear": 1954, "authorNames": ["J.R.R. Tolkien"]},
-{"isbn": "9780547928203", "title": "The Two Towers", "publicationYear": 1954, "authorNames": ["J.R.R. Tolkien"]},
-{"isbn": "9780547928197", "title": "The Return of the King", "publicationYear": 1955, "authorNames": ["J.R.R. Tolkien"]},
-{"isbn": "9780441172719", "title": "Dune", "publicationYear": 1965, "authorNames": ["Frank Herbert"]},
-{"isbn": "9780553293357", "title": "Foundation", "publicationYear": 1951, "authorNames": ["Isaac Asimov"]},
-{"isbn": "9780553294385", "title": "I, Robot", "publicationYear": 1950, "authorNames": ["Isaac Asimov"]},
-{"isbn": "9780385030533", "title": "The Martian Chronicles", "publicationYear": 1950, "authorNames": ["Ray Bradbury"]},
-{"isbn": "9780385333849", "title": "Slaughterhouse-Five", "publicationYear": 1969, "authorNames": ["Kurt Vonnegut"]},
-{"isbn": "9781451626650", "title": "Catch-22", "publicationYear": 1961, "authorNames": ["Joseph Heller"]},
-{"isbn": "9780061148514", "title": "The Bell Jar", "publicationYear": 1963, "authorNames": ["Sylvia Plath"]},
-{"isbn": "9780143105022", "title": "One Flew Over the Cuckoo's Nest", "publicationYear": 1962, "authorNames": ["Ken Kesey"]},
-{"isbn": "9780156028356", "title": "The Color Purple", "publicationYear": 1982, "authorNames": ["Alice Walker"]},
-{"isbn": "9781400033416", "title": "Beloved", "publicationYear": 1987, "authorNames": ["Toni Morrison"]},
-{"isbn": "9780385490818", "title": "The Handmaid's Tale", "publicationYear": 1985, "authorNames": ["Margaret Atwood"]},
-{"isbn": "9781594631931", "title": "The Kite Runner", "publicationYear": 2003, "authorNames": ["Khaled Hosseini"]},
-{"isbn": "9781594489501", "title": "A Thousand Splendid Suns", "publicationYear": 2007, "authorNames": ["Khaled Hosseini"]},
-{"isbn": "9780156027328", "title": "Life of Pi", "publicationYear": 2001, "authorNames": ["Yann Martel"]},
-{"isbn": "9780307387899", "title": "The Road", "publicationYear": 2006, "authorNames": ["Cormac McCarthy"]},
-{"isbn": "9780375706677", "title": "No Country for Old Men", "publicationYear": 2005, "authorNames": ["Cormac McCarthy"]},
-{"isbn": "9780375842207", "title": "The Book Thief", "publicationYear": 2005, "authorNames": ["Markus Zusak"]},
-{"isbn": "9781400032716", "title": "The Curious Incident of the Dog in the Night-Time", "publicationYear": 2003, "authorNames": ["Mark Haddon"]},
-{"isbn": "9781400078776", "title": "Never Let Me Go", "publicationYear": 2005, "authorNames": ["Kazuo Ishiguro"]},
-{"isbn": "9780679731726", "title": "The Remains of the Day", "publicationYear": 1989, "authorNames": ["Kazuo Ishiguro"]},
-{"isbn": "9780385721790", "title": "Atonement", "publicationYear": 2001, "authorNames": ["Ian McEwan"]},
-{"isbn": "9780307474278", "title": "The Da Vinci Code", "publicationYear": 2003, "authorNames": ["Dan Brown"]},
-{"isbn": "9780671027360", "title": "Angels & Demons", "publicationYear": 2000, "authorNames": ["Dan Brown"]},
-{"isbn": "9780307454546", "title": "The Girl with the Dragon Tattoo", "publicationYear": 2005, "authorNames": ["Stieg Larsson"]},
-{"isbn": "9780307588364", "title": "Gone Girl", "publicationYear": 2012, "authorNames": ["Gillian Flynn"]},
-{"isbn": "9781594634024", "title": "The Girl on the Train", "publicationYear": 2015, "authorNames": ["Paula Hawkins"]},
-{"isbn": "9780399167065", "title": "Big Little Lies", "publicationYear": 2014, "authorNames": ["Liane Moriarty"]},
-{"isbn": "9780060853983", "title": "Good Omens", "publicationYear": 1990, "authorNames": ["Terry Pratchett", "Neil Gaiman"]},
-{"isbn": "9780345444882", "title": "The Talisman", "publicationYear": 1984, "authorNames": ["Stephen King", "Peter Straub"]},
-{"isbn": "9780316129084", "title": "Leviathan Wakes", "publicationYear": 2011, "authorNames": ["James S.A. Corey"]},
-{"isbn": "9780756404079", "title": "The Name of the Wind", "publicationYear": 2007, "authorNames": ["Patrick Rothfuss"]},
-{"isbn": "9780765326355", "title": "The Way of Kings", "publicationYear": 2010, "authorNames": ["Brandon Sanderson"]},
-{"isbn": "9780765326362", "title": "Words of Radiance", "publicationYear": 2014, "authorNames": ["Brandon Sanderson"]},
-{"isbn": "9780765326379", "title": "Oathbringer", "publicationYear": 2017, "authorNames": ["Brandon Sanderson"]},
-{"isbn": "9780765311788", "title": "The Final Empire", "publicationYear": 2006, "authorNames": ["Brandon Sanderson"]},
-{"isbn": "9780765316882", "title": "The Well of Ascension", "publicationYear": 2007, "authorNames": ["Brandon Sanderson"]},
-{"isbn": "9780765316899", "title": "The Hero of Ages", "publicationYear": 2008, "authorNames": ["Brandon Sanderson"]},
-{"isbn": "9780756407919", "title": "The Wise Man's Fear", "publicationYear": 2011, "authorNames": ["Patrick Rothfuss"]},
-{"isbn": "9780553103540", "title": "A Game of Thrones", "publicationYear": 1996, "authorNames": ["George R.R. Martin"]},
-{"isbn": "9780553108033", "title": "A Clash of Kings", "publicationYear": 1998, "authorNames": ["George R.R. Martin"]},
-{"isbn": "9780553106633", "title": "A Storm of Swords", "publicationYear": 2000, "authorNames": ["George R.R. Martin"]},
-{"isbn": "9780553801507", "title": "A Feast for Crows", "publicationYear": 2005, "authorNames": ["George R.R. Martin"]},
-{"isbn": "9780553801477", "title": "A Dance with Dragons", "publicationYear": 2011, "authorNames": ["George R.R. Martin"]},
-{"isbn": "9780747532699", "title": "Harry Potter and the Philosopher's Stone", "publicationYear": 1997, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780747538493", "title": "Harry Potter and the Chamber of Secrets", "publicationYear": 1998, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780747542155", "title": "Harry Potter and the Prisoner of Azkaban", "publicationYear": 1999, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780747546245", "title": "Harry Potter and the Goblet of Fire", "publicationYear": 2000, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780747551003", "title": "Harry Potter and the Order of the Phoenix", "publicationYear": 2003, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780747581086", "title": "Harry Potter and the Half-Blood Prince", "publicationYear": 2005, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780747591054", "title": "Harry Potter and the Deathly Hallows", "publicationYear": 2007, "authorNames": ["J.K. Rowling"]},
-{"isbn": "9780064471046", "title": "The Lion, the Witch and the Wardrobe", "publicationYear": 1950, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780064471053", "title": "Prince Caspian", "publicationYear": 1951, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780064471077", "title": "The Voyage of the Dawn Treader", "publicationYear": 1952, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780064471084", "title": "The Silver Chair", "publicationYear": 1953, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780064471060", "title": "The Horse and His Boy", "publicationYear": 1954, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780064471107", "title": "The Magician's Nephew", "publicationYear": 1955, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780064471091", "title": "The Last Battle", "publicationYear": 1956, "authorNames": ["C.S. Lewis"]},
-{"isbn": "9780307743688", "title": "The Stand", "publicationYear": 1978, "authorNames": ["Stephen King"]},
-{"isbn": "9781501142970", "title": "It", "publicationYear": 1986, "authorNames": ["Stephen King"]},
-{"isbn": "9780307743657", "title": "The Shining", "publicationYear": 1977, "authorNames": ["Stephen King"]},
-{"isbn": "9780307743664", "title": "Carrie", "publicationYear": 1974, "authorNames": ["Stephen King"]},
-{"isbn": "9780307743671", "title": "Pet Sematary", "publicationYear": 1983, "authorNames": ["Stephen King"]},
-{"isbn": "9781501143106", "title": "Misery", "publicationYear": 1987, "authorNames": ["Stephen King"]},
-{"isbn": "9781501143434", "title": "The Green Mile", "publicationYear": 1996, "authorNames": ["Stephen King"]},
-{"isbn": "9780307743695", "title": "Salem's Lot", "publicationYear": 1975, "authorNames": ["Stephen King"]},
-{"isbn": "9781476727653", "title": "Doctor Sleep", "publicationYear": 2013, "authorNames": ["Stephen King"]},
-{"isbn": "9781501143519", "title": "The Gunslinger", "publicationYear": 1982, "authorNames": ["Stephen King"]},
-{"isbn": "9780380973651", "title": "American Gods", "publicationYear": 2001, "authorNames": ["Neil Gaiman"]},
-{"isbn": "9781401284774", "title": "The Sandman: Preludes & Nocturnes", "publicationYear": 1991, "authorNames": ["Neil Gaiman"]},
-{"isbn": "9780380807345", "title": "Coraline", "publicationYear": 2002, "authorNames": ["Neil Gaiman"]},
-{"isbn": "9780060530945", "title": "The Graveyard Book", "publicationYear": 2008, "authorNames": ["Neil Gaiman"]},
-{"isbn": "9780380789016", "title": "Neverwhere", "publicationYear": 1996, "authorNames": ["Neil Gaiman"]},
-{"isbn": "9780062255655", "title": "The Ocean at the End of the Lane", "publicationYear": 2013, "authorNames": ["Neil Gaiman"]},
-{"isbn": "9780552124751", "title": "The Colour of Magic", "publicationYear": 1983, "authorNames": ["Terry Pratchett"]},
-{"isbn": "9780552128483", "title": "The Light Fantastic", "publicationYear": 1986, "authorNames": ["Terry Pratchett"]},
-{"isbn": "9780552131063", "title": "Mort", "publicationYear": 1987, "authorNames": ["Terry Pratchett"]},
-{"isbn": "9780552134620", "title": "Guards! Guards!", "publicationYear": 1989, "authorNames": ["Terry Pratchett"]},
-{"isbn": "9780552138901", "title": "Small Gods", "publicationYear": 1992, "authorNames": ["Terry Pratchett"]},
-{"isbn": "9780345391803", "title": "The Hitchhiker's Guide to the Galaxy", "publicationYear": 1979, "authorNames": ["Douglas Adams"]},
-{"isbn": "9780345391810", "title": "The Restaurant at the End of the Universe", "publicationYear": 1980, "authorNames": ["Douglas Adams"]},
-{"isbn": "9780345391827", "title": "Life, the Universe and Everything", "publicationYear": 1982, "authorNames": ["Douglas Adams"]},
-{"isbn": "9780345391834", "title": "So Long, and Thanks for All the Fish", "publicationYear": 1984, "authorNames": ["Douglas Adams"]},
-{"isbn": "9780345418777", "title": "Mostly Harmless", "publicationYear": 1992, "authorNames": ["Douglas Adams"]},
-{"isbn": "9780812550702", "title": "Ender's Game", "publicationYear": 1985, "authorNames": ["Orson Scott Card"]},
-{"isbn": "9780812550757", "title": "Speaker for the Dead", "publicationYear": 1986, "authorNames": ["Orson Scott Card"]},
-{"isbn": "9780812509250", "title": "Xenocide", "publicationYear": 1991, "authorNames": ["Orson Scott Card"]},
-{"isbn": "9780812522396", "title": "Children of the Mind", "publicationYear": 1996, "authorNames": ["Orson Scott Card"]},
-{"isbn": "9780441569595", "title": "Neuromancer", "publicationYear": 1984, "authorNames": ["William Gibson"]},
-{"isbn": "9780441117734", "title": "Count Zero", "publicationYear": 1986, "authorNames": ["William Gibson"]},
-{"isbn": "9780553281743", "title": "Mona Lisa Overdrive", "publicationYear": 1988, "authorNames": ["William Gibson"]},
-{"isbn": "9780553380958", "title": "Snow Crash", "publicationYear": 1992, "authorNames": ["Neal Stephenson"]},
-{"isbn": "9780553380965", "title": "The Diamond Age", "publicationYear": 1995, "authorNames": ["Neal Stephenson"]},
-{"isbn": "9780380973464", "title": "Cryptonomicon", "publicationYear": 1999, "authorNames": ["Neal Stephenson"]},
-{"isbn": "9780486284729", "title": "The Time Machine", "publicationYear": 1895, "authorNames": ["H.G. Wells"]},
-{"isbn": "9780486295060", "title": "The War of the Worlds", "publicationYear": 1898, "authorNames": ["H.G. Wells"]},
-{"isbn": "9780486270715", "title": "The Invisible Man", "publicationYear": 1897, "authorNames": ["H.G. Wells"]},
-{"isbn": "9780486282114", "title": "Frankenstein", "publicationYear": 1818, "authorNames": ["Mary Shelley"]},
-{"isbn": "9780486411095", "title": "Dracula", "publicationYear": 1897, "authorNames": ["Bram Stoker"]},
-{"isbn": "9780486266886", "title": "The Strange Case of Dr. Jekyll and Mr. Hyde", "publicationYear": 1886, "authorNames": ["Robert Louis Stevenson"]},
-{"isbn": "9780486275598", "title": "Treasure Island", "publicationYear": 1883, "authorNames": ["Robert Louis Stevenson"]},
-{"isbn": "9780486404271", "title": "Robinson Crusoe", "publicationYear": 1719, "authorNames": ["Daniel Defoe"]},
-{"isbn": "9780486292731", "title": "Gulliver's Travels", "publicationYear": 1726, "authorNames": ["Jonathan Swift"]},
-{"isbn": "9780060934347", "title": "Don Quixote", "publicationYear": 1605, "authorNames": ["Miguel de Cervantes"]},
-{"isbn": "9780140449266", "title": "The Count of Monte Cristo", "publicationYear": 1844, "authorNames": ["Alexandre Dumas"]},
-{"isbn": "9780140390025", "title": "The Three Musketeers", "publicationYear": 1844, "authorNames": ["Alexandre Dumas"]},
-{"isbn": "9780140444308", "title": "Les Misérables", "publicationYear": 1862, "authorNames": ["Victor Hugo"]},
-{"isbn": "9780140443530", "title": "The Hunchback of Notre-Dame", "publicationYear": 1831, "authorNames": ["Victor Hugo"]},
-{"isbn": "9780486415871", "title": "Crime and Punishment", "publicationYear": 1866, "authorNames": ["Fyodor Dostoevsky"]},
-{"isbn": "9780486437910", "title": "The Brothers Karamazov", "publicationYear": 1880, "authorNames": ["Fyodor Dostoevsky"]},
-{"isbn": "9780140447934", "title": "War and Peace", "publicationYear": 1869, "authorNames": ["Leo Tolstoy"]},
-{"isbn": "9780140449174", "title": "Anna Karenina", "publicationYear": 1877, "authorNames": ["Leo Tolstoy"]},
-{"isbn": "9780486406022", "title": "The Death of Ivan Ilyich", "publicationYear": 1886, "authorNames": ["Leo Tolstoy"]},
-{"isbn": "9780060883287", "title": "One Hundred Years of Solitude", "publicationYear": 1967, "authorNames": ["Gabriel García Márquez"]},
-{"isbn": "9780307389732", "title": "Love in the Time of Cholera", "publicationYear": 1985, "authorNames": ["Gabriel García Márquez"]},
-{"isbn": "9780486290300", "title": "The Metamorphosis", "publicationYear": 1915, "authorNames": ["Franz Kafka"]},
-{"isbn": "9780805209990", "title": "The Trial", "publicationYear": 1925, "authorNames": ["Franz Kafka"]},
-{"isbn": "9780679720201", "title": "The Stranger", "publicationYear": 1942, "authorNames": ["Albert Camus"]},
-{"isbn": "9780679720218", "title": "The Plague", "publicationYear": 1947, "authorNames": ["Albert Camus"]},
-{"isbn": "9780486432151", "title": "Moby-Dick", "publicationYear": 1851, "authorNames": ["Herman Melville"]},
-{"isbn": "9780486280615", "title": "The Adventures of Huckleberry Finn", "publicationYear": 1884, "authorNames": ["Mark Twain"]},
-{"isbn": "9780486400778", "title": "The Adventures of Tom Sawyer", "publicationYear": 1876, "authorNames": ["Mark Twain"]},
-{"isbn": "9780486415918", "title": "A Connecticut Yankee in King Arthur's Court", "publicationYear": 1889, "authorNames": ["Mark Twain"]},
-{"isbn": "9780486280486", "title": "The Scarlet Letter", "publicationYear": 1850, "authorNames": ["Nathaniel Hawthorne"]},
-{"isbn": "9780486408828", "title": "The House of the Seven Gables", "publicationYear": 1851, "authorNames": ["Nathaniel Hawthorne"]},
-{"isbn": "9780486264721", "title": "The Call of the Wild", "publicationYear": 1903, "authorNames": ["Jack London"]},
-{"isbn": "9780486266267", "title": "White Fang", "publicationYear": 1906, "authorNames": ["Jack London"]},
-{"isbn": "9780486411088", "title": "The Sea-Wolf", "publicationYear": 1904, "authorNames": ["Jack London"]},
-{"isbn": "9780486466705", "title": "Martin Eden", "publicationYear": 1909, "authorNames": ["Jack London"]},
-{"isbn": "9780486419732", "title": "The Iron Heel", "publicationYear": 1908, "authorNames": ["Jack London"]},
-{"isbn": "9780486419237", "title": "The Jungle", "publicationYear": 1906, "authorNames": ["Upton Sinclair"]},
-{"isbn": "9780486417944", "title": "Sister Carrie", "publicationYear": 1900, "authorNames": ["Theodore Dreiser"]},
-{"isbn": "9780451532091", "title": "An American Tragedy", "publicationYear": 1925, "authorNames": ["Theodore Dreiser"]}
+  {
+    "isbn": "9780743273565",
+    "title": "The Great Gatsby",
+    "publicationYear": 1925,
+    "authorNames": [
+      "F. Scott Fitzgerald"
+    ]
+  },
+  {
+    "isbn": "9780061120084",
+    "title": "To Kill a Mockingbird",
+    "publicationYear": 1960,
+    "authorNames": [
+      "Harper Lee"
+    ]
+  },
+  {
+    "isbn": "9780141439518",
+    "title": "Pride and Prejudice",
+    "publicationYear": 1813,
+    "authorNames": [
+      "Jane Austen"
+    ]
+  },
+  {
+    "isbn": "9780316769174",
+    "title": "The Catcher in the Rye",
+    "publicationYear": 1951,
+    "authorNames": [
+      "J.D. Salinger"
+    ]
+  },
+  {
+    "isbn": "9780571056866",
+    "title": "Lord of the Flies",
+    "publicationYear": 1954,
+    "authorNames": [
+      "William Golding"
+    ]
+  },
+  {
+    "isbn": "9780141441146",
+    "title": "Jane Eyre",
+    "publicationYear": 1847,
+    "authorNames": [
+      "Charlotte Brontë"
+    ]
+  },
+  {
+    "isbn": "9780141439556",
+    "title": "Wuthering Heights",
+    "publicationYear": 1847,
+    "authorNames": [
+      "Emily Brontë"
+    ]
+  },
+  {
+    "isbn": "9780141439662",
+    "title": "Sense and Sensibility",
+    "publicationYear": 1811,
+    "authorNames": [
+      "Jane Austen"
+    ]
+  },
+  {
+    "isbn": "9780141439587",
+    "title": "Emma",
+    "publicationYear": 1815,
+    "authorNames": [
+      "Jane Austen"
+    ]
+  },
+  {
+    "isbn": "9780140177398",
+    "title": "Of Mice and Men",
+    "publicationYear": 1937,
+    "authorNames": [
+      "John Steinbeck"
+    ]
+  },
+  {
+    "isbn": "9780143039433",
+    "title": "The Grapes of Wrath",
+    "publicationYear": 1939,
+    "authorNames": [
+      "John Steinbeck"
+    ]
+  },
+  {
+    "isbn": "9780060850524",
+    "title": "Brave New World",
+    "publicationYear": 1932,
+    "authorNames": [
+      "Aldous Huxley"
+    ]
+  },
+  {
+    "isbn": "9780451526342",
+    "title": "Animal Farm",
+    "publicationYear": 1945,
+    "authorNames": [
+      "George Orwell"
+    ]
+  },
+  {
+    "isbn": "9781451673319",
+    "title": "Fahrenheit 451",
+    "publicationYear": 1953,
+    "authorNames": [
+      "Ray Bradbury"
+    ]
+  },
+  {
+    "isbn": "9780547928227",
+    "title": "The Hobbit",
+    "publicationYear": 1937,
+    "authorNames": [
+      "J.R.R. Tolkien"
+    ]
+  },
+  {
+    "isbn": "9780547928210",
+    "title": "The Fellowship of the Ring",
+    "publicationYear": 1954,
+    "authorNames": [
+      "J.R.R. Tolkien"
+    ]
+  },
+  {
+    "isbn": "9780547928203",
+    "title": "The Two Towers",
+    "publicationYear": 1954,
+    "authorNames": [
+      "J.R.R. Tolkien"
+    ]
+  },
+  {
+    "isbn": "9780547928197",
+    "title": "The Return of the King",
+    "publicationYear": 1955,
+    "authorNames": [
+      "J.R.R. Tolkien"
+    ]
+  },
+  {
+    "isbn": "9780441172719",
+    "title": "Dune",
+    "publicationYear": 1965,
+    "authorNames": [
+      "Frank Herbert"
+    ]
+  },
+  {
+    "isbn": "9780553293357",
+    "title": "Foundation",
+    "publicationYear": 1951,
+    "authorNames": [
+      "Isaac Asimov"
+    ]
+  },
+  {
+    "isbn": "9780553294385",
+    "title": "I, Robot",
+    "publicationYear": 1950,
+    "authorNames": [
+      "Isaac Asimov"
+    ]
+  },
+  {
+    "isbn": "9780385030533",
+    "title": "The Martian Chronicles",
+    "publicationYear": 1950,
+    "authorNames": [
+      "Ray Bradbury"
+    ]
+  },
+  {
+    "isbn": "9780385333849",
+    "title": "Slaughterhouse-Five",
+    "publicationYear": 1969,
+    "authorNames": [
+      "Kurt Vonnegut"
+    ]
+  },
+  {
+    "isbn": "9781451626650",
+    "title": "Catch-22",
+    "publicationYear": 1961,
+    "authorNames": [
+      "Joseph Heller"
+    ]
+  },
+  {
+    "isbn": "9780061148514",
+    "title": "The Bell Jar",
+    "publicationYear": 1963,
+    "authorNames": [
+      "Sylvia Plath"
+    ]
+  },
+  {
+    "isbn": "9780143105022",
+    "title": "One Flew Over the Cuckoo's Nest",
+    "publicationYear": 1962,
+    "authorNames": [
+      "Ken Kesey"
+    ]
+  },
+  {
+    "isbn": "9780156028356",
+    "title": "The Color Purple",
+    "publicationYear": 1982,
+    "authorNames": [
+      "Alice Walker"
+    ]
+  },
+  {
+    "isbn": "9781400033416",
+    "title": "Beloved",
+    "publicationYear": 1987,
+    "authorNames": [
+      "Toni Morrison"
+    ]
+  },
+  {
+    "isbn": "9780385490818",
+    "title": "The Handmaid's Tale",
+    "publicationYear": 1985,
+    "authorNames": [
+      "Margaret Atwood"
+    ]
+  },
+  {
+    "isbn": "9781594631931",
+    "title": "The Kite Runner",
+    "publicationYear": 2003,
+    "authorNames": [
+      "Khaled Hosseini"
+    ]
+  },
+  {
+    "isbn": "9781594489501",
+    "title": "A Thousand Splendid Suns",
+    "publicationYear": 2007,
+    "authorNames": [
+      "Khaled Hosseini"
+    ]
+  },
+  {
+    "isbn": "9780156027328",
+    "title": "Life of Pi",
+    "publicationYear": 2001,
+    "authorNames": [
+      "Yann Martel"
+    ]
+  },
+  {
+    "isbn": "9780307387899",
+    "title": "The Road",
+    "publicationYear": 2006,
+    "authorNames": [
+      "Cormac McCarthy"
+    ]
+  },
+  {
+    "isbn": "9780375706677",
+    "title": "No Country for Old Men",
+    "publicationYear": 2005,
+    "authorNames": [
+      "Cormac McCarthy"
+    ]
+  },
+  {
+    "isbn": "9780375842207",
+    "title": "The Book Thief",
+    "publicationYear": 2005,
+    "authorNames": [
+      "Markus Zusak"
+    ]
+  },
+  {
+    "isbn": "9781400032716",
+    "title": "The Curious Incident of the Dog in the Night-Time",
+    "publicationYear": 2003,
+    "authorNames": [
+      "Mark Haddon"
+    ]
+  },
+  {
+    "isbn": "9781400078776",
+    "title": "Never Let Me Go",
+    "publicationYear": 2005,
+    "authorNames": [
+      "Kazuo Ishiguro"
+    ]
+  },
+  {
+    "isbn": "9780679731726",
+    "title": "The Remains of the Day",
+    "publicationYear": 1989,
+    "authorNames": [
+      "Kazuo Ishiguro"
+    ]
+  },
+  {
+    "isbn": "9780385721790",
+    "title": "Atonement",
+    "publicationYear": 2001,
+    "authorNames": [
+      "Ian McEwan"
+    ]
+  },
+  {
+    "isbn": "9780307474278",
+    "title": "The Da Vinci Code",
+    "publicationYear": 2003,
+    "authorNames": [
+      "Dan Brown"
+    ]
+  },
+  {
+    "isbn": "9780671027360",
+    "title": "Angels & Demons",
+    "publicationYear": 2000,
+    "authorNames": [
+      "Dan Brown"
+    ]
+  },
+  {
+    "isbn": "9780307454546",
+    "title": "The Girl with the Dragon Tattoo",
+    "publicationYear": 2005,
+    "authorNames": [
+      "Stieg Larsson"
+    ]
+  },
+  {
+    "isbn": "9780307588364",
+    "title": "Gone Girl",
+    "publicationYear": 2012,
+    "authorNames": [
+      "Gillian Flynn"
+    ]
+  },
+  {
+    "isbn": "9781594634024",
+    "title": "The Girl on the Train",
+    "publicationYear": 2015,
+    "authorNames": [
+      "Paula Hawkins"
+    ]
+  },
+  {
+    "isbn": "9780399167065",
+    "title": "Big Little Lies",
+    "publicationYear": 2014,
+    "authorNames": [
+      "Liane Moriarty"
+    ]
+  },
+  {
+    "isbn": "9780060853983",
+    "title": "Good Omens",
+    "publicationYear": 1990,
+    "authorNames": [
+      "Terry Pratchett",
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9780345444882",
+    "title": "The Talisman",
+    "publicationYear": 1984,
+    "authorNames": [
+      "Stephen King",
+      "Peter Straub"
+    ]
+  },
+  {
+    "isbn": "9780316129084",
+    "title": "Leviathan Wakes",
+    "publicationYear": 2011,
+    "authorNames": [
+      "James S.A. Corey"
+    ]
+  },
+  {
+    "isbn": "9780756404079",
+    "title": "The Name of the Wind",
+    "publicationYear": 2007,
+    "authorNames": [
+      "Patrick Rothfuss"
+    ]
+  },
+  {
+    "isbn": "9780765326355",
+    "title": "The Way of Kings",
+    "publicationYear": 2010,
+    "authorNames": [
+      "Brandon Sanderson"
+    ]
+  },
+  {
+    "isbn": "9780765326362",
+    "title": "Words of Radiance",
+    "publicationYear": 2014,
+    "authorNames": [
+      "Brandon Sanderson"
+    ]
+  },
+  {
+    "isbn": "9780765326379",
+    "title": "Oathbringer",
+    "publicationYear": 2017,
+    "authorNames": [
+      "Brandon Sanderson"
+    ]
+  },
+  {
+    "isbn": "9780765311788",
+    "title": "The Final Empire",
+    "publicationYear": 2006,
+    "authorNames": [
+      "Brandon Sanderson"
+    ]
+  },
+  {
+    "isbn": "9780765316882",
+    "title": "The Well of Ascension",
+    "publicationYear": 2007,
+    "authorNames": [
+      "Brandon Sanderson"
+    ]
+  },
+  {
+    "isbn": "9780765316899",
+    "title": "The Hero of Ages",
+    "publicationYear": 2008,
+    "authorNames": [
+      "Brandon Sanderson"
+    ]
+  },
+  {
+    "isbn": "9780756407919",
+    "title": "The Wise Man's Fear",
+    "publicationYear": 2011,
+    "authorNames": [
+      "Patrick Rothfuss"
+    ]
+  },
+  {
+    "isbn": "9780553103540",
+    "title": "A Game of Thrones",
+    "publicationYear": 1996,
+    "authorNames": [
+      "George R.R. Martin"
+    ]
+  },
+  {
+    "isbn": "9780553108033",
+    "title": "A Clash of Kings",
+    "publicationYear": 1998,
+    "authorNames": [
+      "George R.R. Martin"
+    ]
+  },
+  {
+    "isbn": "9780553106633",
+    "title": "A Storm of Swords",
+    "publicationYear": 2000,
+    "authorNames": [
+      "George R.R. Martin"
+    ]
+  },
+  {
+    "isbn": "9780553801507",
+    "title": "A Feast for Crows",
+    "publicationYear": 2005,
+    "authorNames": [
+      "George R.R. Martin"
+    ]
+  },
+  {
+    "isbn": "9780553801477",
+    "title": "A Dance with Dragons",
+    "publicationYear": 2011,
+    "authorNames": [
+      "George R.R. Martin"
+    ]
+  },
+  {
+    "isbn": "9780747532699",
+    "title": "Harry Potter and the Philosopher's Stone",
+    "publicationYear": 1997,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780747538493",
+    "title": "Harry Potter and the Chamber of Secrets",
+    "publicationYear": 1998,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780747542155",
+    "title": "Harry Potter and the Prisoner of Azkaban",
+    "publicationYear": 1999,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780747546245",
+    "title": "Harry Potter and the Goblet of Fire",
+    "publicationYear": 2000,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780747551003",
+    "title": "Harry Potter and the Order of the Phoenix",
+    "publicationYear": 2003,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780747581086",
+    "title": "Harry Potter and the Half-Blood Prince",
+    "publicationYear": 2005,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780747591054",
+    "title": "Harry Potter and the Deathly Hallows",
+    "publicationYear": 2007,
+    "authorNames": [
+      "J.K. Rowling"
+    ]
+  },
+  {
+    "isbn": "9780064471046",
+    "title": "The Lion, the Witch and the Wardrobe",
+    "publicationYear": 1950,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780064471053",
+    "title": "Prince Caspian",
+    "publicationYear": 1951,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780064471077",
+    "title": "The Voyage of the Dawn Treader",
+    "publicationYear": 1952,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780064471084",
+    "title": "The Silver Chair",
+    "publicationYear": 1953,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780064471060",
+    "title": "The Horse and His Boy",
+    "publicationYear": 1954,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780064471107",
+    "title": "The Magician's Nephew",
+    "publicationYear": 1955,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780064471091",
+    "title": "The Last Battle",
+    "publicationYear": 1956,
+    "authorNames": [
+      "C.S. Lewis"
+    ]
+  },
+  {
+    "isbn": "9780307743688",
+    "title": "The Stand",
+    "publicationYear": 1978,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9781501142970",
+    "title": "It",
+    "publicationYear": 1986,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9780307743657",
+    "title": "The Shining",
+    "publicationYear": 1977,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9780307743664",
+    "title": "Carrie",
+    "publicationYear": 1974,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9780307743671",
+    "title": "Pet Sematary",
+    "publicationYear": 1983,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9781501143106",
+    "title": "Misery",
+    "publicationYear": 1987,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9781501143434",
+    "title": "The Green Mile",
+    "publicationYear": 1996,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9780307743695",
+    "title": "Salem's Lot",
+    "publicationYear": 1975,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9781476727653",
+    "title": "Doctor Sleep",
+    "publicationYear": 2013,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9781501143519",
+    "title": "The Gunslinger",
+    "publicationYear": 1982,
+    "authorNames": [
+      "Stephen King"
+    ]
+  },
+  {
+    "isbn": "9780380973651",
+    "title": "American Gods",
+    "publicationYear": 2001,
+    "authorNames": [
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9781401284774",
+    "title": "The Sandman: Preludes & Nocturnes",
+    "publicationYear": 1991,
+    "authorNames": [
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9780380807345",
+    "title": "Coraline",
+    "publicationYear": 2002,
+    "authorNames": [
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9780060530945",
+    "title": "The Graveyard Book",
+    "publicationYear": 2008,
+    "authorNames": [
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9780380789016",
+    "title": "Neverwhere",
+    "publicationYear": 1996,
+    "authorNames": [
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9780062255655",
+    "title": "The Ocean at the End of the Lane",
+    "publicationYear": 2013,
+    "authorNames": [
+      "Neil Gaiman"
+    ]
+  },
+  {
+    "isbn": "9780552124751",
+    "title": "The Colour of Magic",
+    "publicationYear": 1983,
+    "authorNames": [
+      "Terry Pratchett"
+    ]
+  },
+  {
+    "isbn": "9780552128483",
+    "title": "The Light Fantastic",
+    "publicationYear": 1986,
+    "authorNames": [
+      "Terry Pratchett"
+    ]
+  },
+  {
+    "isbn": "9780552131063",
+    "title": "Mort",
+    "publicationYear": 1987,
+    "authorNames": [
+      "Terry Pratchett"
+    ]
+  },
+  {
+    "isbn": "9780552134620",
+    "title": "Guards! Guards!",
+    "publicationYear": 1989,
+    "authorNames": [
+      "Terry Pratchett"
+    ]
+  },
+  {
+    "isbn": "9780552138901",
+    "title": "Small Gods",
+    "publicationYear": 1992,
+    "authorNames": [
+      "Terry Pratchett"
+    ]
+  },
+  {
+    "isbn": "9780345391803",
+    "title": "The Hitchhiker's Guide to the Galaxy",
+    "publicationYear": 1979,
+    "authorNames": [
+      "Douglas Adams"
+    ]
+  },
+  {
+    "isbn": "9780345391810",
+    "title": "The Restaurant at the End of the Universe",
+    "publicationYear": 1980,
+    "authorNames": [
+      "Douglas Adams"
+    ]
+  },
+  {
+    "isbn": "9780345391827",
+    "title": "Life, the Universe and Everything",
+    "publicationYear": 1982,
+    "authorNames": [
+      "Douglas Adams"
+    ]
+  },
+  {
+    "isbn": "9780345391834",
+    "title": "So Long, and Thanks for All the Fish",
+    "publicationYear": 1984,
+    "authorNames": [
+      "Douglas Adams"
+    ]
+  },
+  {
+    "isbn": "9780345418777",
+    "title": "Mostly Harmless",
+    "publicationYear": 1992,
+    "authorNames": [
+      "Douglas Adams"
+    ]
+  },
+  {
+    "isbn": "9780812550702",
+    "title": "Ender's Game",
+    "publicationYear": 1985,
+    "authorNames": [
+      "Orson Scott Card"
+    ]
+  },
+  {
+    "isbn": "9780812550757",
+    "title": "Speaker for the Dead",
+    "publicationYear": 1986,
+    "authorNames": [
+      "Orson Scott Card"
+    ]
+  },
+  {
+    "isbn": "9780812509250",
+    "title": "Xenocide",
+    "publicationYear": 1991,
+    "authorNames": [
+      "Orson Scott Card"
+    ]
+  },
+  {
+    "isbn": "9780812522396",
+    "title": "Children of the Mind",
+    "publicationYear": 1996,
+    "authorNames": [
+      "Orson Scott Card"
+    ]
+  },
+  {
+    "isbn": "9780441569595",
+    "title": "Neuromancer",
+    "publicationYear": 1984,
+    "authorNames": [
+      "William Gibson"
+    ]
+  },
+  {
+    "isbn": "9780441117734",
+    "title": "Count Zero",
+    "publicationYear": 1986,
+    "authorNames": [
+      "William Gibson"
+    ]
+  },
+  {
+    "isbn": "9780553281743",
+    "title": "Mona Lisa Overdrive",
+    "publicationYear": 1988,
+    "authorNames": [
+      "William Gibson"
+    ]
+  },
+  {
+    "isbn": "9780553380958",
+    "title": "Snow Crash",
+    "publicationYear": 1992,
+    "authorNames": [
+      "Neal Stephenson"
+    ]
+  },
+  {
+    "isbn": "9780553380965",
+    "title": "The Diamond Age",
+    "publicationYear": 1995,
+    "authorNames": [
+      "Neal Stephenson"
+    ]
+  },
+  {
+    "isbn": "9780380973464",
+    "title": "Cryptonomicon",
+    "publicationYear": 1999,
+    "authorNames": [
+      "Neal Stephenson"
+    ]
+  },
+  {
+    "isbn": "9780486284729",
+    "title": "The Time Machine",
+    "publicationYear": 1895,
+    "authorNames": [
+      "H.G. Wells"
+    ]
+  },
+  {
+    "isbn": "9780486295060",
+    "title": "The War of the Worlds",
+    "publicationYear": 1898,
+    "authorNames": [
+      "H.G. Wells"
+    ]
+  },
+  {
+    "isbn": "9780486270715",
+    "title": "The Invisible Man",
+    "publicationYear": 1897,
+    "authorNames": [
+      "H.G. Wells"
+    ]
+  },
+  {
+    "isbn": "9780486282114",
+    "title": "Frankenstein",
+    "publicationYear": 1818,
+    "authorNames": [
+      "Mary Shelley"
+    ]
+  },
+  {
+    "isbn": "9780486411095",
+    "title": "Dracula",
+    "publicationYear": 1897,
+    "authorNames": [
+      "Bram Stoker"
+    ]
+  },
+  {
+    "isbn": "9780486266886",
+    "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
+    "publicationYear": 1886,
+    "authorNames": [
+      "Robert Louis Stevenson"
+    ]
+  },
+  {
+    "isbn": "9780486275598",
+    "title": "Treasure Island",
+    "publicationYear": 1883,
+    "authorNames": [
+      "Robert Louis Stevenson"
+    ]
+  },
+  {
+    "isbn": "9780486404271",
+    "title": "Robinson Crusoe",
+    "publicationYear": 1719,
+    "authorNames": [
+      "Daniel Defoe"
+    ]
+  },
+  {
+    "isbn": "9780486292731",
+    "title": "Gulliver's Travels",
+    "publicationYear": 1726,
+    "authorNames": [
+      "Jonathan Swift"
+    ]
+  },
+  {
+    "isbn": "9780060934347",
+    "title": "Don Quixote",
+    "publicationYear": 1605,
+    "authorNames": [
+      "Miguel de Cervantes"
+    ]
+  },
+  {
+    "isbn": "9780140449266",
+    "title": "The Count of Monte Cristo",
+    "publicationYear": 1844,
+    "authorNames": [
+      "Alexandre Dumas"
+    ]
+  },
+  {
+    "isbn": "9780140390025",
+    "title": "The Three Musketeers",
+    "publicationYear": 1844,
+    "authorNames": [
+      "Alexandre Dumas"
+    ]
+  },
+  {
+    "isbn": "9780140444308",
+    "title": "Les Misérables",
+    "publicationYear": 1862,
+    "authorNames": [
+      "Victor Hugo"
+    ]
+  },
+  {
+    "isbn": "9780140443530",
+    "title": "The Hunchback of Notre-Dame",
+    "publicationYear": 1831,
+    "authorNames": [
+      "Victor Hugo"
+    ]
+  },
+  {
+    "isbn": "9780486415871",
+    "title": "Crime and Punishment",
+    "publicationYear": 1866,
+    "authorNames": [
+      "Fyodor Dostoevsky"
+    ]
+  },
+  {
+    "isbn": "9780486437910",
+    "title": "The Brothers Karamazov",
+    "publicationYear": 1880,
+    "authorNames": [
+      "Fyodor Dostoevsky"
+    ]
+  },
+  {
+    "isbn": "9780140447934",
+    "title": "War and Peace",
+    "publicationYear": 1869,
+    "authorNames": [
+      "Leo Tolstoy"
+    ]
+  },
+  {
+    "isbn": "9780140449174",
+    "title": "Anna Karenina",
+    "publicationYear": 1877,
+    "authorNames": [
+      "Leo Tolstoy"
+    ]
+  },
+  {
+    "isbn": "9780486406022",
+    "title": "The Death of Ivan Ilyich",
+    "publicationYear": 1886,
+    "authorNames": [
+      "Leo Tolstoy"
+    ]
+  },
+  {
+    "isbn": "9780060883287",
+    "title": "One Hundred Years of Solitude",
+    "publicationYear": 1967,
+    "authorNames": [
+      "Gabriel García Márquez"
+    ]
+  },
+  {
+    "isbn": "9780307389732",
+    "title": "Love in the Time of Cholera",
+    "publicationYear": 1985,
+    "authorNames": [
+      "Gabriel García Márquez"
+    ]
+  },
+  {
+    "isbn": "9780486290300",
+    "title": "The Metamorphosis",
+    "publicationYear": 1915,
+    "authorNames": [
+      "Franz Kafka"
+    ]
+  },
+  {
+    "isbn": "9780805209990",
+    "title": "The Trial",
+    "publicationYear": 1925,
+    "authorNames": [
+      "Franz Kafka"
+    ]
+  },
+  {
+    "isbn": "9780679720201",
+    "title": "The Stranger",
+    "publicationYear": 1942,
+    "authorNames": [
+      "Albert Camus"
+    ]
+  },
+  {
+    "isbn": "9780679720218",
+    "title": "The Plague",
+    "publicationYear": 1947,
+    "authorNames": [
+      "Albert Camus"
+    ]
+  },
+  {
+    "isbn": "9780486432151",
+    "title": "Moby-Dick",
+    "publicationYear": 1851,
+    "authorNames": [
+      "Herman Melville"
+    ]
+  },
+  {
+    "isbn": "9780486280615",
+    "title": "The Adventures of Huckleberry Finn",
+    "publicationYear": 1884,
+    "authorNames": [
+      "Mark Twain"
+    ]
+  },
+  {
+    "isbn": "9780486400778",
+    "title": "The Adventures of Tom Sawyer",
+    "publicationYear": 1876,
+    "authorNames": [
+      "Mark Twain"
+    ]
+  },
+  {
+    "isbn": "9780486415918",
+    "title": "A Connecticut Yankee in King Arthur's Court",
+    "publicationYear": 1889,
+    "authorNames": [
+      "Mark Twain"
+    ]
+  },
+  {
+    "isbn": "9780486280486",
+    "title": "The Scarlet Letter",
+    "publicationYear": 1850,
+    "authorNames": [
+      "Nathaniel Hawthorne"
+    ]
+  },
+  {
+    "isbn": "9780486408828",
+    "title": "The House of the Seven Gables",
+    "publicationYear": 1851,
+    "authorNames": [
+      "Nathaniel Hawthorne"
+    ]
+  },
+  {
+    "isbn": "9780486264721",
+    "title": "The Call of the Wild",
+    "publicationYear": 1903,
+    "authorNames": [
+      "Jack London"
+    ]
+  },
+  {
+    "isbn": "9780486266267",
+    "title": "White Fang",
+    "publicationYear": 1906,
+    "authorNames": [
+      "Jack London"
+    ]
+  },
+  {
+    "isbn": "9780486411088",
+    "title": "The Sea-Wolf",
+    "publicationYear": 1904,
+    "authorNames": [
+      "Jack London"
+    ]
+  },
+  {
+    "isbn": "9780486466705",
+    "title": "Martin Eden",
+    "publicationYear": 1909,
+    "authorNames": [
+      "Jack London"
+    ]
+  },
+  {
+    "isbn": "9780486419732",
+    "title": "The Iron Heel",
+    "publicationYear": 1908,
+    "authorNames": [
+      "Jack London"
+    ]
+  },
+  {
+    "isbn": "9780486419237",
+    "title": "The Jungle",
+    "publicationYear": 1906,
+    "authorNames": [
+      "Upton Sinclair"
+    ]
+  },
+  {
+    "isbn": "9780486417944",
+    "title": "Sister Carrie",
+    "publicationYear": 1900,
+    "authorNames": [
+      "Theodore Dreiser"
+    ]
+  },
+  {
+    "isbn": "9780451532091",
+    "title": "An American Tragedy",
+    "publicationYear": 1925,
+    "authorNames": [
+      "Theodore Dreiser"
+    ]
+  }
 ]

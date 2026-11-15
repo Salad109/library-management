@@ -67,7 +67,9 @@ Content-Type: application/json
   "lastName": "Mama"
 }
 
-> {% client.global.set("customerId", response.body.id); %}
+> {%
+    client.global.set("customerId", response.body.id);
+%}
 
 ###
 
@@ -76,7 +78,9 @@ POST http://localhost:8080/api/admin/customers/{{customerId}}/activation-code
 X-XSRF-TOKEN: example-token
 Cookie: XSRF-TOKEN=example-token
 
-> {% client.global.set("activationCode", response.body.activationCode); %}
+> {%
+    client.global.set("activationCode", response.body.activationCode);
+%}
 
 ###
 

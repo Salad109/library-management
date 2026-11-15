@@ -47,7 +47,6 @@ BOOKS = json.loads(pathlib.Path(__file__).with_name("books.json").read_text())
 TITLE_WORDS = [word for book in BOOKS for word in book["title"].split() if len(word) > 3]
 AUTHOR_SURNAMES = [name.split()[-1] for book in BOOKS for name in book["authorNames"]]
 
-
 LOG_LOCK = threading.Lock()
 
 

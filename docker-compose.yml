@@ -23,7 +23,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
       interval: 2s
       timeout: 3s
       retries: 30
@@ -56,6 +56,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      # Mount the folder, not the file: editors save by replacing the file
       - ./grafana/dashboards:/etc/grafana/dashboards:ro
     environment:
       - GF_LOG_LEVEL=warn
@@ -66,7 +67,7 @@ services:
   # Simulated users. Opt-in: docker compose --profile simulator up -d
   simulator:
     image: python:3.14-alpine
-    profiles: [simulator]
+    profiles: [ simulator ]
     env_file: .env
     environment:
       - SIMULATOR_BASE_URL=http://library-management-app:8080

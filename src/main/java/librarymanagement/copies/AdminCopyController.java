@@ -25,6 +25,10 @@ public class AdminCopyController {
         this.copyService = copyService;
     }
 
+    private static String blankToNull(String value) {
+        return StringUtils.hasText(value) ? value.strip() : null;
+    }
+
     @Operation(summary = "Get copies, optionally filtered",
             description = "Filters combine. title and customerLastName match case-insensitive substrings; " +
                     "blank filters are ignored.")
@@ -47,9 +51,5 @@ public class AdminCopyController {
     @ResponseStatus(HttpStatus.CREATED)
     public List<CopyResponse> createCopies(@Valid @RequestBody CopyCreateRequest copyCreateRequest) {
         return copyService.addCopies(copyCreateRequest.bookIsbn(), copyCreateRequest.quantity());
-    }
-
-    private static String blankToNull(String value) {
-        return StringUtils.hasText(value) ? value.strip() : null;
     }
 }

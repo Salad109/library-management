@@ -1,13 +1,13 @@
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import {svelte} from '@sveltejs/vite-plugin-svelte'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 
 export default defineConfig({
-  plugins: [tailwindcss(), svelte()],
-  build: {
-    outDir: '../target/classes/static',
-    emptyOutDir: true,
-    rolldownOptions: { input: ['login.html', 'books.html', 'copies.html', 'customers.html', 'librarians.html'] },
-  },
-  server: { proxy: { '/api': 'http://localhost:8080' } },
+    plugins: [tailwindcss(), svelte()],
+    build: {
+        outDir: '../target/classes/static',
+        emptyOutDir: true,
+        rolldownOptions: {input: ['login.html', 'books.html', 'copies.html', 'customers.html', 'librarians.html']},
+    },
+    server: {proxy: {'/api': 'http://localhost:8080'}},
 })

@@ -59,6 +59,22 @@ public abstract class IntegrationTest {
     @Autowired
     private LibrarianBootstrap librarianBootstrap;
 
+    /**
+     * A 400 whose ProblemDetail errors member has the message for the field.
+     */
+    protected static void assertFieldError(MvcTestResult result, String field, String message) {
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("errors")
+                .asArray()
+                .contains(Map.of("detail", message, "pointer", "#/" + field));
+    }
+
+    private static JsonNode readJson(MvcTestResult result) {
+        return new ObjectMapper().readTree(result.getResponse().getContentAsByteArray());
+    }
+
     @BeforeEach
     void resetDatabaseAndCaches() {
         List<String> tables = jdbcTemplate.queryForList("""
@@ -137,22 +153,6 @@ public abstract class IntegrationTest {
                         {"bookIsbn": "%s"}
                         """.formatted(isbn))
                 .exchange();
-    }
-
-    /**
-     * A 400 whose ProblemDetail errors member has the message for the field.
-     */
-    protected static void assertFieldError(MvcTestResult result, String field, String message) {
-        assertThat(result)
-                .hasStatus(HttpStatus.BAD_REQUEST)
-                .bodyJson()
-                .extractingPath("errors")
-                .asArray()
-                .contains(Map.of("detail", message, "pointer", "#/" + field));
-    }
-
-    private static JsonNode readJson(MvcTestResult result) {
-        return new ObjectMapper().readTree(result.getResponse().getContentAsByteArray());
     }
 
     protected MockHttpSession login(String email, String password) {

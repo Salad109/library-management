@@ -29,6 +29,15 @@ class CsrfTest extends IntegrationTest {
 
     private MockMvcTester browser;
 
+    private static String issuedToken(MvcTestResult result) {
+        for (Cookie cookie : result.getResponse().getCookies()) {
+            if (cookie.getName().equals(TOKEN_COOKIE) && !cookie.getValue().isEmpty()) {
+                return cookie.getValue();
+            }
+        }
+        return fail("The response set no " + TOKEN_COOKIE + " cookie");
+    }
+
     @BeforeEach
     void setUpBrowser() {
         browser = MockMvcTester.from(context, builder -> builder.apply(springSecurity()).build());
@@ -120,14 +129,5 @@ class CsrfTest extends IntegrationTest {
                         {"firstName": "Joe", "lastName": "Mama"}
                         """)
                 .exchange();
-    }
-
-    private static String issuedToken(MvcTestResult result) {
-        for (Cookie cookie : result.getResponse().getCookies()) {
-            if (cookie.getName().equals(TOKEN_COOKIE) && !cookie.getValue().isEmpty()) {
-                return cookie.getValue();
-            }
-        }
-        return fail("The response set no " + TOKEN_COOKIE + " cookie");
     }
 }

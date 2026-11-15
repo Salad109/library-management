@@ -31,6 +31,11 @@ class CustomerActivationTest extends IntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private static void assertInvalidCode(MvcTestResult result) {
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.ACTIVATION_CODE_INVALID);
+    }
+
     @Test
     void testGenerateActivationCode() {
         MockHttpSession librarianSession = librarianSession();
@@ -116,10 +121,5 @@ class CustomerActivationTest extends IntegrationTest {
                 .uri("/api/admin/customers/{id}/activation-code", customerId)
                 .session(session)
                 .exchange();
-    }
-
-    private static void assertInvalidCode(MvcTestResult result) {
-        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
-        assertThat(result).bodyJson().extractingPath("detail").isEqualTo(Messages.ACTIVATION_CODE_INVALID);
     }
 }
