@@ -6,3 +6,6 @@ library:
     # IntegrationTest.librarianSession() runs LibrarianBootstrap with these
     email: librarian@example.com
     password: password123
+  reservations:
+    # Off so it can't race the tests
+    expiry-cron: "-"

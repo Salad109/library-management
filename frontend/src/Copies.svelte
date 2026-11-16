@@ -168,7 +168,12 @@
                             -
                         {/if}
                     </td>
-                    <td>{copy.status}</td>
+                    <td>
+                        {copy.status}
+                        {#if copy.dueAt}
+                            <div class="text-xs opacity-70">until {new Date(copy.dueAt).toLocaleString()}</div>
+                        {/if}
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-error" onclick={() => markCopyLost(copy)}
                                 disabled={copy.status === CopyStatus.LOST}>

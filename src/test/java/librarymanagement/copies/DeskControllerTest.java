@@ -44,11 +44,15 @@ class DeskControllerTest extends IntegrationTest {
                 .isEqualTo(reservedCopyId);
 
         // Reserved and available copies can both be checked out
-        assertThat(desk(librarianSession, "checkout", reservedCopyId, customerId))
+        MvcTestResult reservedCheckout = desk(librarianSession, "checkout", reservedCopyId, customerId);
+        assertThat(reservedCheckout)
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .extractingPath("status")
                 .isEqualTo("BORROWED");
+        assertThat(reservedCheckout)
+                .bodyJson()
+                .doesNotHavePath("dueAt");
         assertThat(desk(librarianSession, "checkout", availableCopyId, customerId))
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()

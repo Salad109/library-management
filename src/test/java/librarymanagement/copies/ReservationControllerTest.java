@@ -7,13 +7,20 @@ import librarymanagement.utils.IntegrationTest;
 import librarymanagement.utils.TestISBNGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CountDownLatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +29,21 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Autowired
     private MockMvcTester mockMvcTester;
+
+    @Autowired
+    private CopyService copyService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Value("${library.reservations.max-active}")
+    private int maxActiveReservations;
+
+    @Value("${library.reservations.hold-days}")
+    private int reservationHoldDays;
+
+    @Value("${library.reservations.max-extensions}")
+    private int maxReservationExtensions;
 
     @Test
     void testCreateReservation() throws Exception {
@@ -46,11 +68,11 @@ class ReservationControllerTest extends IntegrationTest {
      */
     @Test
     void testReservationLimit() throws Exception {
-        String isbn = createBookWithCopies(CopyService.MAX_ACTIVE_RESERVATIONS + 1);
+        String isbn = createBookWithCopies(maxActiveReservations + 1);
         MockHttpSession session = customerAccount("hoarder@example.com", "Joe", "Mama").session();
 
         int firstCopyId = ControllerTestUtils.extractIdFromResponse(reserve(session, isbn));
-        for (int i = 1; i < CopyService.MAX_ACTIVE_RESERVATIONS; i++) {
+        for (int i = 1; i < maxActiveReservations; i++) {
             assertThat(reserve(session, isbn)).hasStatus(HttpStatus.CREATED);
         }
 
@@ -58,12 +80,66 @@ class ReservationControllerTest extends IntegrationTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("detail")
-                .isEqualTo(Messages.COPY_RESERVATION_LIMIT + CopyService.MAX_ACTIVE_RESERVATIONS);
+                .isEqualTo(Messages.COPY_RESERVATION_LIMIT + maxActiveReservations);
 
         // Cancelling one frees a slot
         assertThat(mockMvcTester.delete().uri("/api/reservations/" + firstCopyId).session(session))
                 .hasStatus(HttpStatus.NO_CONTENT);
         assertThat(reserve(session, isbn)).hasStatus(HttpStatus.CREATED);
+    }
+
+    /**
+     * 1. Create a book with two copies and reserve both.
+     * 2. Move the first reservation's deadline into the past.
+     * 3. Run the expiry.
+     * 4. The book shows one available copy again.
+     */
+    @Test
+    void testReservationExpires() throws Exception {
+        String isbn = createBookWithCopies(2);
+        MockHttpSession session = customerAccount("joe@example.com", "Joe", "Mama").session();
+
+        Instant before = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        MvcTestResult first = reserve(session, isbn);
+        Instant after = Instant.now();
+        Duration hold = Duration.ofDays(reservationHoldDays);
+        assertThat(dueAt(first)).isBetween(before.plus(hold), after.plus(hold));
+        int expiredCopyId = ControllerTestUtils.extractIdFromResponse(first);
+        int keptCopyId = ControllerTestUtils.extractIdFromResponse(reserve(session, isbn));
+
+        jdbcTemplate.update("UPDATE copies SET due_at = now() - INTERVAL '1 minute' WHERE id = ?", expiredCopyId);
+        copyService.expireReservations();
+
+        assertThat(mockMvcTester.get().uri("/api/reservations/mine").session(session))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("content[*].id")
+                .asArray()
+                .containsExactly(keptCopyId);
+        assertThat(mockMvcTester.get().uri("/api/books/" + isbn))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .extractingPath("availableCopies")
+                .isEqualTo(1);
+    }
+
+    @Test
+    void testExtendReservation() throws Exception {
+        String isbn = createBookWithCopies(1);
+        MockHttpSession session = customerAccount("joe@example.com", "Joe", "Mama").session();
+        MvcTestResult reservation = reserve(session, isbn);
+        int copyId = ControllerTestUtils.extractIdFromResponse(reservation);
+        assertThat(reservation).bodyJson().extractingPath("renewals").isEqualTo(0);
+
+        MvcTestResult extended = mockMvcTester.post().uri("/api/reservations/" + copyId + "/extend").session(session).exchange();
+
+        assertThat(extended).hasStatus(HttpStatus.OK).bodyJson().extractingPath("renewals").isEqualTo(1);
+        assertThat(dueAt(extended)).isEqualTo(dueAt(reservation).plus(Duration.ofDays(reservationHoldDays)));
+        assertThat(mockMvcTester.post().uri("/api/reservations/" + copyId + "/extend").session(session))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("detail")
+                .isEqualTo(Messages.COPY_EXTENSION_LIMIT + maxReservationExtensions);
     }
 
     /**
@@ -166,6 +242,11 @@ class ReservationControllerTest extends IntegrationTest {
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    private static Instant dueAt(MvcTestResult result) throws Exception {
+        JsonNode body = new ObjectMapper().readTree(result.getResponse().getContentAsString());
+        return Instant.parse(body.get("dueAt").asString());
     }
 
     private String createBookWithCopies(int copies) {

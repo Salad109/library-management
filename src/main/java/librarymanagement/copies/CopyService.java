@@ -12,16 +12,21 @@ import librarymanagement.customers.CustomerService;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.resilience.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,17 +34,25 @@ import java.util.Set;
 
 @Service
 public class CopyService {
-    public static final int MAX_ACTIVE_RESERVATIONS = 3;
     private static final Set<String> SORT_FIELDS = Set.of("id", "status");
     private static final Logger log = LoggerFactory.getLogger(CopyService.class);
     private final CopyRepository copyRepository;
     private final BookService bookService;
     private final CustomerService customerService;
+    private final int maxActiveReservations;
+    private final Duration reservationHold;
+    private final int maxReservationExtensions;
 
-    public CopyService(CopyRepository copyRepository, BookService bookService, CustomerService customerService) {
+    public CopyService(CopyRepository copyRepository, BookService bookService, CustomerService customerService,
+                       @Value("${library.reservations.max-active}") int maxActiveReservations,
+                       @Value("${library.reservations.hold-days}") int reservationHoldDays,
+                       @Value("${library.reservations.max-extensions}") int maxReservationExtensions) {
         this.copyRepository = copyRepository;
         this.bookService = bookService;
         this.customerService = customerService;
+        this.maxActiveReservations = maxActiveReservations;
+        this.reservationHold = Duration.ofDays(reservationHoldDays);
+        this.maxReservationExtensions = maxReservationExtensions;
     }
 
     // Hibernate's ILIKE for the trigram indexes
@@ -57,19 +70,19 @@ public class CopyService {
 
         List<Specification<Copy>> filters = new ArrayList<>();
         if (isbn != null) {
-            filters.add((copy, query, cb) ->
+            filters.add((copy, _, cb) ->
                     cb.equal(copy.get("book").get("isbn"), isbn));
         }
         if (title != null) {
-            filters.add((copy, query, cb) ->
+            filters.add((copy, _, cb) ->
                     containsIgnoreCase(cb, copy.join("book").get("title"), title));
         }
         if (customerId != null) {
-            filters.add((copy, query, cb) ->
+            filters.add((copy, _, cb) ->
                     cb.equal(copy.get("customer").get("id"), customerId));
         }
         if (customerLastName != null) {
-            filters.add((copy, query, cb) ->
+            filters.add((copy, _, cb) ->
                     containsIgnoreCase(cb, copy.join("customer").get("lastName"), customerLastName));
         }
 
@@ -111,6 +124,8 @@ public class CopyService {
         Copy existingCopy = getCopyOrThrow(copyId);
 
         existingCopy.setStatus(CopyStatus.LOST);
+        existingCopy.setDueAt(null);
+        existingCopy.setRenewals(0);
         Copy savedCopy = save(existingCopy);
 
         log.info("Copy with ID: {} marked as lost", savedCopy.getId());
@@ -121,9 +136,9 @@ public class CopyService {
     @Transactional
     @Retryable(includes = OptimisticLockingFailureException.class, maxRetries = 2, delay = 50)
     public CopyResponse reserveAnyAvailableCopy(String isbn, Long customerId) {
-        if (copyRepository.countByCustomerIdAndStatus(customerId, CopyStatus.RESERVED) >= MAX_ACTIVE_RESERVATIONS) {
+        if (copyRepository.countByCustomerIdAndStatus(customerId, CopyStatus.RESERVED) >= maxActiveReservations) {
             log.info("Customer ID: {} has reached the reservation limit", customerId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_RESERVATION_LIMIT + MAX_ACTIVE_RESERVATIONS);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_RESERVATION_LIMIT + maxActiveReservations);
         }
 
         Optional<Copy> availableCopy = copyRepository.findFirstByBookIsbnAndStatusOrderById(isbn, CopyStatus.AVAILABLE);
@@ -139,9 +154,11 @@ public class CopyService {
 
         copyToReserve.setCustomer(customer);
         copyToReserve.setStatus(CopyStatus.RESERVED);
+        copyToReserve.setDueAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plus(reservationHold));
+        copyToReserve.setRenewals(0);
         Copy savedCopy = save(copyToReserve);
 
-        log.info("Copy with ID: {} reserved for customer ID: {}", copyId, customerId);
+        log.info("Copy with ID: {} reserved for customer ID: {} until {}", copyId, customerId, savedCopy.getDueAt());
         return CopyResponse.from(savedCopy);
     }
 
@@ -149,6 +166,36 @@ public class CopyService {
     public void cancelReservation(Long copyId, Long customerId) {
         release(copyId, customerId, CopyStatus.RESERVED, Messages.COPY_NOT_RESERVED);
         log.info("Cancelled reservation for copy with ID: {}", copyId);
+    }
+
+    @Transactional
+    public CopyResponse extendReservation(Long copyId, Long customerId) {
+        Copy copy = getCopyOrThrow(copyId);
+        requireStatusAndOwner(copy, CopyStatus.RESERVED, Messages.COPY_NOT_RESERVED, customerId);
+        if (copy.getRenewals() >= maxReservationExtensions) {
+            log.warn("Reservation for copy with ID: {} was already extended {} times", copyId, copy.getRenewals());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_EXTENSION_LIMIT + maxReservationExtensions);
+        }
+
+        copy.setDueAt(copy.getDueAt().plus(reservationHold));
+        copy.setRenewals(copy.getRenewals() + 1);
+        Copy savedCopy = save(copy);
+        log.info("Reservation for copy with ID: {} extended until {}", copyId, savedCopy.getDueAt());
+        return CopyResponse.from(savedCopy);
+    }
+
+    @Scheduled(cron = "${library.reservations.expiry-cron}")
+    @Transactional
+    public void expireReservations() {
+        List<Copy> expiredCopies = copyRepository.findByStatusAndDueAtBefore(CopyStatus.RESERVED, Instant.now());
+        for (Copy copy : expiredCopies) {
+            log.info("Reservation for copy with ID: {} by customer ID: {} expired", copy.getId(), copy.getCustomer().getId());
+            copy.setCustomer(null);
+            copy.setStatus(CopyStatus.AVAILABLE);
+            copy.setDueAt(null);
+            copy.setRenewals(0);
+            save(copy);
+        }
     }
 
     // Available copies go to anyone, reserved ones only to the customer who reserved them
@@ -167,6 +214,8 @@ public class CopyService {
 
         copy.setCustomer(customer);
         copy.setStatus(CopyStatus.BORROWED);
+        copy.setDueAt(null);
+        copy.setRenewals(0);
         Copy savedCopy = save(copy);
         log.info("Copy with ID: {} checked out to customer ID: {}", copyId, customerId);
         return CopyResponse.from(savedCopy);
@@ -177,19 +226,24 @@ public class CopyService {
     // Makes a borrowed or reserved copy available again; only its own customer can release it
     private Copy release(Long copyId, Long customerId, CopyStatus expectedStatus, String wrongStatusMessage) {
         Copy copy = getCopyOrThrow(copyId);
+        requireStatusAndOwner(copy, expectedStatus, wrongStatusMessage, customerId);
+        copy.setCustomer(null);
+        copy.setStatus(CopyStatus.AVAILABLE);
+        copy.setDueAt(null);
+        copy.setRenewals(0);
+        return save(copy);
+    }
+
+    private void requireStatusAndOwner(Copy copy, CopyStatus expectedStatus, String wrongStatusMessage, Long customerId) {
         if (copy.getStatus() != expectedStatus) {
-            log.warn("Copy with ID: {} is not {}, current status: {}", copyId, expectedStatus, copy.getStatus());
+            log.warn("Copy with ID: {} is not {}, current status: {}", copy.getId(), expectedStatus, copy.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, wrongStatusMessage + copy.getStatus());
         }
         Long ownerId = copy.getCustomer().getId();
         if (!ownerId.equals(customerId)) {
-            log.warn("Copy with ID: {} belongs to customer ID: {}, not {}", copyId, ownerId, customerId);
+            log.warn("Copy with ID: {} belongs to customer ID: {}, not {}", copy.getId(), ownerId, customerId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Messages.COPY_WRONG_CUSTOMER + ownerId);
         }
-
-        copy.setCustomer(null);
-        copy.setStatus(CopyStatus.AVAILABLE);
-        return save(copy);
     }
 
     public Copy getCopyOrThrow(Long id) {

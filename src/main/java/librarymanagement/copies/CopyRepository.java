@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,4 +16,6 @@ public interface CopyRepository extends JpaRepository<Copy, Long>, JpaSpecificat
     boolean existsByBookIsbn(String isbn);
 
     long countByCustomerIdAndStatus(Long customerId, CopyStatus status);
+
+    List<Copy> findByStatusAndDueAtBefore(CopyStatus status, Instant time);
 }

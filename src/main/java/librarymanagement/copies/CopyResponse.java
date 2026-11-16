@@ -5,19 +5,24 @@ import librarymanagement.authors.AuthorResponse;
 import librarymanagement.books.Book;
 import librarymanagement.customers.Customer;
 
+import java.time.Instant;
 import java.util.List;
 
 public record CopyResponse(@NotNull Long id,
                            @NotNull BookSummaryResponse book,
                            CustomerSummaryResponse customer,
-                           @NotNull CopyStatus status) {
+                           @NotNull CopyStatus status,
+                           Instant dueAt,
+                           @NotNull Integer renewals) {
 
     public static CopyResponse from(Copy copy) {
         return new CopyResponse(
                 copy.getId(),
                 BookSummaryResponse.from(copy.getBook()),
                 copy.getCustomer() != null ? CustomerSummaryResponse.from(copy.getCustomer()) : null,
-                copy.getStatus());
+                copy.getStatus(),
+                copy.getDueAt(),
+                copy.getRenewals());
     }
 
     public record CustomerSummaryResponse(@NotNull Long id, @NotNull String firstName, @NotNull String lastName) {

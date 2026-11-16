@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import librarymanagement.books.Book;
 import librarymanagement.customers.Customer;
 
+import java.time.Instant;
+
 @Entity
 @Table(name = "copies")
 public class Copy {
@@ -22,6 +24,12 @@ public class Copy {
 
     @Enumerated(EnumType.STRING)
     private CopyStatus status; // "available", "reserved", "borrowed" or "lost"
+
+    // Deadline for the current status
+    private Instant dueAt;
+
+    // Times the deadline was extended
+    private int renewals;
 
     public Copy() {
     }
@@ -56,5 +64,21 @@ public class Copy {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public Instant getDueAt() {
+        return dueAt;
+    }
+
+    public void setDueAt(Instant dueAt) {
+        this.dueAt = dueAt;
+    }
+
+    public int getRenewals() {
+        return renewals;
+    }
+
+    public void setRenewals(int renewals) {
+        this.renewals = renewals;
     }
 }

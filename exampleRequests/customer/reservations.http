@@ -30,6 +30,13 @@ Content-Type: application/json
 
 ###
 
+### Extend a reservation by another hold period
+POST http://localhost:8080/api/reservations/1/extend
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
+
+###
+
 ### Cancel specific reservation
 DELETE http://localhost:8080/api/reservations/1
 X-XSRF-TOKEN: example-token

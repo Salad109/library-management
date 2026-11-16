@@ -34,7 +34,9 @@ public class ReservationController {
 
     @Operation(summary = "Reserve a copy of a book",
             description = "Customers can reserve an available copy of a book by its ISBN, " +
-                    "up to 3 active reservations. Requires CUSTOMER role")
+                    "up to ${library.reservations.max-active} active reservations. A reservation is held for " +
+                    "${library.reservations.hold-days} days, then the copy becomes available again. " +
+                    "Requires CUSTOMER role")
     @PostMapping("/api/reservations")
     @ResponseStatus(HttpStatus.CREATED)
     public CopyResponse createReservation(@AuthenticationPrincipal AuthenticatedUser user,
@@ -48,5 +50,13 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelReservation(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable Long copyId) {
         copyService.cancelReservation(copyId, user.getCustomerId());
+    }
+
+    @Operation(summary = "Extend a reservation",
+            description = "Customers can extend their reservation ${library.reservations.max-extensions} time(s), " +
+                    "by another ${library.reservations.hold-days} days each. Requires CUSTOMER role")
+    @PostMapping("/api/reservations/{copyId}/extend")
+    public CopyResponse extendReservation(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable Long copyId) {
+        return copyService.extendReservation(copyId, user.getCustomerId());
     }
 }

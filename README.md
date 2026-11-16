@@ -11,6 +11,7 @@ reservations, and librarian workflow management.
 - Author management with many-to-many relationships to books
 - Copy tracking with status management (available, borrowed, reserved, lost)
 - Borrowing and reservation system with state transition validation
+- Reservations expire after 3 days unless picked up; customers can extend once
 - Customer management with offline and online account separation
 - Role-based access control (Librarian vs Customer vs Public)
 - Optimistic locking and retry mechanisms to prevent concurrency issues
@@ -91,7 +92,7 @@ code
 
 ### Customer Self-Service (CUSTOMER role)
 
-Create, view and cancel your reservations
+Create, view, extend and cancel your reservations
 
 ### Desk Operations (LIBRARIAN role)
 
@@ -134,6 +135,7 @@ exampleRequests/
 - [x] Comprehensive test coverage written while procrastinating adding new features (ongoing)
 - [x] Customer management
 - [x] Borrowing and reservation system with customers
+- [x] Reservation expiry with one customer extension
 - [x] Authentication and authorization with Spring Security
 - [x] Password hashing and secure user management
 - [x] Role-based access control (Librarian vs Customer)

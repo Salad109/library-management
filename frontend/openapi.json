@@ -147,7 +147,7 @@
       "post" : {
         "tags" : [ "Customer Reservations" ],
         "summary" : "Reserve a copy of a book",
-        "description" : "Customers can reserve an available copy of a book by its ISBN, up to 3 active reservations. Requires CUSTOMER role",
+        "description" : "Customers can reserve an available copy of a book by its ISBN, up to 3 active reservations. A reservation is held for 3 days, then the copy becomes available again. Requires CUSTOMER role",
         "operationId" : "createReservation",
         "requestBody" : {
           "content" : {
@@ -162,6 +162,35 @@
         "responses" : {
           "201" : {
             "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{copyId}/extend" : {
+      "post" : {
+        "tags" : [ "Customer Reservations" ],
+        "summary" : "Extend a reservation",
+        "description" : "Customers can extend their reservation 1 time(s), by another 3 days each. Requires CUSTOMER role",
+        "operationId" : "extendReservation",
+        "parameters" : [ {
+          "name" : "copyId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1105,9 +1134,17 @@
           },
           "status" : {
             "$ref" : "#/components/schemas/CopyStatus"
+          },
+          "dueAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "renewals" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         },
-        "required" : [ "book", "id", "status" ]
+        "required" : [ "book", "id", "renewals", "status" ]
       },
       "CopyStatus" : {
         "type" : "string",

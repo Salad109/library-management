@@ -57,3 +57,11 @@ library:
     # First librarian, created at startup only if no librarian exist
     email: ${LIBRARY_ADMIN_EMAIL:}
     password: ${LIBRARY_ADMIN_PASSWORD:}
+  reservations:
+    # Reserved copies one customer can hold at once
+    max-active: 3
+    # Days a reserved copy is held for pick-up
+    hold-days: 3
+    max-extensions: 1
+    # How often expired reservations are released
+    expiry-cron: "0 * * * * *"
