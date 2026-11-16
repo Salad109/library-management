@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @PreAuthorize("hasRole('LIBRARIAN')")
-@Tag(name = "Desk Operations", description = "Librarians can manage copy checkouts, returns, and lost copies. " +
+@Tag(name = "Desk Operations", description = "Librarians can manage copy checkouts, renewals, returns, and lost copies. " +
         "Requires LIBRARIAN role")
 public class DeskController {
 
@@ -22,7 +22,8 @@ public class DeskController {
 
     @Operation(summary = "Checkout a copy to a customer",
             description = "Desk operation. Librarians can checkout a copy to a customer. The copy must be either " +
-                    "available or reserved by the specific customer. Requires LIBRARIAN role")
+                    "available or reserved by the specific customer. " +
+                    "The loan is due ${library.loans.period-days} days later. Requires LIBRARIAN role")
     @PostMapping("/api/desk/checkout")
     public CopyResponse checkout(@Valid @RequestBody CopyCheckoutRequest request) {
         return copyService.checkout(request.copyId(), request.customerId());
@@ -34,6 +35,14 @@ public class DeskController {
     @PostMapping("/api/desk/return")
     public CopyResponse returnCopy(@Valid @RequestBody CopyReturnRequest request) {
         return copyService.returnCopy(request.copyId(), request.customerId());
+    }
+
+    @Operation(summary = "Renew a loan",
+            description = "Desk operation. Librarians can renew any loan. " +
+                    "It'll then be due ${library.loans.period-days} days from now. Requires LIBRARIAN role")
+    @PostMapping("/api/desk/renew")
+    public CopyResponse renewLoan(@Valid @RequestBody CopyRenewRequest request) {
+        return copyService.renewLoan(request.copyId(), request.customerId());
     }
 
     @Operation(summary = "Mark a copy as lost",

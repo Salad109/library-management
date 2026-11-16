@@ -42,17 +42,20 @@ public class CopyService {
     private final int maxActiveReservations;
     private final Duration reservationHold;
     private final int maxReservationExtensions;
+    private final Duration loanPeriod;
 
     public CopyService(CopyRepository copyRepository, BookService bookService, CustomerService customerService,
                        @Value("${library.reservations.max-active}") int maxActiveReservations,
                        @Value("${library.reservations.hold-days}") int reservationHoldDays,
-                       @Value("${library.reservations.max-extensions}") int maxReservationExtensions) {
+                       @Value("${library.reservations.max-extensions}") int maxReservationExtensions,
+                       @Value("${library.loans.period-days}") int loanPeriodDays) {
         this.copyRepository = copyRepository;
         this.bookService = bookService;
         this.customerService = customerService;
         this.maxActiveReservations = maxActiveReservations;
         this.reservationHold = Duration.ofDays(reservationHoldDays);
         this.maxReservationExtensions = maxReservationExtensions;
+        this.loanPeriod = Duration.ofDays(loanPeriodDays);
     }
 
     // Hibernate's ILIKE for the trigram indexes
@@ -64,7 +67,7 @@ public class CopyService {
     // Null filters are ignored
     @Transactional(readOnly = true)
     public Page<CopyResponse> getCopies(String isbn, String title, Long customerId, String customerLastName,
-                                        Pageable pageable) {
+                                        boolean overdue, Pageable pageable) {
         SortFields.requireAllowed(pageable, SORT_FIELDS);
         Pageable stablePageable = SortFields.withTiebreaker(pageable, "id");
 
@@ -84,6 +87,12 @@ public class CopyService {
         if (customerLastName != null) {
             filters.add((copy, _, cb) ->
                     containsIgnoreCase(cb, copy.join("customer").get("lastName"), customerLastName));
+        }
+        if (overdue) {
+            Instant now = Instant.now();
+            filters.add((copy, _, cb) -> cb.and(
+                    cb.equal(copy.get("status"), CopyStatus.BORROWED),
+                    cb.lessThan(copy.get("dueAt"), now)));
         }
 
         return copyRepository.findAll(Specification.allOf(filters), stablePageable).map(CopyResponse::from);
@@ -214,10 +223,22 @@ public class CopyService {
 
         copy.setCustomer(customer);
         copy.setStatus(CopyStatus.BORROWED);
-        copy.setDueAt(null);
+        copy.setDueAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plus(loanPeriod));
         copy.setRenewals(0);
         Copy savedCopy = save(copy);
-        log.info("Copy with ID: {} checked out to customer ID: {}", copyId, customerId);
+        log.info("Copy with ID: {} checked out to customer ID: {}, due {}", copyId, customerId, savedCopy.getDueAt());
+        return CopyResponse.from(savedCopy);
+    }
+
+    @Transactional
+    public CopyResponse renewLoan(Long copyId, Long customerId) {
+        Copy copy = getCopyOrThrow(copyId);
+        requireStatusAndOwner(copy, CopyStatus.BORROWED, Messages.COPY_NOT_BORROWED, customerId);
+
+        copy.setDueAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plus(loanPeriod));
+        copy.setRenewals(copy.getRenewals() + 1);
+        Copy savedCopy = save(copy);
+        log.info("Loan of copy with ID: {} renewed until {}", copyId, savedCopy.getDueAt());
         return CopyResponse.from(savedCopy);
     }
 

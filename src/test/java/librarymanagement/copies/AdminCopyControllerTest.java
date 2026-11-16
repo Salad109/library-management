@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -21,6 +22,9 @@ class AdminCopyControllerTest extends IntegrationTest {
 
     @Autowired
     private MockMvcTester mockMvcTester;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     void testCreateCopies() {
@@ -97,6 +101,10 @@ class AdminCopyControllerTest extends IntegrationTest {
         assertCopyCount(0, "/api/admin/copies?title={title}&customerLastName={name}", "filtered", "other");
         assertCopyCount(2, "/api/admin/copies?title={title}", " ");
         assertCopyCount(2, "/api/admin/copies?isbn={isbn}&size=1", isbn);
+        assertCopyCount(0, "/api/admin/copies?overdue=true");
+        jdbcTemplate.update("UPDATE copies SET due_at = now() - INTERVAL '1 day' WHERE id = ?", copyId);
+        assertCopyCount(1, "/api/admin/copies?overdue=true");
+        assertCopyCount(0, "/api/admin/copies?overdue=true&title={title}", "other");
     }
 
     private void assertCopyCount(int expected, String uri, Object... uriVariables) {

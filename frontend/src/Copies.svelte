@@ -1,6 +1,6 @@
 <script lang="ts">
     import type {CopyResponse, GetCopiesData, PagedModelCopyResponse} from './api'
-    import {checkout, CopyStatus, createCopies, getCopies, markLost, returnCopy} from './api'
+    import {checkout, CopyStatus, createCopies, getCopies, markLost, renewLoan, returnCopy} from './api'
     import FieldError from './components/FieldError.svelte'
     import Modal from './components/Modal.svelte'
     import Navbar from './components/Navbar.svelte'
@@ -17,13 +17,15 @@
     const q = params.get('q')?.trim() ?? ''
     const searchType = params.get('searchType') ?? 'title'
     const pageNumber = Number(params.get('page') ?? 0)
+    const overdue = params.get('overdue') === 'true'
+    const overdueText = overdue ? 'overdue ' : ''
     const searchLabel = searchTypes.find((type) => type.value === searchType)?.label
 
     let copies = $state<PagedModelCopyResponse>()
     let error = $state('')
     let notice = $state('')
 
-    let dialog = $state<'checkout' | 'return' | 'add' | null>(null)
+    let dialog = $state<'checkout' | 'return' | 'renew' | 'add' | null>(null)
     let formError = $state<Error>()
     let customerId = $state<number | null>(null)
     let copyId = $state<number | null>(null)
@@ -32,12 +34,22 @@
 
     function searchQuery() {
         const query: GetCopiesData['query'] = {page: pageNumber}
+        if (overdue) query.overdue = true
         if (q === '') return query
         if (searchType === 'isbn') query.isbn = q
         if (searchType === 'title') query.title = q
         if (searchType === 'customerId') query.customerId = Number(q)
         if (searchType === 'customerLastName') query.customerLastName = q
         return query
+    }
+
+    function isOverdue(copy: CopyResponse) {
+        return copy.status === CopyStatus.BORROWED && copy.dueAt !== undefined && new Date(copy.dueAt) < new Date()
+    }
+
+    // Whole days past the due date
+    function daysOverdue(dueAt: string) {
+        return Math.floor((Date.now() - new Date(dueAt).getTime()) / (24 * 60 * 60 * 1000))
     }
 
     async function load() {
@@ -53,7 +65,7 @@
         }
     }
 
-    function openDesk(action: 'checkout' | 'return') {
+    function openDesk(action: 'checkout' | 'return' | 'renew') {
         formError = undefined
         customerId = null
         copyId = null
@@ -86,9 +98,23 @@
         const body = {copyId: copyId as number, customerId: customerId as number}
         if (dialog === 'checkout') {
             submit(event, () => checkout({body: body}), 'Checkout completed successfully')
-        } else {
+        } else if (dialog === 'return') {
             submit(event, () => returnCopy({body: body}), 'Return completed successfully')
+        } else {
+            submit(event, () => renewLoan({body: body}), 'Loan renewed successfully')
         }
+    }
+
+    function deskTitle() {
+        if (dialog === 'checkout') return 'Checkout Copy'
+        if (dialog === 'return') return 'Return Copy'
+        return 'Renew Loan'
+    }
+
+    function deskButton() {
+        if (dialog === 'checkout') return 'Checkout'
+        if (dialog === 'return') return 'Return'
+        return 'Renew'
     }
 
     function submitAdd(event: SubmitEvent) {
@@ -118,20 +144,27 @@
     <h1 class="mb-4 text-3xl font-bold">Copies</h1>
 
     <div class="mb-4 flex flex-wrap justify-between gap-2">
-        <form class="join">
-            <select aria-label="Search by" class="select join-item w-48" name="searchType">
-                {#each searchTypes as type (type.value)}
-                    <option value={type.value} selected={type.value === searchType}>{type.label}</option>
-                {/each}
-            </select>
-            <input autocomplete="off" class="input join-item w-64" name="q" placeholder="Enter search term..."
-                   value={q}/>
-            <button class="btn btn-primary join-item" type="submit">Search</button>
-            <a class="btn join-item" href="?">Clear</a>
+        <form class="flex flex-wrap items-center gap-4">
+            <div class="join">
+                <select aria-label="Search by" class="select join-item w-48" name="searchType">
+                    {#each searchTypes as type (type.value)}
+                        <option value={type.value} selected={type.value === searchType}>{type.label}</option>
+                    {/each}
+                </select>
+                <input autocomplete="off" class="input join-item w-64" name="q" placeholder="Enter search term..."
+                       value={q}/>
+                <button class="btn btn-primary join-item" type="submit">Search</button>
+                <a class="btn join-item" href="?">Clear</a>
+            </div>
+            <label class="label">
+                <input class="checkbox" name="overdue" type="checkbox" value="true" checked={overdue}/>
+                Overdue only
+            </label>
         </form>
         <div>
             <button class="btn btn-success" onclick={() => openDesk('checkout')}>Checkout</button>
             <button class="btn btn-warning" onclick={() => openDesk('return')}>Return</button>
+            <button class="btn btn-secondary" onclick={() => openDesk('renew')}>Renew</button>
             <button class="btn btn-info" onclick={openAdd}>Add Copies</button>
         </div>
     </div>
@@ -144,7 +177,9 @@
     {/if}
 
     {#if copies}
-        <p class="mb-2 opacity-70">{q ? `Showing results for ${searchLabel}: "${q}"` : 'Showing all copies'}</p>
+        <p class="mb-2 opacity-70">
+            {q ? `Showing ${overdueText}results for ${searchLabel}: "${q}"` : `Showing all ${overdueText}copies`}
+        </p>
 
         <table class="table table-zebra mb-4">
             <thead>
@@ -170,8 +205,15 @@
                     </td>
                     <td>
                         {copy.status}
-                        {#if copy.dueAt}
+                        {#if copy.dueAt && isOverdue(copy)}
+                            <div class="text-xs text-error">
+                                overdue since {new Date(copy.dueAt).toLocaleDateString()} ({daysOverdue(copy.dueAt)} days)
+                            </div>
+                        {:else if copy.dueAt}
                             <div class="text-xs opacity-70">until {new Date(copy.dueAt).toLocaleString()}</div>
+                        {/if}
+                        {#if copy.renewals > 0}
+                            <div class="text-xs opacity-70">renewed {copy.renewals}×</div>
                         {/if}
                     </td>
                     <td>
@@ -189,8 +231,8 @@
     {/if}
 </main>
 
-{#if dialog === 'checkout' || dialog === 'return'}
-    <Modal title={dialog === 'checkout' ? 'Checkout Copy' : 'Return Copy'} onclose={() => (dialog = null)}>
+{#if dialog === 'checkout' || dialog === 'return' || dialog === 'renew'}
+    <Modal title={deskTitle()} onclose={() => (dialog = null)}>
         <form onsubmit={submitDesk}>
             {#if formError}
                 <div class="alert alert-error mb-4">{formError.message}</div>
@@ -207,7 +249,7 @@
             </div>
             <div class="modal-action">
                 <button class="btn" type="button" onclick={() => (dialog = null)}>Cancel</button>
-                <button class="btn btn-primary" type="submit">{dialog === 'checkout' ? 'Checkout' : 'Return'}</button>
+                <button class="btn btn-primary" type="submit">{deskButton()}</button>
             </div>
         </form>
     </Modal>

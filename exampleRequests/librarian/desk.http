@@ -27,6 +27,19 @@ Content-Type: application/json
 
 ###
 
+### Renew a loan for another loan period from today
+POST http://localhost:8080/api/desk/renew
+X-XSRF-TOKEN: example-token
+Cookie: XSRF-TOKEN=example-token
+Content-Type: application/json
+
+{
+  "copyId": 1,
+  "customerId": 1
+}
+
+###
+
 ### Mark copy as lost
 POST http://localhost:8080/api/desk/mark-lost
 X-XSRF-TOKEN: example-token

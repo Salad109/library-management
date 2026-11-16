@@ -15,8 +15,6 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -103,7 +101,7 @@ class ReservationControllerTest extends IntegrationTest {
         MvcTestResult first = reserve(session, isbn);
         Instant after = Instant.now();
         Duration hold = Duration.ofDays(reservationHoldDays);
-        assertThat(dueAt(first)).isBetween(before.plus(hold), after.plus(hold));
+        assertThat(ControllerTestUtils.extractDueAtFromResponse(first)).isBetween(before.plus(hold), after.plus(hold));
         int expiredCopyId = ControllerTestUtils.extractIdFromResponse(first);
         int keptCopyId = ControllerTestUtils.extractIdFromResponse(reserve(session, isbn));
 
@@ -134,7 +132,9 @@ class ReservationControllerTest extends IntegrationTest {
         MvcTestResult extended = mockMvcTester.post().uri("/api/reservations/" + copyId + "/extend").session(session).exchange();
 
         assertThat(extended).hasStatus(HttpStatus.OK).bodyJson().extractingPath("renewals").isEqualTo(1);
-        assertThat(dueAt(extended)).isEqualTo(dueAt(reservation).plus(Duration.ofDays(reservationHoldDays)));
+        Instant reservedUntil = ControllerTestUtils.extractDueAtFromResponse(reservation);
+        assertThat(ControllerTestUtils.extractDueAtFromResponse(extended))
+                .isEqualTo(reservedUntil.plus(Duration.ofDays(reservationHoldDays)));
         assertThat(mockMvcTester.post().uri("/api/reservations/" + copyId + "/extend").session(session))
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
@@ -242,11 +242,6 @@ class ReservationControllerTest extends IntegrationTest {
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.FORBIDDEN);
-    }
-
-    private static Instant dueAt(MvcTestResult result) throws Exception {
-        JsonNode body = new ObjectMapper().readTree(result.getResponse().getContentAsString());
-        return Instant.parse(body.get("dueAt").asString());
     }
 
     private String createBookWithCopies(int copies) {

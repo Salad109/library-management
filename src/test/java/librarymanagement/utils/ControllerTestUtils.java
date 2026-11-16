@@ -4,6 +4,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Instant;
+
 public final class ControllerTestUtils {
     private ControllerTestUtils() {
     }
@@ -20,5 +22,12 @@ public final class ControllerTestUtils {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.get(0).get("id").asInt();
+    }
+
+    public static Instant extractDueAtFromResponse(MvcTestResult result) throws Exception {
+        String responseBody = result.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return Instant.parse(jsonNode.get("dueAt").asString());
     }
 }

@@ -34,6 +34,11 @@ GET http://localhost:8080/api/admin/copies?customerLastName=mama
 
 ###
 
+### Get borrowed copies past their due date
+GET http://localhost:8080/api/admin/copies?overdue=true
+
+###
+
 ### Create copies of a book
 POST http://localhost:8080/api/admin/copies
 X-XSRF-TOKEN: example-token

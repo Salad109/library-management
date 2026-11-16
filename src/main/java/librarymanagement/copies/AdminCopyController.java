@@ -31,15 +31,16 @@ public class AdminCopyController {
 
     @Operation(summary = "Get copies, optionally filtered",
             description = "Filters combine. title and customerLastName match case-insensitive substrings; " +
-                    "blank filters are ignored.")
+                    "blank filters are ignored. overdue=true lists only borrowed copies past their due date.")
     @GetMapping("/api/admin/copies")
     public Page<CopyResponse> getCopies(@RequestParam(required = false) String isbn,
                                         @RequestParam(required = false) String title,
                                         @RequestParam(required = false) Long customerId,
                                         @RequestParam(required = false) String customerLastName,
+                                        @RequestParam(defaultValue = "false") boolean overdue,
                                         @ParameterObject @SortDefault("id") Pageable pageable) {
         return copyService.getCopies(blankToNull(isbn), blankToNull(title), customerId, blankToNull(customerLastName),
-                pageable);
+                overdue, pageable);
     }
 
     @GetMapping("/api/admin/copies/{id}")

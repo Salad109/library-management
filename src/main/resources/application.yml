@@ -65,3 +65,6 @@ library:
     max-extensions: 1
     # How often expired reservations are released
     expiry-cron: "0 * * * * *"
+  loans:
+    # Days until a checked-out copy is due
+    period-days: 28

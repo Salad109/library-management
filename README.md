@@ -12,6 +12,7 @@ reservations, and librarian workflow management.
 - Copy tracking with status management (available, borrowed, reserved, lost)
 - Borrowing and reservation system with state transition validation
 - Reservations expire after 3 days unless picked up; customers can extend once
+- Loans are due after 28 days; librarians can renew them, and overdue loans stand out
 - Customer management with offline and online account separation
 - Role-based access control (Librarian vs Customer vs Public)
 - Optimistic locking and retry mechanisms to prevent concurrency issues
@@ -96,7 +97,7 @@ Create, view, extend and cancel your reservations
 
 ### Desk Operations (LIBRARIAN role)
 
-Handle checkouts, returns, and mark items as lost
+Handle checkouts, renewals, returns, and mark items as lost; find overdue loans
 
 ### Admin Operations (LIBRARIAN role)
 
@@ -136,6 +137,7 @@ exampleRequests/
 - [x] Customer management
 - [x] Borrowing and reservation system with customers
 - [x] Reservation expiry with one customer extension
+- [x] Loan due dates with librarian renewals
 - [x] Authentication and authorization with Spring Security
 - [x] Password hashing and secure user management
 - [x] Role-based access control (Librarian vs Customer)

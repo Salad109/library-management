@@ -23,7 +23,7 @@
     "description" : "Librarians can do CRUD operations on copies. Requires LIBRARIAN role"
   }, {
     "name" : "Desk Operations",
-    "description" : "Librarians can manage copy checkouts, returns, and lost copies. Requires LIBRARIAN role"
+    "description" : "Librarians can manage copy checkouts, renewals, returns, and lost copies. Requires LIBRARIAN role"
   } ],
   "paths" : {
     "/api/admin/customers/{id}" : {
@@ -302,6 +302,36 @@
         }
       }
     },
+    "/api/desk/renew" : {
+      "post" : {
+        "tags" : [ "Desk Operations" ],
+        "summary" : "Renew a loan",
+        "description" : "Desk operation. Librarians can renew a loan as many times as needed, overdue ones too. It's then due 28 days from now. Requires LIBRARIAN role",
+        "operationId" : "renewLoan",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CopyRenewRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CopyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/desk/mark-lost" : {
       "post" : {
         "tags" : [ "Desk Operations" ],
@@ -336,7 +366,7 @@
       "post" : {
         "tags" : [ "Desk Operations" ],
         "summary" : "Checkout a copy to a customer",
-        "description" : "Desk operation. Librarians can checkout a copy to a customer. The copy must be either available or reserved by the specific customer. Requires LIBRARIAN role",
+        "description" : "Desk operation. Librarians can checkout a copy to a customer. The copy must be either available or reserved by the specific customer. The loan is due 28 days later. Requires LIBRARIAN role",
         "operationId" : "checkout",
         "requestBody" : {
           "content" : {
@@ -511,7 +541,7 @@
       "get" : {
         "tags" : [ "Admin Copy Operations" ],
         "summary" : "Get copies, optionally filtered",
-        "description" : "Filters combine. title and customerLastName match case-insensitive substrings; blank filters are ignored.",
+        "description" : "Filters combine. title and customerLastName match case-insensitive substrings; blank filters are ignored. overdue=true lists only borrowed copies past their due date.",
         "operationId" : "getCopies",
         "parameters" : [ {
           "name" : "isbn",
@@ -541,6 +571,14 @@
           "required" : false,
           "schema" : {
             "type" : "string"
+          }
+        }, {
+          "name" : "overdue",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean",
+            "default" : false
           }
         }, {
           "name" : "page",
@@ -1237,6 +1275,20 @@
         "required" : [ "email", "role" ]
       },
       "CopyReturnRequest" : {
+        "type" : "object",
+        "properties" : {
+          "copyId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "customerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "copyId", "customerId" ]
+      },
+      "CopyRenewRequest" : {
         "type" : "object",
         "properties" : {
           "copyId" : {
