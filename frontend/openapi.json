@@ -306,7 +306,7 @@
       "post" : {
         "tags" : [ "Desk Operations" ],
         "summary" : "Renew a loan",
-        "description" : "Desk operation. Librarians can renew a loan as many times as needed, overdue ones too. It's then due 28 days from now. Requires LIBRARIAN role",
+        "description" : "Desk operation. Librarians can renew any loan. It'll then be due 28 days from now. Requires LIBRARIAN role",
         "operationId" : "renewLoan",
         "requestBody" : {
           "content" : {
