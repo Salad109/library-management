@@ -5,6 +5,7 @@
     import Modal from './components/Modal.svelte'
     import Navbar from './components/Navbar.svelte'
     import Pagination from './components/Pagination.svelte'
+    import Toast from './components/Toast.svelte'
 
     const params = new URLSearchParams(location.search)
     const q = params.get('q')?.trim() ?? ''
@@ -12,9 +13,11 @@
 
     let customers = $state<PagedModelCustomerResponse>()
     let error = $state('')
+    let notice = $state('')
     let addedCustomer = $state<CustomerResponse>()
-    let activationCode = $state<ActivationCodeResponse>()
     let activationCustomer = $state<CustomerResponse>()
+    let activationCode = $state<ActivationCodeResponse>()
+    let activationError = $state<Error>()
 
     let formOpen = $state(false)
     let editing = $state(false)
@@ -63,6 +66,7 @@
     async function save(event: SubmitEvent) {
         event.preventDefault()
         formError = undefined
+        notice = ''
         addedCustomer = undefined
         try {
             if (editing) {
@@ -70,6 +74,7 @@
                     path: {id: id as number},
                     body: {firstName: firstName, lastName: lastName, email: email},
                 })
+                notice = `Saved ${firstName} ${lastName}`
             } else {
                 const response = await createCustomer({body: {firstName: firstName, lastName: lastName}})
                 addedCustomer = response.data
@@ -81,15 +86,16 @@
         }
     }
 
+    // Shown in a dialog
     async function generateCode(customer: CustomerResponse) {
-        error = ''
+        activationCustomer = customer
         activationCode = undefined
+        activationError = undefined
         try {
             const response = await generateActivationCode({path: {id: customer.id}})
             activationCode = response.data
-            activationCustomer = customer
         } catch (e) {
-            error = (e as Error).message
+            activationError = e as Error
         }
     }
 
@@ -121,13 +127,8 @@
             <button class="btn btn-sm" onclick={() => generateCode(customer)}>Generate activation code</button>
         </div>
     {/if}
-    {#if activationCode && activationCustomer}
-        <div class="alert alert-success mb-4 block">
-            <p>Activation code for {fullName(activationCustomer)}: <code
-                    class="text-2xl">{activationCode.activationCode}</code></p>
-            <p>Valid until {new Date(activationCode.expiresAt).toLocaleString()}. Generating a new code replaces this
-                one.</p>
-        </div>
+    {#if notice}
+        <Toast message={notice} onclose={() => (notice = '')}/>
     {/if}
 
     {#if customers}
@@ -193,5 +194,21 @@
                 <button class="btn btn-primary" type="submit">Save</button>
             </div>
         </form>
+    </Modal>
+{/if}
+{#if activationCustomer}
+    <Modal title="Activation Code" onclose={() => (activationCustomer = undefined)}>
+        {#if activationError}
+            <div class="alert alert-error mb-4">{activationError.message}</div>
+        {/if}
+        {#if activationCode}
+            <p class="mb-3">For {fullName(activationCustomer)}:</p>
+            <p class="mb-3"><code class="text-2xl">{activationCode.activationCode}</code></p>
+            <p class="mb-3">Valid until {new Date(activationCode.expiresAt).toLocaleString()}. Generating a new code
+                replaces this one.</p>
+        {/if}
+        <div class="modal-action">
+            <button class="btn" type="button" onclick={() => (activationCustomer = undefined)}>Close</button>
+        </div>
     </Modal>
 {/if}

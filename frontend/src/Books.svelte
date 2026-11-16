@@ -5,6 +5,7 @@
     import Modal from './components/Modal.svelte'
     import Navbar from './components/Navbar.svelte'
     import Pagination from './components/Pagination.svelte'
+    import Toast from './components/Toast.svelte'
 
     const params = new URLSearchParams(location.search)
     const q = params.get('q')?.trim() ?? ''
@@ -21,6 +22,7 @@
     let title = $state('')
     let year = $state<number | null>(null)
     let authors = $state('')
+    let deleting = $state<BookResponse | null>(null)
 
     async function load() {
         try {
@@ -69,6 +71,7 @@
                     path: {isbn: isbn},
                     body: {title: title, publicationYear: publicationYear, authorNames: names},
                 })
+                notice = `Saved "${title}"`
             } else {
                 await createBook({
                     body: {isbn: isbn, title: title, publicationYear: publicationYear, authorNames: names},
@@ -82,15 +85,23 @@
         }
     }
 
-    async function remove(book: BookResponse) {
-        if (!confirm(`Are you sure you want to delete "${book.title}"?`)) return
-        error = ''
+    function openDelete(book: BookResponse) {
+        formError = undefined
+        deleting = book
+    }
+
+    // A failure stays in the dialog
+    async function remove(event: SubmitEvent, book: BookResponse) {
+        event.preventDefault()
+        formError = undefined
         notice = ''
         try {
             await deleteBook({path: {isbn: book.isbn}})
+            notice = `Deleted "${book.title}"`
+            deleting = null
             await load()
         } catch (e) {
-            error = (e as Error).message
+            formError = e as Error
         }
     }
 
@@ -115,7 +126,7 @@
         <div class="alert alert-error mb-4">{error}</div>
     {/if}
     {#if notice}
-        <div class="alert alert-success mb-4">{notice}</div>
+        <Toast message={notice} onclose={() => (notice = '')}/>
     {/if}
 
     {#if books}
@@ -142,7 +153,7 @@
                     <td>{book.availableCopies}</td>
                     <td>
                         <button class="btn btn-sm btn-warning" onclick={() => openEdit(book)}>Edit</button>
-                        <button class="btn btn-sm btn-error" onclick={() => remove(book)}>Delete</button>
+                        <button class="btn btn-sm btn-error" onclick={() => openDelete(book)}>Delete</button>
                     </td>
                 </tr>
             {/each}
@@ -182,6 +193,21 @@
             <div class="modal-action">
                 <button class="btn" type="button" onclick={() => (formOpen = false)}>Cancel</button>
                 <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+        </form>
+    </Modal>
+{/if}
+{#if deleting}
+    {@const book = deleting}
+    <Modal title="Delete Book" onclose={() => (deleting = null)}>
+        <form onsubmit={(event) => remove(event, book)}>
+            {#if formError}
+                <div class="alert alert-error mb-4">{formError.message}</div>
+            {/if}
+            <p class="mb-3">Delete "{book.title}" (ISBN: {book.isbn})?</p>
+            <div class="modal-action">
+                <button class="btn" type="button" onclick={() => (deleting = null)}>Cancel</button>
+                <button class="btn btn-error" type="submit">Delete</button>
             </div>
         </form>
     </Modal>

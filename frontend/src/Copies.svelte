@@ -5,6 +5,7 @@
     import Modal from './components/Modal.svelte'
     import Navbar from './components/Navbar.svelte'
     import Pagination from './components/Pagination.svelte'
+    import Toast from './components/Toast.svelte'
 
     const searchTypes = [
         {value: 'title', label: 'Book title'},
@@ -25,7 +26,25 @@
     let error = $state('')
     let notice = $state('')
 
-    let dialog = $state<'checkout' | 'return' | 'renew' | 'add' | null>(null)
+    type Action = 'checkout' | 'return' | 'renew' | 'add' | 'lost'
+
+    // The top bar's buttons
+    type ActionEntry = { action: Action; label: string; buttonClass: string; title: string; submitLabel: string }
+    const actions: ActionEntry[] = [
+        {action: 'checkout', label: 'Checkout', buttonClass: 'btn-success', title: 'Checkout Copy',
+            submitLabel: 'Checkout'},
+        {action: 'return', label: 'Return', buttonClass: 'btn-warning', title: 'Return Copy', submitLabel: 'Return'},
+        {action: 'renew', label: 'Renew', buttonClass: 'btn-secondary', title: 'Renew Loan', submitLabel: 'Renew'},
+        {action: 'add', label: 'Add Copies', buttonClass: 'btn-info', title: 'Add Copies', submitLabel: 'Add'},
+        {action: 'lost', label: 'Mark Lost', buttonClass: 'btn-error', title: 'Mark Copy Lost',
+            submitLabel: 'Mark Lost'},
+    ]
+    const rowActions = actions.filter((entry) => entry.action !== 'add')
+
+    // The clicked button's entry; null while no dialog is open
+    let dialog = $state<ActionEntry | null>(null)
+    // The copy whose row button opened the dialog, null when a top-bar button did
+    let rowCopy = $state<CopyResponse | null>(null)
     let formError = $state<Error>()
     let customerId = $state<number | null>(null)
     let copyId = $state<number | null>(null)
@@ -65,18 +84,27 @@
         }
     }
 
-    function openDesk(action: 'checkout' | 'return' | 'renew') {
-        formError = undefined
-        customerId = null
-        copyId = null
-        dialog = action
+    // Whether a row's button applies to that copy's status
+    function allowed(action: Action, copy: CopyResponse) {
+        if (action === 'checkout') return copy.status === CopyStatus.AVAILABLE || copy.status === CopyStatus.RESERVED
+        if (action === 'return' || action === 'renew') return copy.status === CopyStatus.BORROWED
+        return copy.status !== CopyStatus.LOST
     }
 
-    function openAdd() {
+    function openDialog(entry: ActionEntry, copy: CopyResponse | null) {
         formError = undefined
+        rowCopy = copy
+        copyId = copy ? copy.id : null
+        customerId = copy && copy.customer ? copy.customer.id : null
         isbn = ''
         quantity = 1
-        dialog = 'add'
+        dialog = entry
+    }
+
+    // Checkout, return and renew need a customer, unless the row's copy already has one
+    function asksCustomer() {
+        if (dialog === null || dialog.action === 'add' || dialog.action === 'lost') return false
+        return rowCopy === null || rowCopy.customer === undefined
     }
 
     // Runs a dialog's write, then closes the dialog and refetches; a failure stays in the dialog
@@ -94,44 +122,20 @@
         }
     }
 
-    function submitDesk(event: SubmitEvent) {
-        const body = {copyId: copyId as number, customerId: customerId as number}
-        if (dialog === 'checkout') {
-            submit(event, () => checkout({body: body}), 'Checkout completed successfully')
-        } else if (dialog === 'return') {
-            submit(event, () => returnCopy({body: body}), 'Return completed successfully')
+    function submitDialog(event: SubmitEvent) {
+        const action = dialog?.action
+        const deskBody = {copyId: copyId as number, customerId: customerId as number}
+        if (action === 'checkout') {
+            submit(event, () => checkout({body: deskBody}), 'Checkout completed successfully')
+        } else if (action === 'return') {
+            submit(event, () => returnCopy({body: deskBody}), 'Return completed successfully')
+        } else if (action === 'renew') {
+            submit(event, () => renewLoan({body: deskBody}), 'Loan renewed successfully')
+        } else if (action === 'add') {
+            const addBody = {bookIsbn: isbn, quantity: quantity as number}
+            submit(event, () => createCopies({body: addBody}), 'Copies added successfully')
         } else {
-            submit(event, () => renewLoan({body: body}), 'Loan renewed successfully')
-        }
-    }
-
-    function deskTitle() {
-        if (dialog === 'checkout') return 'Checkout Copy'
-        if (dialog === 'return') return 'Return Copy'
-        return 'Renew Loan'
-    }
-
-    function deskButton() {
-        if (dialog === 'checkout') return 'Checkout'
-        if (dialog === 'return') return 'Return'
-        return 'Renew'
-    }
-
-    function submitAdd(event: SubmitEvent) {
-        const body = {bookIsbn: isbn, quantity: quantity as number}
-        submit(event, () => createCopies({body: body}), 'Copies added successfully')
-    }
-
-    async function markCopyLost(copy: CopyResponse) {
-        if (!confirm(`Mark copy ${copy.id} of "${copy.book.title}" as lost? This can't be undone.`)) return
-        error = ''
-        notice = ''
-        try {
-            await markLost({body: {copyId: copy.id}})
-            notice = 'Copy marked as lost'
-            await load()
-        } catch (e) {
-            error = (e as Error).message
+            submit(event, () => markLost({body: {copyId: copyId as number}}), 'Copy marked as lost')
         }
     }
 
@@ -161,11 +165,12 @@
                 Overdue only
             </label>
         </form>
-        <div>
-            <button class="btn btn-success" onclick={() => openDesk('checkout')}>Checkout</button>
-            <button class="btn btn-warning" onclick={() => openDesk('return')}>Return</button>
-            <button class="btn btn-secondary" onclick={() => openDesk('renew')}>Renew</button>
-            <button class="btn btn-info" onclick={openAdd}>Add Copies</button>
+        <div class="flex flex-wrap gap-1">
+            {#each actions as entry (entry.action)}
+                <button class="btn {entry.buttonClass}" onclick={() => openDialog(entry, null)}>
+                    {entry.label}
+                </button>
+            {/each}
         </div>
     </div>
 
@@ -173,7 +178,7 @@
         <div class="alert alert-error mb-4">{error}</div>
     {/if}
     {#if notice}
-        <div class="alert alert-success mb-4">{notice}</div>
+        <Toast message={notice} onclose={() => (notice = '')}/>
     {/if}
 
     {#if copies}
@@ -217,10 +222,15 @@
                         {/if}
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-error" onclick={() => markCopyLost(copy)}
-                                disabled={copy.status === CopyStatus.LOST}>
-                            Mark Lost
-                        </button>
+                        <div class="flex flex-wrap gap-1">
+                            {#each rowActions as entry (entry.action)}
+                                <button class="btn btn-sm {entry.buttonClass}"
+                                        onclick={() => openDialog(entry, copy)}
+                                        disabled={!allowed(entry.action, copy)}>
+                                    {entry.label}
+                                </button>
+                            {/each}
+                        </div>
                     </td>
                 </tr>
             {/each}
@@ -231,48 +241,55 @@
     {/if}
 </main>
 
-{#if dialog === 'checkout' || dialog === 'return' || dialog === 'renew'}
-    <Modal title={deskTitle()} onclose={() => (dialog = null)}>
-        <form onsubmit={submitDesk}>
+{#if dialog !== null}
+    <Modal title={dialog.title} onclose={() => (dialog = null)}>
+        <form onsubmit={submitDialog}>
             {#if formError}
                 <div class="alert alert-error mb-4">{formError.message}</div>
             {/if}
-            <div class="mb-3">
-                <label class="label mb-1" for="customerId">Customer ID</label>
-                <input class="input w-full" id="customerId" type="number" bind:value={customerId} required/>
-                <FieldError error={formError} field="customerId"/>
-            </div>
-            <div class="mb-3">
-                <label class="label mb-1" for="copyId">Copy ID</label>
-                <input class="input w-full" id="copyId" type="number" bind:value={copyId} required/>
-                <FieldError error={formError} field="copyId"/>
-            </div>
-            <div class="modal-action">
-                <button class="btn" type="button" onclick={() => (dialog = null)}>Cancel</button>
-                <button class="btn btn-primary" type="submit">{deskButton()}</button>
-            </div>
-        </form>
-    </Modal>
-{:else if dialog === 'add'}
-    <Modal title="Add Copies" onclose={() => (dialog = null)}>
-        <form onsubmit={submitAdd}>
-            {#if formError}
-                <div class="alert alert-error mb-4">{formError.message}</div>
+            {#if rowCopy}
+                <p class="mb-3">Copy {rowCopy.id} of "{rowCopy.book.title}"</p>
+                {#if rowCopy.customer}
+                    <p class="mb-3">
+                        Customer: {rowCopy.customer.firstName} {rowCopy.customer.lastName} (ID: {rowCopy.customer.id})
+                    </p>
+                {/if}
             {/if}
-            <div class="mb-3">
-                <label class="label mb-1" for="isbn">Book ISBN</label>
-                <input class="input w-full" id="isbn" bind:value={isbn} required/>
-                <FieldError error={formError} field="bookIsbn"/>
-            </div>
-            <div class="mb-3">
-                <label class="label mb-1" for="quantity">Quantity</label>
-                <input class="input w-full" id="quantity" type="number" min="1" max="100" bind:value={quantity}
-                       required/>
-                <FieldError error={formError} field="quantity"/>
-            </div>
+
+            {#if asksCustomer()}
+                <div class="mb-3">
+                    <label class="label mb-1" for="customerId">Customer ID</label>
+                    <input class="input w-full" id="customerId" type="number" bind:value={customerId} required/>
+                    <FieldError error={formError} field="customerId"/>
+                </div>
+            {/if}
+            {#if dialog.action !== 'add' && rowCopy === null}
+                <div class="mb-3">
+                    <label class="label mb-1" for="copyId">Copy ID</label>
+                    <input class="input w-full" id="copyId" type="number" bind:value={copyId} required/>
+                    <FieldError error={formError} field="copyId"/>
+                </div>
+            {/if}
+            {#if dialog.action === 'add'}
+                <div class="mb-3">
+                    <label class="label mb-1" for="isbn">Book ISBN</label>
+                    <input class="input w-full" id="isbn" bind:value={isbn} required/>
+                    <FieldError error={formError} field="bookIsbn"/>
+                </div>
+                <div class="mb-3">
+                    <label class="label mb-1" for="quantity">Quantity</label>
+                    <input class="input w-full" id="quantity" type="number" min="1" max="100" bind:value={quantity}
+                           required/>
+                    <FieldError error={formError} field="quantity"/>
+                </div>
+            {/if}
+            {#if dialog.action === 'lost'}
+                <p class="mb-3">This can't be undone.</p>
+            {/if}
+
             <div class="modal-action">
                 <button class="btn" type="button" onclick={() => (dialog = null)}>Cancel</button>
-                <button class="btn btn-primary" type="submit">Add</button>
+                <button class="btn btn-primary" type="submit">{dialog.submitLabel}</button>
             </div>
         </form>
     </Modal>
